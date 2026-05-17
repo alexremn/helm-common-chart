@@ -1,6 +1,20 @@
 apiVersion: v2
 name: common
-description: A Helm chart for Kubernetes
+description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "1.4.5"
+version: "1.0.0"
 appVersion: "1.0.0"
+home: https://github.com/alexremn/helm-common-chart
+sources:
+  - https://github.com/alexremn/helm-common-chart
+maintainers:
+  - name: Alex Remniov
+    url: https://remniov.com
+keywords:
+  - common
+  - library
+  - kubernetes
+  - helm
+icon: https://remniov.com/icon.png
+annotations:
+  artifacthub.io/license: Apache-2.0
