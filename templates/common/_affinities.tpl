@@ -15,17 +15,10 @@ Default topologyKey with intelligent fallback mechanism
 Usage: {{ include "common.affinities.topologyKey" (dict "topologyKey" "topology.kubernetes.io/zone") }}
 */}}
 {{- define "common.affinities.topologyKey" -}}
-{{- $defaultTopologyKey := "kubernetes.io/hostname" -}}
-{{- $standardTopologyKeys := list "kubernetes.io/hostname" "topology.kubernetes.io/zone" "topology.kubernetes.io/region" -}}
 {{- if .topologyKey -}}
-  {{- if has .topologyKey $standardTopologyKeys -}}
-    {{- .topologyKey -}}
-  {{- else -}}
-    {{- /* Warn if non-standard topology key is used - this is a no-op in production */ -}}
-    {{- $defaultTopologyKey -}}
-  {{- end -}}
+  {{- .topologyKey -}}
 {{- else -}}
-  {{- $defaultTopologyKey -}}
+  {{- "kubernetes.io/hostname" -}}
 {{- end -}}
 {{- end -}}
 
