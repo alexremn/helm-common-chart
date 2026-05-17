@@ -136,7 +136,9 @@ app.kubernetes.io/name: {{ $svc }}
 {{- if $cmp }}
 app.kubernetes.io/component: {{ $cmp }}
 {{- end }}
-app.kubernetes.io/environment: {{ $env }}
+{{- if $env }}
+helm.sh/environment: {{ $env }}
+{{- end }}
 {{- if $instance }}
 app.kubernetes.io/instance: {{ $instance }}
 {{- end }}
@@ -163,7 +165,6 @@ Usage: {{ include "common.labels.matchLabels" (dict "svc" "my-service" "cmp" "we
 {{- define "common.labels.matchLabels" -}}
 {{- $svc := include "common.appName" . | trim -}}
 {{- $cmp := default "" .cmp -}}
-{{- $env := include "common.environment" . | trim -}}
 {{- $instance := include "common.releaseName" . | trim -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
 {{- $legacy := dig "global" "compat" "legacySelectorLabels" false $values -}}
@@ -171,7 +172,6 @@ app.kubernetes.io/name: {{ $svc }}
 {{- if $cmp }}
 app.kubernetes.io/component: {{ $cmp }}
 {{- end }}
-app.kubernetes.io/environment: {{ $env }}
 {{- if $instance }}
 app.kubernetes.io/instance: {{ $instance }}
 {{- end }}

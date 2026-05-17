@@ -150,23 +150,39 @@ spec:
           - name: metrics
             containerPort: 9090
             protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: "config"
+                optional: true
+            - secretRef:
+                name: "secrets"
+                optional: true
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health_check/full
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 2
+            failureThreshold: 5
+            timeoutSeconds: 3
           livenessProbe:
             httpGet:
-              path: /health
+              path: /health_check/full
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 2
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: web
       imagePullSecrets:
         - name: ghcr-pull
 ---
@@ -208,26 +224,42 @@ spec:
           - name: http
             containerPort: 8081
             protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: "config"
+                optional: true
+            - secretRef:
+                name: "secrets"
+                optional: true
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health_check/full
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 2
+            failureThreshold: 5
+            timeoutSeconds: 3
           livenessProbe:
             httpGet:
-              path: /health
+              path: /health_check/full
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 2
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
           volumeMounts:
             - name: data
               mountPath: /mnt/data
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: stateful
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -277,7 +309,23 @@ spec:
             - -c
           args: 
             - echo features
+          envFrom:
+            - configMapRef:
+                name: "config"
+                optional: true
+            - secretRef:
+                name: "secrets"
+                optional: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
       restartPolicy: "Never"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: run-task
       imagePullSecrets:
         - name: ghcr-pull
 ---
@@ -316,7 +364,23 @@ spec:
                 - -c
               args: 
                 - echo cron features
+              envFrom:
+                - configMapRef:
+                    name: "config"
+                    optional: true
+                - secretRef:
+                    name: "secrets"
+                    optional: true
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
           restartPolicy: "Never"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 3000
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccountName: sync-task
           imagePullSecrets:
             - name: ghcr-pull
 
@@ -375,6 +439,10 @@ spec:
       interval: 1m
       path: /metrics
       port: "metrics"
+      metricRelabelings:
+        - action: drop
+          regex: '(activerecord_query_duration_seconds_bucket|http_response_duration_milliseconds_bucket|rails_view_runtime_seconds_bucket|rails_request_duration_seconds_bucket|rails_db_runtime_seconds_bucket)'
+          sourceLabels: [__name__]
   namespaceSelector:
     matchNames:
       - default

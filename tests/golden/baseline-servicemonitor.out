@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   maxUnavailable: 25%
@@ -15,7 +15,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: sm-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: dev
       app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -26,7 +25,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 automountServiceAccountToken: false
 ---
@@ -38,7 +37,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 data:
 ---
@@ -50,7 +49,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   type: ClusterIP
@@ -66,7 +65,6 @@ spec:
   selector:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
     app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -77,7 +75,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   replicas: 1
@@ -91,14 +89,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: sm-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: dev
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: sm-app
         app.kubernetes.io/component: web
-        app.kubernetes.io/environment: dev
+        helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -114,30 +111,21 @@ spec:
             protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
+            failureThreshold: 3
+            timeoutSeconds: 1
           livenessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
+            failureThreshold: 3
+            timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: web
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1
@@ -148,23 +136,18 @@ metadata:
     
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: sm-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: dev
       app.kubernetes.io/instance: smoke
   endpoints:
     - port: "metrics"
       path: /metrics
       interval: 30s
-      metricRelabelings:
-        - action: drop
-          regex: '(activerecord_query_duration_seconds_bucket|http_response_duration_milliseconds_bucket|rails_view_runtime_seconds_bucket|rails_request_duration_seconds_bucket|rails_db_runtime_seconds_bucket)'
-          sourceLabels: [__name__]
   namespaceSelector:
     matchNames:
       - default

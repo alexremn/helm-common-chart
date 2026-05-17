@@ -4,8 +4,10 @@ PROFILE HELPERS
 Resolves the active profile name and exposes a profile-keyed defaults map.
 
 Profiles let helpers swap previously-hardcoded literals for a lookup. The
-`rails` profile (default) preserves all v1.3.1 behavior. `generic`, `python`,
-and `go` profiles substitute vanilla K8s defaults. See docs/profiles.md.
+`generic` profile (default in v2.x) ships vanilla K8s defaults. The
+`rails` profile is opt-in via `global.profile: rails` for charts
+upgrading from v1.x. `python` and `go` profiles cover other common
+runtimes. See docs/profiles.md.
 =============================================================================
 */}}
 
@@ -13,11 +15,12 @@ and `go` profiles substitute vanilla K8s defaults. See docs/profiles.md.
 Resolve the active profile name.
 Lookup order:
   1. .Values.global.profile
-  2. literal "rails" (preserves v1.3.1 behavior for charts that haven't opted in)
+  2. literal "generic" (vanilla K8s defaults; set `global.profile: rails`
+     to retain v1.x behavior)
 */}}
 {{- define "common.profile" -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- dig "global" "profile" "rails" $values -}}
+{{- dig "global" "profile" "generic" $values -}}
 {{- end -}}
 
 {{/*

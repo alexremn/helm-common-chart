@@ -6,7 +6,7 @@ metadata:
   name: app-critical
   labels:
     app.kubernetes.io/name: pc-app
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 value: 1e+06
 globalDefault: false

@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: ds-app
     app.kubernetes.io/component: logShipper
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   minReadySeconds: 0
@@ -20,14 +20,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: ds-app
       app.kubernetes.io/component: logShipper
-      app.kubernetes.io/environment: dev
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: ds-app
         app.kubernetes.io/component: logShipper
-        app.kubernetes.io/environment: dev
+        helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -40,33 +39,23 @@ spec:
             protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
+            failureThreshold: 3
+            timeoutSeconds: 1
           livenessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
+            failureThreshold: 3
+            timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        seccompProfile:
-          type: RuntimeDefault
       tolerations:
-        -
-          operator: "Exists"
-          effect: "NoSchedule"
-      serviceAccountName: logShipper
+        - effect: NoSchedule
+          operator: Exists
       hostNetwork: true
       hostPID: true

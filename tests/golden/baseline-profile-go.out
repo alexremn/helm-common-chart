@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   maxUnavailable: 25%
@@ -15,7 +15,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -26,7 +25,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 automountServiceAccountToken: false
 ---
@@ -38,7 +37,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 data:
 ---
@@ -50,7 +49,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   accessModes: [ReadWriteOnce]
@@ -66,7 +65,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   type: ClusterIP
@@ -82,7 +81,6 @@ spec:
   selector:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
     app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -93,7 +91,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     service.kubernetes.io/headless: "true"
 spec:
@@ -107,7 +105,6 @@ spec:
   selector:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
 ---
@@ -119,7 +116,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   replicas: 1
@@ -133,14 +130,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: web
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -182,7 +178,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   serviceName: "stateful-headless"
@@ -195,14 +191,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: stateful
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: stateful
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -245,7 +240,7 @@ spec:
         labels:
           app.kubernetes.io/name: features-app
           app.kubernetes.io/component: stateful
-          app.kubernetes.io/environment: production
+          helm.sh/environment: production
           app.kubernetes.io/instance: smoke
       spec: 
         accessModes: [ReadWriteOnce]
@@ -261,7 +256,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: run-task
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   backoffLimit: 0
@@ -270,7 +265,7 @@ spec:
       labels:
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: run-task
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -294,7 +289,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: sync-task
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   schedule: "0 0 * * *"
@@ -309,7 +304,7 @@ spec:
           labels:
             app.kubernetes.io/name: features-app
             app.kubernetes.io/component: sync-task
-            app.kubernetes.io/environment: production
+            helm.sh/environment: production
             app.kubernetes.io/instance: smoke
         spec:
           containers:
@@ -334,7 +329,7 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   
 spec:
@@ -366,14 +361,13 @@ metadata:
   labels:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
   podMetricsEndpoints:
     - filterRunning: true

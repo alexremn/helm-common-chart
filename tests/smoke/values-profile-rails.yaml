@@ -1,0 +1,54 @@
+# Same component surface as values-profile-generic.yaml but with
+# global.profile: rails to assert that the opt-in rails path renders the
+# Rails-flavored defaults: probe path `/health/live`, podMonitor metric
+# relabelings, envFrom phantom configmap/secret (with optional: true), and
+# runAsUser 1000 / runAsGroup 3000.
+name: features-app
+environment: production
+
+global:
+  profile: rails
+  image:
+    registry: ghcr.io
+    repository: example/features-app
+    tag: "3.1.4"
+  imagePullPolicy: Always
+  imagePullSecrets:
+    - name: ghcr-pull
+  ingress:
+    className: nginx
+  hooks:
+    enabled: true
+    weight: "-7"
+  envFrom:
+    configs: []
+    secrets: []
+
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  podMonitor:
+    enabled: true
+  ingress:
+    - name: public
+      domains:
+        - app.example.com
+
+stateful:
+  ports:
+    http: 8081
+  persistence:
+    name: data
+    size: 10Gi
+
+jobs:
+  run_task:
+    command: ["/bin/sh", "-c"]
+    args: ["echo features"]
+
+cronjobs:
+  sync_task:
+    schedule: "0 0 * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron features"]

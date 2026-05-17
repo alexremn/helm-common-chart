@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   maxUnavailable: 25%
@@ -15,7 +15,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: legacy-service
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -26,7 +25,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 automountServiceAccountToken: false
 ---
@@ -38,7 +37,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   annotations:
     werf.io/weight: "-1"
@@ -52,7 +51,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   accessModes: [ReadWriteOnce]
@@ -68,7 +67,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   type: ClusterIP
@@ -80,7 +79,6 @@ spec:
   selector:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
     app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -91,7 +89,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     service.kubernetes.io/headless: "true"
 spec:
@@ -105,7 +103,6 @@ spec:
   selector:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
 ---
@@ -117,7 +114,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   annotations:
     werf.io/no-activity-timeout: "6m"
@@ -134,14 +131,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: legacy-service
       app.kubernetes.io/component: web
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: legacy-service
         app.kubernetes.io/component: web
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -154,30 +150,21 @@ spec:
             protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
+            failureThreshold: 3
+            timeoutSeconds: 1
           livenessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
+            failureThreshold: 3
+            timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: web
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -187,7 +174,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: stateful
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   annotations:
     werf.io/no-activity-timeout: "6m"
@@ -203,14 +190,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: legacy-service
       app.kubernetes.io/component: stateful
-      app.kubernetes.io/environment: production
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         app.kubernetes.io/name: legacy-service
         app.kubernetes.io/component: stateful
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -223,33 +209,24 @@ spec:
             protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
+            failureThreshold: 3
+            timeoutSeconds: 1
           livenessProbe:
             httpGet:
-              path: /health_check/full
+              path: /healthz
               port: http
             initialDelaySeconds: 0
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
+            failureThreshold: 3
+            timeoutSeconds: 1
           volumeMounts:
             - name: data
               mountPath: /mnt/data
       terminationGracePeriodSeconds: 30
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: stateful
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -260,7 +237,7 @@ spec:
         labels:
           app.kubernetes.io/name: legacy-service
           app.kubernetes.io/component: stateful
-          app.kubernetes.io/environment: production
+          helm.sh/environment: production
           app.kubernetes.io/instance: smoke
       spec: 
         accessModes: [ReadWriteOnce]
@@ -276,7 +253,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: run-task
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   backoffLimit: 0
@@ -285,7 +262,7 @@ spec:
       labels:
         app.kubernetes.io/name: legacy-service
         app.kubernetes.io/component: run-task
-        app.kubernetes.io/environment: production
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
@@ -297,16 +274,7 @@ spec:
             - -c
           args: 
             - echo legacy job
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
       restartPolicy: "Never"
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: run-task
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -316,7 +284,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: sync-task
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   schedule: "0 * * * *"
@@ -331,7 +299,7 @@ spec:
           labels:
             app.kubernetes.io/name: legacy-service
             app.kubernetes.io/component: sync-task
-            app.kubernetes.io/environment: production
+            helm.sh/environment: production
             app.kubernetes.io/instance: smoke
         spec:
           containers:
@@ -343,16 +311,7 @@ spec:
                 - -c
               args: 
                 - echo legacy cron
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
           restartPolicy: "Never"
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 3000
-            seccompProfile:
-              type: RuntimeDefault
-          serviceAccountName: sync-task
 
 ---
 # Source: common-smoke/templates/all.yaml
@@ -363,7 +322,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   
 spec:
@@ -394,7 +353,7 @@ metadata:
   labels:
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
-    app.kubernetes.io/environment: production
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
   annotations: 
     

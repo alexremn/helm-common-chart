@@ -6,7 +6,7 @@ metadata:
   name: cluster-iam
   labels:
     app.kubernetes.io/name: ta-app
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   podIdentity: 
@@ -19,7 +19,7 @@ metadata:
   name: redis-auth
   labels:
     app.kubernetes.io/name: ta-app
-    app.kubernetes.io/environment: dev
+    helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
   secretTargetRef: 
