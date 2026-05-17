@@ -59,7 +59,6 @@ rails:
   service:
     type: ClusterIP
   pvc:
-    storageClass: gp3
     accessMode: ReadWriteOnce
   securityContext:
     pod:
@@ -87,7 +86,6 @@ generic:
   service:
     type: ClusterIP
   pvc:
-    storageClass: gp3
     accessMode: ReadWriteOnce
 python:
   probe:
@@ -107,7 +105,6 @@ python:
   service:
     type: ClusterIP
   pvc:
-    storageClass: gp3
     accessMode: ReadWriteOnce
 go:
   probe:
@@ -127,6 +124,5 @@ go:
   service:
     type: ClusterIP
   pvc:
-    storageClass: gp3
     accessMode: ReadWriteOnce
 {{- end -}}

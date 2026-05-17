@@ -14,7 +14,9 @@ accessModes: [{{ default "ReadWriteOnce" .accessMode }}]
 resources:
   requests:
     storage: {{ required "Volume size is required" .size | quote }}
-storageClassName: {{ default "gp3" .storageClass }}
+{{- with .storageClass }}
+storageClassName: {{ . }}
+{{- end }}
 {{- with .selector }}
 selector:
   {{- toYaml . | nindent 2 }}

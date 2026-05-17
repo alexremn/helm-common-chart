@@ -57,7 +57,6 @@ spec:
   resources:
     requests:
       storage: "10Gi"
-  storageClassName: gp3
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -286,7 +285,6 @@ spec:
         resources:
           requests:
             storage: "10Gi"
-        storageClassName: gp3
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
