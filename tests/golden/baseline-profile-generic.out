@@ -186,7 +186,7 @@ spec:
           key: CriticalAppsOnly
           operator: Equal
           value: "true"
-        - key: ops.hubstaff.com/drain-safe
+        - key: ops.example.com/drain-safe
           operator: Exists
       affinity:
         nodeAffinity:

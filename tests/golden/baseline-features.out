@@ -124,7 +124,7 @@ metadata:
     app.kubernetes.io/environment: production
     app.kubernetes.io/instance: smoke
   annotations:
-    hubstaff.com/initial-replicas: "3"
+    example.com/initial-replicas: "3"
 spec:
   minReadySeconds: 10
   strategy:
