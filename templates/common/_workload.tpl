@@ -234,43 +234,27 @@ restartPolicy: {{ . | quote }}
 {{- if $includeTerminationGracePeriod }}
 terminationGracePeriodSeconds: {{ default 30 $component.terminationGracePeriod }}
 {{- end }}
-{{- $podSec := include "common.pod.securityContext" (dict "root" $root "component" $component) | trim }}
-{{- if $podSec }}
-{{ $podSec }}
+{{- /* Table-driven emission of pod-spec sections. Each entry is the
+       already-rendered & trimmed section body; empty entries are skipped.
+       Order is significant — it dictates the YAML field order in the
+       rendered pod spec. */ -}}
+{{- $sections := list
+    (include "common.pod.securityContext" (dict "root" $root "component" $component) | trim)
+    (include "common.tolerations" (dict "component" $component "root" $root) | trim)
+    (include "common.affinity" (dict "val" $component "svc" $svc "cmp" $cmp "env" $env) | trim)
+    (include "common.serviceAccount" (dict "component" $component "root" $root "cmp" $cmp) | trim)
+    (include "common.volumes" $component | trim)
+    (include "common.nodeSelector" $component | trim)
+    (include "common.imagePullSecrets" (dict "component" $component "root" $root) | trim)
+-}}
+{{- if $includeTopologySpreadConstraints -}}
+  {{- $sections = append $sections (include "common.topologySpreadConstraints" $component | trim) -}}
+{{- end -}}
+{{- $sections = append $sections (include "common.podRuntime" $component | trim) -}}
+{{- range $section := $sections }}
+{{- if $section }}
+{{ $section }}
 {{- end }}
-{{- $tol := include "common.tolerations" (dict "component" $component "root" $root) | trim }}
-{{- if $tol }}
-{{ $tol }}
-{{- end }}
-{{- $aff := include "common.affinity" (dict "val" $component "svc" $svc "cmp" $cmp "env" $env) | trim }}
-{{- if $aff }}
-{{ $aff }}
-{{- end }}
-{{- $sa := include "common.serviceAccount" (dict "component" $component "root" $root "cmp" $cmp) | trim }}
-{{- if $sa }}
-{{ $sa }}
-{{- end }}
-{{- $vol := include "common.volumes" $component | trim }}
-{{- if $vol }}
-{{ $vol }}
-{{- end }}
-{{- $ns := include "common.nodeSelector" $component | trim }}
-{{- if $ns }}
-{{ $ns }}
-{{- end }}
-{{- $ips := include "common.imagePullSecrets" (dict "component" $component "root" $root) | trim }}
-{{- if $ips }}
-{{ $ips }}
-{{- end }}
-{{- if $includeTopologySpreadConstraints }}
-{{- $tsc := include "common.topologySpreadConstraints" $component | trim }}
-{{- if $tsc }}
-{{ $tsc }}
-{{- end }}
-{{- end }}
-{{- $pr := include "common.podRuntime" $component | trim }}
-{{- if $pr }}
-{{ $pr }}
 {{- end }}
 {{- with $component.extraPodConfig }}
 {{ toYaml . }}
