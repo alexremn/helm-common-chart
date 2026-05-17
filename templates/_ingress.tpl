@@ -140,8 +140,7 @@ spec:
 {{- range $type, $conf := $ingressValues }}
 {{- if and (ne $type "annotations") (kindIs "map" $conf) (ne (dig "enabled" true $conf) false) $conf.domains }}
 {{- $ingressName := printf "%s-%s-ingress" $cmp $type | replace "_" "-" }}
-{{- $classNameDefault := coalesce (get (dict "internal" "nginx-internal" "external" "nginx") $type) (dig "global" "ingress" "className" nil $values) }}
-{{- $className := coalesce $conf.className $classNameDefault }}
+{{- $className := coalesce $conf.className (dig "global" "ingress" "className" nil $values) }}
 
 ---
 apiVersion: networking.k8s.io/v1

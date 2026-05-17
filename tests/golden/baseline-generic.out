@@ -382,7 +382,6 @@ metadata:
     app.kubernetes.io/instance: smoke
   
 spec:
-  ingressClassName: nginx
   
   tls:
     - hosts:
