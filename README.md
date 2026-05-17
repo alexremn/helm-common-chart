@@ -69,6 +69,7 @@ Common helper library (`templates/common/`): workload composition, container bui
 
 ## Docs
 
+- [Breaking changes](./BREAKING.md) — version-by-version migration notes
 - [Values reference](./docs/values-reference.md) — top-level keys grouped by concern
 - [Examples](./examples/) — working `values.*.yaml` per feature
 - [Contributing](./CONTRIBUTING.md) — dev setup, tests, golden workflow
