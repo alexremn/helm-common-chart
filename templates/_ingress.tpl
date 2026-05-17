@@ -101,12 +101,36 @@ Per-entry annotations override these via mergeOverwrite in `ingress.annotations`
 */}}
 {{- $globalIngressAnnotations := dig "global" "ingress" "annotations" dict $values }}
 
-{{- if $ingressValues }}
-{{- if kindIs "slice" $ingressValues }}
-{{- range $index, $conf := $ingressValues }}
-{{- if and (ne (dig "enabled" true $conf) false) $conf.domains }}
-{{- $entryName := default (printf "ingress-%d" $index) $conf.name }}
-{{- $ingressName := printf "%s-%s" $cmp $entryName | replace "_" "-" }}
+{{- if $ingressValues -}}
+{{- /* Normalize slice + map inputs to a uniform list of entries so a single
+       rendering loop covers both shapes. Each entry carries:
+         name             — final Ingress object name
+         conf             — the per-entry config map
+         baseAnnotations  — the annotations layered under per-entry overrides
+*/ -}}
+{{- $entries := list -}}
+{{- if kindIs "slice" $ingressValues -}}
+  {{- range $index, $conf := $ingressValues -}}
+    {{- if and (ne (dig "enabled" true $conf) false) $conf.domains -}}
+      {{- $entryName := default (printf "ingress-%d" $index) $conf.name -}}
+      {{- $name := printf "%s-%s" $cmp $entryName | replace "_" "-" -}}
+      {{- $entries = append $entries (dict "name" $name "conf" $conf "baseAnnotations" $globalIngressAnnotations) -}}
+    {{- end -}}
+  {{- end -}}
+{{- else if kindIs "map" $ingressValues -}}
+  {{- $componentBaseAnnotations := dig "annotations" dict $ingressValues -}}
+  {{- $mapBaseAnnotations := mergeOverwrite (deepCopy $globalIngressAnnotations) $componentBaseAnnotations -}}
+  {{- range $type, $conf := $ingressValues -}}
+    {{- if and (ne $type "annotations") (kindIs "map" $conf) (ne (dig "enabled" true $conf) false) $conf.domains -}}
+      {{- $name := printf "%s-%s-ingress" $cmp $type | replace "_" "-" -}}
+      {{- $entries = append $entries (dict "name" $name "conf" $conf "baseAnnotations" $mapBaseAnnotations) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range $entry := $entries }}
+{{- $conf := $entry.conf }}
+{{- $ingressName := $entry.name }}
 {{- $className := coalesce $conf.className (dig "global" "ingress" "className" nil $values) }}
 
 ---
@@ -116,7 +140,7 @@ metadata:
   name: {{ $ingressName }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- include "ingress.annotations" (dict "baseAnnotations" $globalIngressAnnotations "conf" $conf) | nindent 2 }}
+  {{- include "ingress.annotations" (dict "baseAnnotations" $entry.baseAnnotations "conf" $conf) | nindent 2 }}
 spec:
   {{- if $className }}
   ingressClassName: {{ $className }}
@@ -132,41 +156,6 @@ spec:
   {{- with $conf.extraConfig }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-{{- end }}
-{{- end }}
-{{- else if kindIs "map" $ingressValues }}
-{{- $componentBaseAnnotations := dig "annotations" dict $ingressValues }}
-{{- $baseAnnotations := mergeOverwrite (deepCopy $globalIngressAnnotations) $componentBaseAnnotations }}
-{{- range $type, $conf := $ingressValues }}
-{{- if and (ne $type "annotations") (kindIs "map" $conf) (ne (dig "enabled" true $conf) false) $conf.domains }}
-{{- $ingressName := printf "%s-%s-ingress" $cmp $type | replace "_" "-" }}
-{{- $className := coalesce $conf.className (dig "global" "ingress" "className" nil $values) }}
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ $ingressName }}
-  labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- include "ingress.annotations" (dict "baseAnnotations" $baseAnnotations "conf" $conf) | nindent 2 }}
-spec:
-  {{- if $className }}
-  ingressClassName: {{ $className }}
-  {{- end }}
-  {{- if $conf.tls | default true }}
-  {{- include "ingress.tls" (dict "conf" $conf "secretName" $ingressName) | nindent 2 }}
-  {{- end }}
-  {{- include "ingress.rules" (dict "conf" $conf "cmp" $cmp) | nindent 2 }}
-  {{- with $conf.defaultBackend }}
-  defaultBackend:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $conf.extraConfig }}
-  {{- toYaml . | nindent 2 }}
-  {{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
