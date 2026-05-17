@@ -118,14 +118,12 @@ Usage: {{ include "common.probe" .Values.myComponent }}
          profile-default  →  .Values.global.probe.<field>  →  .probes.<field>  →  .probes.<phase>.<field>
        Uses `dig` (not `coalesce`) so falsy-but-valid values (0, []) are honored. */ -}}
 {{- $probe := dict }}
-{{- $_ := set $probe "type" (dig "type" (dig "type" (dig "type" $probeDefaults.type $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "path" (dig "path" (dig "path" (dig "path" $probeDefaults.path $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "command" (dig "command" (dig "command" (dig "command" $probeDefaults.command $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "port" (dig "port" (dig "port" (dig "port" $probeDefaults.port $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "initialDelaySeconds" (dig "initialDelaySeconds" (dig "initialDelaySeconds" (dig "initialDelaySeconds" $probeDefaults.initialDelaySeconds $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "periodSeconds" (dig "periodSeconds" (dig "periodSeconds" (dig "periodSeconds" $probeDefaults.periodSeconds $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "failureThreshold" (dig "failureThreshold" (dig "failureThreshold" (dig "failureThreshold" $probeDefaults.failureThreshold $globalProbe) $shared) $perPhase) }}
-{{- $_ = set $probe "timeoutSeconds" (dig "timeoutSeconds" (dig "timeoutSeconds" (dig "timeoutSeconds" $probeDefaults.timeoutSeconds $globalProbe) $shared) $perPhase) }}
+{{- $fields := list "type" "path" "command" "port" "initialDelaySeconds" "periodSeconds" "failureThreshold" "timeoutSeconds" }}
+{{- range $field := $fields }}
+  {{- $defaultVal := index $probeDefaults $field }}
+  {{- $resolved := dig $field (dig $field (dig $field $defaultVal $globalProbe) $shared) $perPhase }}
+  {{- $_ := set $probe $field $resolved }}
+{{- end }}
 
 {{- if eq $probe.type "exec" -}}
 exec:
