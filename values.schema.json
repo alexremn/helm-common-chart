@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hubstaff.com/helm/common/values.schema.json",
+  "$id": "https://github.com/alexremn/helm-common-chart/values.schema.json",
   "title": "common (library chart) values",
   "description": "Library chart -- a consumer chart's values are validated against this schema. The library itself only ships an empty `global: {}`.",
   "type": "object",
