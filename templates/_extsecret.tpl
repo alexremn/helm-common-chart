@@ -70,7 +70,7 @@ metadata:
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
   secretStoreRef:
-    name: {{ dig "secretStore" "secrets-manager" $val }}
+    name: {{ required (printf "secrets.%s.secretStore is required for ExternalSecret" $name) (dig "secretStore" "" $val) }}
     kind: {{ dig "secretStoreKind" "ClusterSecretStore" $val }}
   target:
     name: {{ default $name $val.secretName }}

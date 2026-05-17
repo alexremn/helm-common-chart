@@ -33,6 +33,7 @@ cronjobs:
 
 secrets:
   legacy-secrets:
+    secretStore: example-store
     secretKey: /legacy/app
     properties:
       - TOKEN

@@ -452,7 +452,7 @@ metadata:
 spec:
   refreshInterval: "10000h"
   secretStoreRef:
-    name: secrets-manager
+    name: example-store
     kind: ClusterSecretStore
   target:
     name: web-secrets
