@@ -50,6 +50,47 @@ Usage: {{ include "common.image.toString" $imgValue }}
 {{- end }}
 
 {{/*
+Render workload-level annotations (werf + user annotations + optional
+extra key/value), or emit nothing when no source is present.
+
+Used by Deployment and StatefulSet renderers (and any future workload
+kind that follows the same contract).
+
+Parameters:
+  root      — chart root (passed to common.annotations.werf)
+  component — component values map (.annotations is honored)
+  extra     — optional dict of additional `key: value` annotations to
+              merge on top (e.g. `werf.io/replicas-on-creation`)
+
+Emits the full `annotations:` block at the current indent + 2 spaces
+(matches the existing call sites at workload metadata level).
+
+Usage:
+  {{- $extra := dict }}
+  {{- if $shouldEmitReplicasAnn }}{{- $_ := set $extra "werf.io/replicas-on-creation" ($componentValues.scaling.min | toString) }}{{- end }}
+  {{- include "common.workload.annotations" (dict "root" $ "component" $componentValues "extra" $extra) | nindent 2 }}
+*/}}
+{{- define "common.workload.annotations" -}}
+{{- $root := default dict .root -}}
+{{- $component := default dict .component -}}
+{{- $extra := default dict .extra -}}
+{{- $werfAnn := include "common.annotations.werf" $root | trim -}}
+{{- $userAnn := dig "annotations" dict $component -}}
+{{- if or $werfAnn (gt (len $userAnn) 0) (gt (len $extra) 0) }}
+  annotations:
+    {{- if $werfAnn }}
+    {{- $werfAnn | nindent 4 }}
+    {{- end }}
+    {{- with $userAnn }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- range $key, $val := $extra }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Resolve the container image for a workload component.
 Lookup order:
   1. component.image (string or map)

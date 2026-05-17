@@ -33,21 +33,10 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $werfAnn := include "common.annotations.werf" . | trim }}
-  {{- $userAnn := $componentValues.annotations }}
   {{- $emitReplicasAnn := and $replicasOnCreationAnnotation (not $componentValues.replicas) (and ($componentValues.scaling) ($componentValues.scaling.min)) }}
-  {{- if or $werfAnn $userAnn $emitReplicasAnn }}
-  annotations:
-    {{- if $werfAnn }}
-    {{- $werfAnn | nindent 4 }}
-    {{- end }}
-    {{- with $userAnn }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- if $emitReplicasAnn }}
-    {{ printf "%s: %s" $replicasOnCreationAnnotation ($componentValues.scaling.min | quote) }}
-    {{- end }}
-  {{- end }}
+  {{- $extraAnn := dict }}
+  {{- if $emitReplicasAnn }}{{- $_ := set $extraAnn $replicasOnCreationAnnotation ($componentValues.scaling.min | toString) }}{{- end }}
+  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues "extra" $extraAnn) }}
 spec:
   {{- if not $componentValues.scaling }}
   replicas: {{ default 1 $componentValues.replicas | int }}

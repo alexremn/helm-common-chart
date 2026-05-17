@@ -11,17 +11,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $werfAnn := include "common.annotations.werf" . | trim }}
-  {{- $userAnn := $componentValues.annotations }}
-  {{- if or $werfAnn $userAnn }}
-  annotations:
-    {{- if $werfAnn }}
-    {{- $werfAnn | nindent 4 }}
-    {{- end }}
-    {{- with $userAnn }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-  {{- end }}
+  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
   serviceName: {{ default (printf "%s-headless" ($cmp)) $componentValues.serviceName | quote }}
   updateStrategy:
