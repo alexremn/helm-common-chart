@@ -323,6 +323,12 @@ Usage: {{ include "common.formatUrl" (dict "protocol" "http" "host" "example.com
 
 {{/*
 Format a database URL from components.
+
+NOTE: `user` and `password` are interpolated verbatim. They are NOT
+URL-encoded. Callers passing values that may contain `@`, `:`, `/`, `?`,
+`#`, or other URL-reserved characters MUST pre-encode them (e.g. wrap
+with `urlquery`) or the resulting connection string will be invalid.
+
 Usage: {{ include "common.dbUrl" (dict "type" "postgres" "host" "db.example.com" "port" "5432" "name" "mydb" "user" "dbuser" "password" "secret") }}
 */}}
 {{- define "common.dbUrl" }}
