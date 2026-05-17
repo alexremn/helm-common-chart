@@ -368,6 +368,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           serviceAccountName: "default"
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1

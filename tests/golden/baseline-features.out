@@ -364,6 +364,7 @@ spec:
           serviceAccountName: "default"
           imagePullSecrets:
             - name: ghcr-pull
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1

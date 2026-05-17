@@ -17,6 +17,9 @@ spec:
       app.kubernetes.io/component: web
       app.kubernetes.io/environment: dev
       app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1

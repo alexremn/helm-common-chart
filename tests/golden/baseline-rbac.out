@@ -155,6 +155,7 @@ roleRef:
 subjects: 
   - kind: ServiceAccount
     name: read-only
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1

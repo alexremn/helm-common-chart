@@ -53,6 +53,7 @@ spec:
   policyTypes:
   - Ingress
   - Egress
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
