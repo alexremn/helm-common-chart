@@ -151,7 +151,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: custom-readonly
-subjects: 
+subjects:
   - kind: ServiceAccount
     name: read-only
 
