@@ -150,6 +150,8 @@ grpc:
   {{- with $service }}
   service: {{ . }}
   {{- end }}
+{{- else -}}
+  {{- fail (printf "common.probe: unknown probe type %q. Must be one of: exec, http, tcp, grpc." $probe.type) -}}
 {{- end }}
 initialDelaySeconds: {{ $probe.initialDelaySeconds }}
 periodSeconds: {{ $probe.periodSeconds }}
