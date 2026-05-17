@@ -167,6 +167,9 @@ Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revis
 */}}
 {{- define "generateName" -}}
   {{- $name := required "Name is required" .name }}
-  {{- $suffix := .suffix | default (randAlphaNum 5 | lower) }}
-  {{- printf "%s-%s" $name $suffix }}
+  {{- $suffix := .suffix }}
+  {{- if not $suffix }}
+    {{- $suffix = required "generateName: suffix is required (pass .Release.Revision for a per-revision suffix, or any deterministic string)" .suffix }}
+  {{- end }}
+  {{- printf "%s-%s" $name (toString $suffix) }}
 {{- end -}}
