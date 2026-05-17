@@ -45,7 +45,7 @@ web:
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"
-    - key: "ops.hubstaff.com/drain-safe"
+    - key: "ops.example.com/drain-safe"
       operator: "Exists"
   affinity:
     nodeAffinity:

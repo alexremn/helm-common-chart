@@ -21,7 +21,7 @@ global:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
   deployment:
-    replicasOnCreationAnnotation: "hubstaff.com/initial-replicas"
+    replicasOnCreationAnnotation: "example.com/initial-replicas"
   compat:
     legacySelectorLabels: true
   hooks:

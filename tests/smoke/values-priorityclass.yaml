@@ -2,7 +2,7 @@ name: pc-app
 environment: dev
 
 priorityClasses:
-  hubstaff-critical:
+  app-critical:
     value: 1000000
     globalDefault: false
     description: "Critical workloads"
