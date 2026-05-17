@@ -8,6 +8,28 @@ both helpers fail fast if the component has both .podMonitor and
 =============================================================================
 */}}
 
+{{/*
+Render the metricRelabelings block (with profile fallback) of a
+ServiceMonitor or PodMonitor endpoint. Identical logic for both kinds.
+
+Emits nothing when both explicit and profile are empty.
+
+Usage (must be invoked with `{{- ... -}}` whitespace trimming):
+  {{- include "common.prometheus.metricRelabelings" (dict
+        "explicit" $cfg.metricRelabelings
+        "profile" $profileRelabelings) -}}
+*/}}
+{{- define "common.prometheus.metricRelabelings" -}}
+{{- $explicit := .explicit -}}
+{{- $profile := .profile -}}
+{{- if $explicit }}
+      metricRelabelings: {{ toYaml $explicit | nindent 8 }}
+{{- else if $profile }}
+      metricRelabelings:
+{{ $profile | indent 8 }}
+{{- end -}}
+{{- end -}}
+
 {{- define "chart.servicemonitor" }}
 {{- $svc := include "common.appName" . | trim }}
 {{- $cmp := include "common.componentName" . | trim }}
@@ -50,14 +72,7 @@ spec:
       {{- with $sm.honorLabels }}
       honorLabels: {{ . }}
       {{- end }}
-      {{- with $sm.metricRelabelings }}
-      metricRelabelings: {{ toYaml . | nindent 8 }}
-      {{- else }}
-      {{- if $profileRelabelings }}
-      metricRelabelings:
-{{ $profileRelabelings | indent 8 }}
-      {{- end }}
-      {{- end }}
+      {{- include "common.prometheus.metricRelabelings" (dict "explicit" $sm.metricRelabelings "profile" $profileRelabelings) }}
       {{- with $sm.relabelings }}
       relabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
