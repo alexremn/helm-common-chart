@@ -162,26 +162,6 @@ Usage: {{ include "secrets.retrieve.external" (dict "key" "KEY_NAME" "base" (dic
 {{- end -}}
 
 {{/*
-=============================================================================
-SERVICE SPECIFIC HELPERS
-=============================================================================
-*/}}
-
-{{/*
-Helper for determining Tasks API URL based on environment
-Usage: {{ include "server.review.setTasksApiUrl" (dict "baseURL" "https://tasks.staging.example.com") }}
-*/}}
-{{- define "server.review.setTasksApiUrl" -}}
-  {{- $baseURL := .baseURL -}}
-  {{- if eq $baseURL "https://tasks.staging.hbstf.co" -}}
-    http://web.hubstaff-tasks-staging.svc.cluster.local:3000
-  {{- else -}}
-    {{- $prNum := regexFind "([0-9]+)" $baseURL -}}
-    http://web.hubstaff-tasks-review-{{ $prNum }}.svc.cluster.local:3000
-  {{- end -}}
-{{- end -}}
-
-{{/*
 Generate a deterministic name for resources like jobs
 Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revision) }}
 */}}
