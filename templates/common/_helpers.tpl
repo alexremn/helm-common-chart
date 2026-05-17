@@ -190,6 +190,39 @@ Generate a deterministic name for resources like jobs
 Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revision) }}
 */}}
 {{/*
+Emit a YAML field from a source map, conditionally.
+
+Replaces the "if hasKey emit toYaml" passthrough boilerplate scattered
+across container/pod helpers. Skips emission entirely when the source
+map does not have the key.
+
+Parameters:
+  src      — source dict (typically a component values map)
+  key      — key to look up in src
+  emitAs   — output field name (defaults to key)
+  scalar   — true to emit `field: <value>` instead of `field: |yaml|`
+             (use for primitives like priorityClassName)
+
+Usage:
+  {{- include "common.passthroughField" (dict "src" . "key" "lifecycle") }}
+  {{- include "common.passthroughField" (dict "src" . "key" "priorityClassName" "scalar" true) }}
+*/}}
+{{- define "common.passthroughField" -}}
+{{- $src := .src -}}
+{{- $key := required "common.passthroughField: key is required" .key -}}
+{{- $emitAs := default $key .emitAs -}}
+{{- $scalar := default false .scalar -}}
+{{- if and (kindIs "map" $src) (hasKey $src $key) -}}
+{{- $val := index $src $key }}
+{{- if $scalar }}
+{{ $emitAs }}: {{ $val }}
+{{- else }}
+{{ $emitAs }}: {{ toYaml $val | nindent 2 }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Resolve the ServiceAccount name for a component.
 
 Single source of truth for both the pod side (`spec.serviceAccountName`)

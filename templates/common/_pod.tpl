@@ -9,11 +9,7 @@ Add node selector to pods if specified
 Usage: {{ include "common.nodeSelector" .Values.myComponent }}
 */}}
 {{- define "common.nodeSelector" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "nodeSelector" }}
-nodeSelector: {{ toYaml .nodeSelector | nindent 2 }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "nodeSelector") }}
 {{- end }}
 
 {{/*
@@ -73,11 +69,7 @@ Add topology spread constraints to pods if specified
 Usage: {{ include "common.topologySpreadConstraints" .Values.myComponent }}
 */}}
 {{- define "common.topologySpreadConstraints" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "topologySpreadConstraints" }}
-topologySpreadConstraints: {{ toYaml .topologySpreadConstraints | nindent 2 }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "topologySpreadConstraints") }}
 {{- end }}
 
 {{/*
@@ -85,11 +77,7 @@ Configure the priority class name for a pod
 Usage: {{ include "common.priorityClassName" .Values.myComponent }}
 */}}
 {{- define "common.priorityClassName" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "priorityClassName" }}
-priorityClassName: {{ .priorityClassName }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "priorityClassName" "scalar" true) }}
 {{- end }}
 
 {{/*
@@ -97,11 +85,7 @@ Configure host aliases for a pod
 Usage: {{ include "common.hostAliases" .Values.myComponent }}
 */}}
 {{- define "common.hostAliases" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "hostAliases" }}
-hostAliases: {{ toYaml .hostAliases | nindent 2 }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "hostAliases") }}
 {{- end }}
 
 {{/*

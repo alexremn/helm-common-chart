@@ -9,13 +9,7 @@ Process container command
 Usage: {{ include "common.command" .Values.myComponent }}
 */}}
 {{- define "common.command" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "command" }}
-{{- with .command }}
-command: {{ . | toYaml | nindent 2 }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "command") }}
 {{- end }}
 
 {{/*
@@ -23,13 +17,7 @@ Process container args
 Usage: {{ include "common.args" .Values.myComponent }}
 */}}
 {{- define "common.args" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "args" }}
-{{- with .args }}
-args: {{ . | toYaml | nindent 2 }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "args") }}
 {{- end }}
 
 {{/*
@@ -37,13 +25,7 @@ Process container resources
 Usage: {{ include "common.resources" .Values.myComponent }}
 */}}
 {{- define "common.resources" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "resources" }}
-{{- with .resources }}
-resources: {{ . | toYaml | nindent 2 }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "resources") }}
 {{- end }}
 
 {{/*
@@ -51,13 +33,7 @@ Process container lifecycle
 Usage: {{ include "common.lifecycle" .Values.myComponent }}
 */}}
 {{- define "common.lifecycle" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "lifecycle" }}
-{{- with .lifecycle }}
-lifecycle: {{ . | toYaml | nindent 2 }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- include "common.passthroughField" (dict "src" . "key" "lifecycle") }}
 {{- end }}
 
 {{/*
