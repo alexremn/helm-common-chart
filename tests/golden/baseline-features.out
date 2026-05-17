@@ -181,7 +181,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: web
       imagePullSecrets:
         - name: ghcr-pull
 ---
@@ -252,7 +252,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: stateful
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -311,7 +311,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: run-task
       imagePullSecrets:
         - name: ghcr-pull
 ---
@@ -359,7 +359,7 @@ spec:
             runAsGroup: 3000
             seccompProfile:
               type: RuntimeDefault
-          serviceAccountName: "default"
+          serviceAccountName: sync-task
           imagePullSecrets:
             - name: ghcr-pull
 

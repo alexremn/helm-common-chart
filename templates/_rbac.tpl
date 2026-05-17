@@ -24,7 +24,7 @@ Top-level shape:
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $saName := dig "serviceAccount" "name" $cmp $componentValues }}
+{{- $saName := include "common.serviceAccountName" (dict "component" $componentValues "fallback" $cmp) }}
 
 {{- /* Per-component namespaced Role + RoleBinding. */ -}}
 {{- with $componentValues.rbac }}

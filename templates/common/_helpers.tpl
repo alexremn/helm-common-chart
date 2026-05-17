@@ -165,6 +165,28 @@ Usage: {{ include "secrets.retrieve.external" (dict "key" "KEY_NAME" "base" (dic
 Generate a deterministic name for resources like jobs
 Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revision) }}
 */}}
+{{/*
+Resolve the ServiceAccount name for a component.
+
+Single source of truth for both the pod side (`spec.serviceAccountName`)
+and the RBAC side (RoleBinding/ClusterRoleBinding `subjects[].name`).
+The two must agree; resolving them through this helper prevents the
+pod-side literal `"default"` from drifting away from the RBAC-side
+`dig "serviceAccount" "name" $cmp` resolution.
+
+Usage:
+  {{ include "common.serviceAccountName" (dict "component" .componentValues "fallback" $cmp) }}
+
+Resolution order:
+  1. .component.serviceAccount.name (explicit override)
+  2. .fallback (caller-supplied default, typically the component name)
+*/}}
+{{- define "common.serviceAccountName" -}}
+{{- $component := default dict .component -}}
+{{- $fallback := required "common.serviceAccountName: fallback is required" .fallback -}}
+{{- dig "serviceAccount" "name" $fallback $component -}}
+{{- end -}}
+
 {{- define "generateName" -}}
   {{- $name := required "Name is required" .name }}
   {{- $suffix := .suffix }}

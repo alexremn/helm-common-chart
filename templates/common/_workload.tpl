@@ -205,7 +205,7 @@ terminationGracePeriodSeconds: {{ default 30 $component.terminationGracePeriod }
 {{- if $aff }}
 {{ $aff }}
 {{- end }}
-{{- $sa := include "common.serviceAccount" (dict "component" $component "root" $root) | trim }}
+{{- $sa := include "common.serviceAccount" (dict "component" $component "root" $root "cmp" $cmp) | trim }}
 {{- if $sa }}
 {{ $sa }}
 {{- end }}

@@ -186,4 +186,4 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: web

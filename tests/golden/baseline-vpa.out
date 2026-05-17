@@ -130,7 +130,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: web
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: autoscaling.k8s.io/v1

@@ -177,7 +177,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: web
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -249,7 +249,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: stateful
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -306,7 +306,7 @@ spec:
         runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: "default"
+      serviceAccountName: run-task
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -352,7 +352,7 @@ spec:
             runAsGroup: 3000
             seccompProfile:
               type: RuntimeDefault
-          serviceAccountName: "default"
+          serviceAccountName: sync-task
 
 ---
 # Source: common-smoke/templates/all.yaml

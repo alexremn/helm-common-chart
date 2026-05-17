@@ -146,16 +146,18 @@ initContainers:
 Set up service account for pods.
 
 Accepts either a plain component map (legacy) or
-(dict "component" <map> "root" $). With root, the literal
-serviceAccountName: "default" is only emitted under the rails profile
-(preserving v1.3.1 byte-identical renders); other profiles let K8s apply
-its own default by omitting the line.
+(dict "component" <map> "root" $ "cmp" "<component-name>"). With root,
+the rails profile emits a `serviceAccountName` line so the pod stays
+bound to the chart's RBAC (resolved through `common.serviceAccountName`);
+other profiles omit the line and let Kubernetes apply its own default.
 */}}
 {{- define "common.serviceAccount" }}
 {{- $component := dict -}}
+{{- $cmp := "" -}}
 {{- $emitDefault := true -}}
 {{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") -}}
   {{- $component = default dict .component -}}
+  {{- $cmp = default "" .cmp -}}
   {{- $profile := include "common.profile" .root -}}
   {{- if ne $profile "rails" -}}
     {{- $emitDefault = false -}}
@@ -164,9 +166,9 @@ its own default by omitting the line.
   {{- $component = . -}}
 {{- end -}}
 {{- if and (kindIs "map" $component) (hasKey $component "serviceAccount") }}
-serviceAccountName: {{ $component.serviceAccount.name }}
+serviceAccountName: {{ include "common.serviceAccountName" (dict "component" $component "fallback" (default "default" $cmp)) }}
 {{- else if $emitDefault }}
-serviceAccountName: "default"
+serviceAccountName: {{ include "common.serviceAccountName" (dict "component" $component "fallback" (default "default" $cmp)) }}
 {{- end }}
 {{- end }}
 

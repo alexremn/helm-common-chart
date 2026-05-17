@@ -67,6 +67,6 @@ spec:
         -
           operator: "Exists"
           effect: "NoSchedule"
-      serviceAccountName: "default"
+      serviceAccountName: logShipper
       hostNetwork: true
       hostPID: true
