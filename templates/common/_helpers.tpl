@@ -70,7 +70,19 @@ Usage: {{ include "secrets.generate" (dict "key" "secret-key" "values" (list "pr
 {{- end -}}
 
 {{/*
-Retrieve a secret value from Kubernetes
+Retrieve a secret value from Kubernetes.
+
+Resolution is offline / Helm-only: uses the `lookup` template function,
+which only sees Secrets that already exist in the target cluster at the
+time `helm template`/`upgrade` runs. There is no fetch against an
+external secret store (AWS Secrets Manager, Vault, ESO etc.); for that
+flow see `secrets.retrieve.external` or the ExternalSecret renderer.
+
+If the Secret does not exist, an empty string (or `KEY: ""` when
+`type=full`) is returned silently — `helm install --dry-run` will not
+fail. This is intentional for bootstrapping new clusters; callers that
+need the value to exist must guard externally.
+
 Usage: {{ include "secrets.retrieve" (dict "name" "secret-name" "key" "KEY_NAME" "type" "full" "ns" .Release.Namespace) }}
 */}}
 {{- define "secrets.retrieve" -}}
@@ -96,7 +108,18 @@ Usage: {{ include "secrets.retrieve" (dict "name" "secret-name" "key" "KEY_NAME"
 {{- end -}}
 
 {{/*
-Define a secret value with generator and lookup capability
+Define a secret value with generator and lookup capability.
+
+Like `secrets.retrieve`, the lookup is offline / Helm-only and only
+resolves against Secrets already present in the cluster. If the Secret
+does not exist, a generated value is emitted (random 64-char alphanum
+when `var=base`; random hex when `var=hex`) — and that generated value
+will *change on every render*, so consuming workloads will see token
+drift unless the underlying Secret is created before the next upgrade.
+
+Use this for first-install bootstrap of secrets that the cluster will
+then own. Do not use as a long-running source of truth.
+
 Usage: {{ include "secrets.define" (dict "name" "secret-name" "key" "KEY_NAME" "value" "default-value" "type" "full" "var" "base" "ns" .Release.Namespace) }}
 */}}
 {{- define "secrets.define" -}}
