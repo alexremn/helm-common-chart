@@ -81,7 +81,7 @@ spec:
   {{- else if eq .type "prometheus" }}
     - type: prometheus
       metadata:
-        serverAddress: {{ default "http://prometheus-prometheus.prometheus.svc.cluster.local:9090" $.Values.global.prometheusEndpoint }}
+        serverAddress: {{ required "scaledObject.triggers[].type=prometheus requires global.prometheusEndpoint to be set" $.Values.global.prometheusEndpoint }}
         threshold: {{ .threshold | quote }}
         query: {{ tpl .query $ | quote }}
         {{- with .authModes }}
