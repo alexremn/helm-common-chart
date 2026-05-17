@@ -10,13 +10,14 @@ Generate a random hexadecimal string of a specified length.
 Usage: {{ include "randHex" 16 }}
 */}}
 {{- define "randHex" -}}
+    {{- $base := "0123456789abcdef" -}}
     {{- $result := "" -}}
     {{- range $i := until . -}}
-        {{- $base := shuffle "0123456789abcdef" -}}
-        {{- $i_curr := (randNumeric 1) | int -}}
-        {{- $i_next := add $i_curr 1 | int -}}
-        {{- $rand_hex := substr $i_curr $i_next $base -}}
-        {{- $result = print $result $rand_hex -}}
+        {{- /* `randNumeric 1` returns "0".."9" — never picks a..f. Pick over
+               the full 0..15 range by drawing a 3-digit number and reducing
+               mod 16. Distribution bias is ~0.1% (1000 mod 16 ≠ 0). */ -}}
+        {{- $idx := mod (randNumeric 3 | int) 16 -}}
+        {{- $result = print $result (substr $idx (add $idx 1 | int) $base) -}}
     {{- end -}}
     {{- $result -}}
 {{- end -}}
