@@ -287,13 +287,15 @@ Usage: {{ include "common.envFrom" (dict "svc" .Values.myComponent "global" .Val
 {{- end -}}
 {{- $defaultConfigName := dig "envFrom" "defaultConfigName" "config" $profileDefaults -}}
 {{- $defaultSecretName := dig "envFrom" "defaultSecretName" "secrets" $profileDefaults -}}
+{{- /* Phantom defaults are emitted with optional: true so a missing
+       ConfigMap/Secret in the cluster does not crash pod startup. */ -}}
 {{- $defaultConfigList := list -}}
 {{- if ne $defaultConfigName "" -}}
-  {{- $defaultConfigList = list (dict "name" $defaultConfigName) -}}
+  {{- $defaultConfigList = list (dict "name" $defaultConfigName "optional" true) -}}
 {{- end -}}
 {{- $defaultSecretList := list -}}
 {{- if ne $defaultSecretName "" -}}
-  {{- $defaultSecretList = list (dict "name" $defaultSecretName) -}}
+  {{- $defaultSecretList = list (dict "name" $defaultSecretName "optional" true) -}}
 {{- end }}
 
 {{/* Append global defaults/config where present */}}
