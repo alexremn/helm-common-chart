@@ -29,6 +29,32 @@ werf.io/weight: {{ dig "werf" "configWeight" "-1" $values | quote }}
 {{- end }}
 {{- end -}}
 
+{{/*
+Render the shared ConfigMap header (separator, apiVersion, kind,
+metadata.name, labels, annotations).
+
+Usage:
+  {{- include "chart._configmap.header" (dict
+        "name" $name
+        "labelCtx" $labelCtx
+        "env" $env
+        "Values" .Values) }}
+*/}}
+{{- define "chart._configmap.header" -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "common.labels" .labelCtx | nindent 4 }}
+  {{- $ann := include "config.annotations.default" (dict "env" .env "Values" .Values) | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
+{{- end -}}
+
 {{- define "chart.configmap" }}
 {{- $svc := include "common.appName" . | trim }}
 {{- $cmp := include "common.componentName" . | trim }}
@@ -38,18 +64,7 @@ werf.io/weight: {{ dig "werf" "configWeight" "-1" $values | quote }}
 
 {{- if hasKey .Values "configs" }}
 {{- range $name, $val := .Values.configs }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $name }}
-  labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
-  {{- if $ann }}
-  annotations:
-    {{- $ann | nindent 4 }}
-  {{- end }}
+{{- include "chart._configmap.header" (dict "name" $name "labelCtx" $labelCtx "env" $env "Values" $.Values) }}
 {{- if $val.immutable }}
 immutable: true
 {{- end }}
@@ -73,18 +88,7 @@ binaryData:
 {{- end }}
 {{- end }}
 {{- else }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $cmp }}
-  labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" .Values) | trim }}
-  {{- if $ann }}
-  annotations:
-    {{- $ann | nindent 4 }}
-  {{- end }}
+{{- include "chart._configmap.header" (dict "name" $cmp "labelCtx" $labelCtx "env" $env "Values" .Values) }}
 data:
 {{- $commonConfig := include "config.dict.common" . | default "" | trim }}
 {{- if ne $commonConfig "" }}
@@ -114,18 +118,7 @@ Usage: {{ include "chart.binaryConfigmap" (dict "svc" "app-name" "cmp" "componen
 {{- $componentValue := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "binaryData") }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $cmp }}-files
-  labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" .Values) | trim }}
-  {{- if $ann }}
-  annotations:
-    {{- $ann | nindent 4 }}
-  {{- end }}
+{{- include "chart._configmap.header" (dict "name" (printf "%s-files" $cmp) "labelCtx" $labelCtx "env" $env "Values" .Values) }}
 binaryData:
   {{- range $key, $value := $componentValue.configmap.binaryData }}
   {{ $key }}: {{ $value | quote }}
