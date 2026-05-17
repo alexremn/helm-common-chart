@@ -28,7 +28,7 @@ metadata:
     app.kubernetes.io/component: web
     app.kubernetes.io/environment: staging
     app.kubernetes.io/instance: smoke
-automountServiceAccountToken: true
+automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1

@@ -28,7 +28,7 @@ metadata:
   annotations:
     {{- $ann | nindent 2 }}
   {{- end }}
-automountServiceAccountToken: {{ default true $saConfig.automount }}
+automountServiceAccountToken: {{ dig "automount" false $saConfig }}
 {{- with $saConfig.imagePullSecrets }}
 imagePullSecrets: {{ toYaml . | nindent 2 }}
 {{- end }}
