@@ -1,0 +1,531 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: staging
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-sa
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+automountServiceAccountToken: true
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+data:
+  APP_MODE: "internal"
+  FEATURE_X: "true"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-files
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+binaryData:
+  app.bin: "YmluYXJ5"
+---
+# Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "5Gi"
+  storageClassName: standard
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+  publishNotReadyAddresses: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: staging
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: web
+        app.kubernetes.io/environment: staging
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/web:2.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: metrics
+            containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: web-sa
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: stateful
+      app.kubernetes.io/environment: staging
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: stateful
+        app.kubernetes.io/environment: staging
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/internal-app:1.2.3
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: "default"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: internal-platform
+          app.kubernetes.io/component: stateful
+          app.kubernetes.io/environment: staging
+          app.kubernetes.io/instance: smoke
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "5Gi"
+        storageClassName: standard
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-task
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: run-task
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: run-task
+        app.kubernetes.io/environment: staging
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: run-task
+          image: ghcr.io/example/jobs:latest
+          imagePullPolicy: "IfNotPresent"
+          command: 
+            - /bin/sh
+            - -c
+          args: 
+            - echo job
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+      restartPolicy: "Never"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: "default"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-task
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: sync-task
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: internal-platform
+            app.kubernetes.io/component: sync-task
+            app.kubernetes.io/environment: staging
+            app.kubernetes.io/instance: smoke
+        spec:
+          containers:
+            - name: sync-task
+              image: ghcr.io/example/cron:latest
+              imagePullPolicy: "IfNotPresent"
+              command: 
+                - /bin/sh
+                - -c
+              args: 
+                - echo cron
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+          restartPolicy: "Never"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 3000
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccountName: "default"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-external-ingress
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+  
+spec:
+  ingressClassName: nginx
+  
+  tls:
+    - hosts:
+        - web.example.com
+      secretName: web-external-ingress
+  
+  rules:
+    - host: web.example.com
+      http:
+        paths:
+        -
+          path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: web
+              port:
+                name: http
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-internal-ingress
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+  
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+spec:
+  ingressClassName: nginx-internal
+  
+  tls:
+    - hosts:
+        - web.internal.example.com
+      secretName: web-internal-ingress
+  
+  rules:
+    - host: web.internal.example.com
+      http:
+        paths:
+        -
+          path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: web
+              port:
+                name: http
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: web-secrets
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+  annotations: 
+    
+    force-sync: "<NOW>"
+spec:
+  refreshInterval: "10000h"
+  secretStoreRef:
+    name: secrets-manager
+    kind: ClusterSecretStore
+  target:
+    name: web-secrets
+    creationPolicy: Owner
+
+  
+  data:
+
+
+    
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          key: /apps/internal/web
+          property: DB_PASSWORD
+      - secretKey: API_KEY
+        remoteRef:
+          key: /apps/internal/web
+          property: API_KEY
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: staging
+      app.kubernetes.io/instance: smoke
+  podMetricsEndpoints:
+    - filterRunning: true
+      followRedirects: true
+      interval: 30s
+      path: /metrics
+      port: "metrics"
+      metricRelabelings:
+        - action: drop
+          regex: '(activerecord_query_duration_seconds_bucket|http_response_duration_milliseconds_bucket|rails_view_runtime_seconds_bucket|rails_request_duration_seconds_bucket|rails_db_runtime_seconds_bucket)'
+          sourceLabels: [__name__]
+  namespaceSelector:
+    matchNames:
+      - default
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  scaleTargetRef:
+    name: web
+    kind: Deployment
+  pollingInterval: 30
+  cooldownPeriod: 180
+  minReplicaCount: 2
+  maxReplicaCount: 5
+  advanced:
+    restoreToOriginalReplicaCount: false
+  fallback:
+    failureThreshold: 3
+    replicas: 1
+  triggers:
+    - type: cpu
+      metadata:
+        value: "75"

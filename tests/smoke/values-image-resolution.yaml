@@ -1,0 +1,13 @@
+name: image-resolution-app
+environment: dev
+
+images:
+  web: ghcr.io/example/legacy-images-map:99.99.99
+
+global:
+  image:
+    repository: ghcr.io/example/global-app
+
+web:
+  ports:
+    http: 8080

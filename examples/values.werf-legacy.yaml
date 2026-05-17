@@ -1,0 +1,14 @@
+werf:
+  name: legacy-app
+  env: production
+  image:
+    app: ghcr.io/example/legacy-app:9.9.9
+
+app:
+  ports:
+    http: 3000
+  ingress:
+    external:
+      domains:
+        - legacy.example.com
+

@@ -1,0 +1,188 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: np-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+  policyTypes: 
+    - Ingress
+    - Egress
+  ingress:
+    -
+      from: 
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    -
+      to: 
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec: 
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: np-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+automountServiceAccountToken: true
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+data:
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: np-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: np-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: np-app
+        app.kubernetes.io/component: web
+        app.kubernetes.io/environment: dev
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/web:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: "default"

@@ -1,0 +1,13 @@
+# Example: opt into the Python profile
+# Use as: -f examples/values.profile-python.yaml
+
+global:
+  profile: python
+
+web:
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+  ports:
+    http: 8080
+  # /health is the python-profile default; timeoutSeconds: 2.

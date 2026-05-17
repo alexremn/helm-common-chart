@@ -1,0 +1,13 @@
+name: ta-app
+environment: dev
+
+triggerAuthentications:
+  redis-auth:
+    secretTargetRef:
+      - parameter: password
+        name: redis-credentials
+        key: password
+  cluster-iam:
+    cluster: true
+    podIdentity:
+      provider: aws-eks

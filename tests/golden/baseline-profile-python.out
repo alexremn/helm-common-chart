@@ -1,0 +1,387 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: features-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: production
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+automountServiceAccountToken: true
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+data:
+---
+# Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "10Gi"
+  storageClassName: gp3
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+  publishNotReadyAddresses: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: features-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: production
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: features-app
+        app.kubernetes.io/component: web
+        app.kubernetes.io/environment: production
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/features-app:3.1.4
+          imagePullPolicy: "Always"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: metrics
+            containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+      terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+        - name: ghcr-pull
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: features-app
+      app.kubernetes.io/component: stateful
+      app.kubernetes.io/environment: production
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: features-app
+        app.kubernetes.io/component: stateful
+        app.kubernetes.io/environment: production
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/features-app:3.1.4
+          imagePullPolicy: "Always"
+          ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+      imagePullSecrets:
+        - name: ghcr-pull
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: features-app
+          app.kubernetes.io/component: stateful
+          app.kubernetes.io/environment: production
+          app.kubernetes.io/instance: smoke
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "10Gi"
+        storageClassName: gp3
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-task
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: run-task
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: features-app
+        app.kubernetes.io/component: run-task
+        app.kubernetes.io/environment: production
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: run-task
+          image: ghcr.io/example/features-app:3.1.4
+          imagePullPolicy: "Always"
+          command: 
+            - /bin/sh
+            - -c
+          args: 
+            - echo features
+      restartPolicy: "Never"
+      imagePullSecrets:
+        - name: ghcr-pull
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-task
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: sync-task
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: features-app
+            app.kubernetes.io/component: sync-task
+            app.kubernetes.io/environment: production
+            app.kubernetes.io/instance: smoke
+        spec:
+          containers:
+            - name: sync-task
+              image: ghcr.io/example/features-app:3.1.4
+              imagePullPolicy: "Always"
+              command: 
+                - /bin/sh
+                - -c
+              args: 
+                - echo cron features
+          restartPolicy: "Never"
+          imagePullSecrets:
+            - name: ghcr-pull
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-public
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+  
+spec:
+  ingressClassName: nginx
+  
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: web-public
+  
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+        -
+          path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: web
+              port:
+                name: http
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: features-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: features-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: production
+      app.kubernetes.io/instance: smoke
+  podMetricsEndpoints:
+    - filterRunning: true
+      followRedirects: true
+      interval: 1m
+      path: /metrics
+      port: "metrics"
+  namespaceSelector:
+    matchNames:
+      - default

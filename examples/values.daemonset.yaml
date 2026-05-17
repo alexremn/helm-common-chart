@@ -1,0 +1,25 @@
+# Example values for chart.daemonset
+# Use as: -f examples/values.daemonset.yaml
+
+name: ds-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/log-shipper
+    tag: "1.0.0"
+
+logShipper:
+  ports:
+    metrics: 9090
+  daemonSet:
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+    revisionHistoryLimit: 3
+  hostNetwork: true
+  hostPID: true
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule

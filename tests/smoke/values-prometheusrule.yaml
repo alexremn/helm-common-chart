@@ -1,0 +1,15 @@
+name: rule-app
+environment: dev
+
+prometheusRules:
+  app-alerts:
+    groups:
+      - name: web
+        rules:
+          - alert: WebHighErrorRate
+            expr: rate(http_requests_total{code=~"5.."}[5m]) > 0.05
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High 5xx rate on web"

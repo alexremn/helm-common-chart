@@ -1,0 +1,41 @@
+werf:
+  name: legacy-service
+  env: production
+  enabled: true
+  image:
+    app: ghcr.io/example/legacy-app:9.9.9
+
+web:
+  ports:
+    http: 3000
+  ingress:
+    external:
+      domains:
+        - legacy.example.com
+
+stateful:
+  ports:
+    http: 3001
+  persistence:
+    - name: data
+      size: 1Gi
+
+jobs:
+  run_task:
+    command: ["/bin/sh", "-c"]
+    args: ["echo legacy job"]
+
+cronjobs:
+  sync_task:
+    schedule: "0 * * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo legacy cron"]
+
+secrets:
+  legacy-secrets:
+    secretKey: /legacy/app
+    properties:
+      - TOKEN
+    includes:
+      - common
+

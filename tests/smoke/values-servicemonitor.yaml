@@ -1,0 +1,17 @@
+name: sm-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  serviceMonitor:
+    enabled: true
+    portName: metrics
+    path: /metrics
+    interval: 30s

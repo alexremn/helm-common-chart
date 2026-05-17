@@ -1,0 +1,68 @@
+{{- /* Existing helpers (1.3.x) — gated on .Values.web / .Values.stateful /
+       .Values.jobs / .Values.cronjobs presence so new-resource fixtures that
+       don't define a `web` component (e.g. values-daemonset.yaml) don't
+       fail in chart.service for missing ports. The original 1.3.1 fixtures
+       all define web/stateful so renders are unchanged for them. */ -}}
+{{- $hasWeb := and (hasKey .Values "web") (kindIs "map" (index .Values "web")) -}}
+{{- $hasStateful := and (hasKey .Values "stateful") (kindIs "map" (index .Values "stateful")) -}}
+{{- if or $hasWeb (hasKey .Values "configs") }}
+{{ include "chart.configmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.binaryConfigmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if or $hasWeb (hasKey .Values "secrets") }}
+{{ include "chart.extsecret" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if $hasWeb }}
+{{ include "chart.serviceAccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.ingress" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.pdb" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.podmonitor" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.scaledobject" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if $hasStateful }}
+{{ include "chart.statefulset" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "stateful") }}
+{{ include "chart.service.headless" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "stateful") }}
+{{ include "chart.pvc" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "stateful") }}
+{{- end }}
+{{- if and (hasKey .Values "jobs") (hasKey (index .Values "jobs") "run_task") }}
+{{ include "chart.job" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "run_task") }}
+{{- end }}
+{{- if and (hasKey .Values "cronjobs") (hasKey (index .Values "cronjobs") "sync_task") }}
+{{ include "chart.cronjob" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "sync_task") }}
+{{- end }}
+
+{{- /* New resources (1.4.0): each is gated on the presence of its values key
+       so the existing Phase 1/2 fixtures don't accidentally render them and
+       the rails-default goldens stay byte-identical. */ -}}
+{{- if hasKey .Values "logShipper" }}
+{{ include "chart.daemonset" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "logShipper") }}
+{{- end }}
+{{- if and $hasWeb (hasKey (index .Values "web") "hpa") }}
+{{ include "chart.hpa" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if and $hasWeb (hasKey (index .Values "web") "vpa") }}
+{{ include "chart.vpa" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if or (and $hasWeb (hasKey (index .Values "web") "networkPolicy")) (hasKey .Values "networkPolicies") }}
+{{ include "chart.networkpolicy" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if hasKey .Values "nativeSecrets" }}
+{{ include "chart.secret" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if or (and $hasWeb (or (hasKey (index .Values "web") "rbac") (hasKey (index .Values "web") "rbacCluster"))) (hasKey .Values "rbac") }}
+{{ include "chart.rbac" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if and $hasWeb (hasKey (index .Values "web") "serviceMonitor") }}
+{{ include "chart.servicemonitor" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if hasKey .Values "prometheusRules" }}
+{{ include "chart.prometheusrule" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if hasKey .Values "priorityClasses" }}
+{{ include "chart.priorityclass" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
+{{- if hasKey .Values "triggerAuthentications" }}
+{{ include "chart.triggerauth" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}

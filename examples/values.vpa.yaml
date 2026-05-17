@@ -1,0 +1,27 @@
+# Example values for chart.vpa
+# Use as: -f examples/values.vpa.yaml
+
+name: vpa-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  vpa:
+    updatePolicy:
+      updateMode: Auto
+    resourcePolicy:
+      containerPolicies:
+        - containerName: '*'
+          minAllowed:
+            cpu: 100m
+            memory: 128Mi
+          maxAllowed:
+            cpu: 2
+            memory: 2Gi
+          controlledResources: [cpu, memory]

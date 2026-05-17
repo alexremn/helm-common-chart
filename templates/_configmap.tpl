@@ -1,0 +1,134 @@
+{{/*
+=============================================================================
+CONFIGMAP TEMPLATE
+This template renders a Kubernetes ConfigMap with environment-specific configuration.
+
+Usage: {{ include "chart.configmap" (dict "svc" "app-name" "cmp" "component" "Values" .Values) }}
+=============================================================================
+*/}}
+
+{{- define "config.dict.common" }}{{- end }}
+{{- define "config.dict.default" }}{{- end }}
+{{- define "config.dict.production" }}{{- end }}
+{{- define "config.dict.staging" }}{{- end }}
+{{- define "config.dict.review" }}{{- end }}
+{{- define "config.dict.demo" }}{{- end }}
+{{- define "config.dict.dev" }}{{- end }}
+{{- define "config.dict.sandbox" }}{{- end }}
+
+{{- define "config.annotations.default" -}}
+{{- $env := .env -}}
+{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list "review") $values -}}
+{{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values -}}
+{{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
+helm.sh/hook: pre-install,pre-upgrade
+helm.sh/hook-weight: {{ dig "global" "hooks" "weight" "-5" $values | quote }}
+{{- else if hasKey $values "werf" }}
+werf.io/weight: {{ dig "werf" "configWeight" "-1" $values | quote }}
+{{- end }}
+{{- end -}}
+
+{{- define "chart.configmap" }}
+{{- $svc := include "common.appName" . | trim }}
+{{- $cmp := include "common.componentName" . | trim }}
+{{- $env := include "common.environment" . | trim }}
+{{- $componentValue := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+
+{{- if hasKey .Values "configs" }}
+{{- range $name, $val := .Values.configs }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "common.labels" $labelCtx | nindent 4 }}
+  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
+{{- if $val.immutable }}
+immutable: true
+{{- end }}
+data:
+{{- range $key, $value := $val.data }}
+  {{ $key }}: {{ tpl (toString $value) $ | quote }}
+{{- end }}
+{{- range $glob := $val.fromFiles | default list }}
+{{- range $path, $content := $.Files.Glob $glob }}
+  {{ base $path }}: |
+    {{- $content | toString | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- if $val.binaryFromFiles }}
+binaryData:
+{{- range $glob := $val.binaryFromFiles }}
+{{- range $path, $content := $.Files.Glob $glob }}
+  {{ base $path }}: {{ $content | b64enc | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- else }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmp }}
+  labels:
+    {{- include "common.labels" $labelCtx | nindent 4 }}
+  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" .Values) | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
+data:
+{{- $commonConfig := include "config.dict.common" . | default "" | trim }}
+{{- if ne $commonConfig "" }}
+  {{ $commonConfig | nindent 2 }}
+{{- end }}
+{{- $envSpecificTemplate := printf "config.dict.%s" $env }}
+{{- $envConfig := include $envSpecificTemplate . | default "" | trim }}
+{{- if ne $envConfig "" }}
+  {{ $envConfig | nindent 2 }}
+{{- end }}
+{{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "data") }}
+  {{- range $key, $value := $componentValue.configmap.data }}
+  {{ $key }}: {{ tpl (toString $value) $ | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create a ConfigMap specifically for binary data
+Usage: {{ include "chart.binaryConfigmap" (dict "svc" "app-name" "cmp" "component" "Values" .Values) }}
+*/}}
+{{- define "chart.binaryConfigmap" }}
+{{- $svc := include "common.appName" . | trim }}
+{{- $cmp := include "common.componentName" . | trim }}
+{{- $env := include "common.environment" . | trim }}
+{{- $componentValue := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "binaryData") }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmp }}-files
+  labels:
+    {{- include "common.labels" $labelCtx | nindent 4 }}
+  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" .Values) | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
+binaryData:
+  {{- range $key, $value := $componentValue.configmap.binaryData }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+{{- end -}}

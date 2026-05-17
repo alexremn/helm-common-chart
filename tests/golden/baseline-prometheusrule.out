@@ -1,0 +1,23 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: app-alerts
+  labels:
+    
+    app.kubernetes.io/name: rule-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  groups: 
+    - name: web
+      rules:
+      - alert: WebHighErrorRate
+        annotations:
+          summary: High 5xx rate on web
+        expr: rate(http_requests_total{code=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical

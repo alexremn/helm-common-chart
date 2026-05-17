@@ -1,0 +1,57 @@
+name: internal-app
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/internal-app
+    tag: "1.0.0"
+  imagePullPolicy: IfNotPresent
+  ingress:
+    className: nginx
+  hooks:
+    enabled: true
+    preInstallEnvironments:
+      - review
+    weight: "-5"
+
+app:
+  replicas: 2
+  image:
+    repository: ghcr.io/example/app
+    tag: "2.0.0"
+  ports:
+    http: 8080
+    metrics:
+      containerPort: 9090
+  service:
+    type: ClusterIP
+  ingress:
+    internal:
+      className: nginx-internal
+      domains:
+        - host: app.internal.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: http
+    external:
+      domains:
+        - app.example.com
+  podMonitor:
+    enabled: true
+  serviceAccount:
+    name: app-sa
+  pdb:
+    maxUnavailable: 1
+
+configs:
+  app:
+    data:
+      APP_MODE: "internal"
+
+secrets:
+  app:
+    secretKey: "internal/app/staging"
+    properties:
+      - API_KEY
+

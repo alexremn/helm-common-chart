@@ -1,0 +1,170 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sm-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+automountServiceAccountToken: true
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+data:
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sm-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sm-app
+        app.kubernetes.io/component: web
+        app.kubernetes.io/environment: dev
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/web:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: metrics
+            containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: "default"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web
+  labels:
+    
+    app.kubernetes.io/name: sm-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sm-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/instance: smoke
+  endpoints:
+    - port: "metrics"
+      path: /metrics
+      interval: 30s
+      metricRelabelings:
+        - action: drop
+          regex: '(activerecord_query_duration_seconds_bucket|http_response_duration_milliseconds_bucket|rails_view_runtime_seconds_bucket|rails_request_duration_seconds_bucket|rails_db_runtime_seconds_bucket)'
+          sourceLabels: [__name__]
+  namespaceSelector:
+    matchNames:
+      - default

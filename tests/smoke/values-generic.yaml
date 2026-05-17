@@ -1,0 +1,86 @@
+name: internal-platform
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/internal-app
+    tag: "1.2.3"
+  imagePullPolicy: IfNotPresent
+  hooks:
+    preInstallEnvironments:
+      - review
+
+web:
+  replicas: 2
+  image:
+    repository: ghcr.io/example/web
+    tag: "2.0.0"
+  ports:
+    http: 8080
+    metrics:
+      containerPort: 9090
+  podMonitor:
+    enabled: true
+    interval: 30s
+  serviceAccount:
+    name: web-sa
+  ingress:
+    internal:
+      className: nginx-internal
+      domains:
+        - host: web.internal.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: http
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    external:
+      domains:
+        - web.example.com
+  scaling:
+    min: 2
+    max: 5
+    triggers:
+      - type: cpu
+        value: "75"
+  pdb:
+    maxUnavailable: 1
+  configmap:
+    data:
+      APP_MODE: internal
+      FEATURE_X: "true"
+    binaryData:
+      app.bin: "YmluYXJ5"
+
+stateful:
+  replicas: 1
+  ports:
+    http: 8081
+  persistence:
+    - name: data
+      size: 5Gi
+      storageClass: standard
+
+jobs:
+  run_task:
+    image: ghcr.io/example/jobs:latest
+    command: ["/bin/sh", "-c"]
+    args: ["echo job"]
+
+cronjobs:
+  sync_task:
+    schedule: "*/5 * * * *"
+    image: ghcr.io/example/cron:latest
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron"]
+
+secrets:
+  web-secrets:
+    secretKey: /apps/internal/web
+    properties:
+      - DB_PASSWORD
+      - API_KEY
+    includes:
+      - common
+

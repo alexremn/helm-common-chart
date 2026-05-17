@@ -1,0 +1,9 @@
+apiVersion: v2
+name: common-smoke
+version: 0.1.0
+appVersion: "7.8.9"
+type: application
+dependencies:
+  - name: common
+    version: "*"
+    repository: "file://../.."

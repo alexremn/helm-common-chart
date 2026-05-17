@@ -1,0 +1,39 @@
+# Example values for chart.rbac
+# Use as: -f examples/values.rbac.yaml
+
+name: rbac-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  serviceAccount:
+    name: web-sa
+  rbac:
+    role:
+      rules:
+        - apiGroups: [""]
+          resources: [configmaps]
+          verbs: [get, list, watch]
+  rbacCluster:
+    clusterRole:
+      rules:
+        - apiGroups: [""]
+          resources: [nodes]
+          verbs: [get, list]
+
+rbac:
+  custom-readonly:
+    kind: Role
+    rules:
+      - apiGroups: [""]
+        resources: [pods]
+        verbs: [get, list]
+    subjects:
+      - kind: ServiceAccount
+        name: read-only

@@ -1,0 +1,16 @@
+# Example: opt into the Go profile
+# Use as: -f examples/values.profile-go.yaml
+
+global:
+  profile: go
+
+web:
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+  ports:
+    http: 8080
+    metrics: 9090
+  podMonitor:
+    enabled: true
+  # /healthz is the go-profile default; no per-component override needed.

@@ -1,0 +1,78 @@
+# Exercises 1.3.x feature surface:
+#  - generic name/environment (no werf)
+#  - structured image map with `registry`
+#  - list-style ingress with global+entry annotations
+#  - global.compat.legacySelectorLabels flag
+#  - global.imagePullSecrets
+#  - explicit deployment.replicasOnCreationAnnotation
+name: features-app
+environment: production
+
+global:
+  image:
+    registry: ghcr.io
+    repository: example/features-app
+    tag: "3.1.4"
+  imagePullPolicy: Always
+  imagePullSecrets:
+    - name: ghcr-pull
+  ingress:
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+  deployment:
+    replicasOnCreationAnnotation: "hubstaff.com/initial-replicas"
+  compat:
+    legacySelectorLabels: true
+  hooks:
+    enabled: true
+    weight: "-7"
+
+web:
+  # No explicit replicas + scaling.min => initial-replicas annotation is emitted.
+  ports:
+    http: 8080
+    metrics: 9090
+  ingress:
+    - name: public
+      domains:
+        - app.example.com
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 32m
+    - name: admin
+      className: nginx-internal
+      domains:
+        - host: admin.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: http
+  scaling:
+    min: 3
+    max: 10
+    triggers:
+      - type: cpu
+        value: "75"
+  pdb:
+    minAvailable: 2
+  configmap:
+    data:
+      LOG_LEVEL: info
+
+stateful:
+  ports:
+    http: 8081
+  persistence:
+    name: data
+    size: 10Gi
+
+jobs:
+  run_task:
+    command: ["/bin/sh", "-c"]
+    args: ["echo features"]
+
+cronjobs:
+  sync_task:
+    schedule: "0 0 * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron features"]

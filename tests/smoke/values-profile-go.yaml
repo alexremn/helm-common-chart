@@ -1,0 +1,53 @@
+# Same component surface as values-features.yaml but with global.profile: go
+# to assert the go profile changes probe paths, podmonitor relabelings,
+# and envFrom phantom defaults. Other Phase 1 task fixtures keep the implicit
+# rails profile (which is byte-identical to v1.3.1).
+name: features-app
+environment: production
+
+global:
+  profile: go
+  image:
+    registry: ghcr.io
+    repository: example/features-app
+    tag: "3.1.4"
+  imagePullPolicy: Always
+  imagePullSecrets:
+    - name: ghcr-pull
+  ingress:
+    className: nginx
+  hooks:
+    enabled: true
+    weight: "-7"
+  envFrom:
+    configs: []
+    secrets: []
+
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  podMonitor:
+    enabled: true
+  ingress:
+    - name: public
+      domains:
+        - app.example.com
+
+stateful:
+  ports:
+    http: 8081
+  persistence:
+    name: data
+    size: 10Gi
+
+jobs:
+  run_task:
+    command: ["/bin/sh", "-c"]
+    args: ["echo features"]
+
+cronjobs:
+  sync_task:
+    schedule: "0 0 * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron features"]
