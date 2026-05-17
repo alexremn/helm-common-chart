@@ -190,6 +190,58 @@ Generate a deterministic name for resources like jobs
 Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revision) }}
 */}}
 {{/*
+Build a merged securityContext map for the requested scope ("pod" or
+"container"). Used by `common.pod.securityContext` and
+`common.container.securityContext`; both share the merge logic and
+differ only in scope key and the set of override keys.
+
+Returns the YAML-marshaled merged map (use `fromYaml` to consume).
+
+Parameters:
+  scope         — "pod" or "container"
+  root          — chart root (for profile + global lookups)
+  component     — component values map (reads .securityContext.<scope>)
+  input         — for the legacy unwrapped call shape, the raw input
+                  map whose top-level <overrideKeys> are layered last
+  overrideKeys  — list of top-level keys honored on unwrapped input
+  wrapped       — true when called with the new dict shape (skips
+                  the override-keys layering)
+*/}}
+{{- define "common._securityContext.merge" -}}
+{{- $scope := required "common._securityContext.merge: scope is required" .scope -}}
+{{- $root := default dict .root -}}
+{{- $component := default dict .component -}}
+{{- $input := default dict .input -}}
+{{- $overrideKeys := default (list) .overrideKeys -}}
+{{- $wrapped := default false .wrapped -}}
+{{- $secCtx := dict -}}
+{{- $profile := include "common.profile" $root -}}
+{{- if eq $profile "rails" -}}
+  {{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
+  {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" $scope dict $profileDefaults)) -}}
+{{- end -}}
+{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $globalSecCtx := dig "global" "securityContext" $scope dict $values -}}
+{{- if kindIs "map" $globalSecCtx -}}
+  {{- $_ := mergeOverwrite $secCtx (deepCopy $globalSecCtx) -}}
+{{- end -}}
+{{- if and (kindIs "map" $component) (hasKey $component "securityContext") -}}
+  {{- $compSec := $component.securityContext -}}
+  {{- if and (kindIs "map" $compSec) (hasKey $compSec $scope) (kindIs "map" (index $compSec $scope)) -}}
+    {{- $_ := mergeOverwrite $secCtx (deepCopy (index $compSec $scope)) -}}
+  {{- end -}}
+{{- end -}}
+{{- if and (not $wrapped) (kindIs "map" $input) -}}
+  {{- range $key := $overrideKeys -}}
+    {{- if hasKey $input $key -}}
+      {{- $_ := set $secCtx $key (index $input $key) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{ toYaml $secCtx }}
+{{- end -}}
+
+{{/*
 Emit a YAML field from a source map, conditionally.
 
 Replaces the "if hasKey emit toYaml" passthrough boilerplate scattered

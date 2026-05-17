@@ -359,29 +359,13 @@ Usage:
   {{- $root = default dict $input.root -}}
   {{- $wrapped = true -}}
 {{- end -}}
-{{- $secCtx := dict -}}
-{{- $profile := include "common.profile" $root -}}
-{{- if eq $profile "rails" -}}
-  {{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
-  {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" "container" dict $profileDefaults)) -}}
-{{- end -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
-{{- $globalSecCtx := dig "global" "securityContext" "container" dict $values -}}
-{{- if kindIs "map" $globalSecCtx -}}
-  {{- $_ := mergeOverwrite $secCtx (deepCopy $globalSecCtx) -}}
-{{- end -}}
-{{- if and (kindIs "map" $component) (hasKey $component "securityContext") -}}
-  {{- if and (kindIs "map" $component.securityContext) (hasKey $component.securityContext "container") (kindIs "map" $component.securityContext.container) -}}
-    {{- $_ := mergeOverwrite $secCtx (deepCopy $component.securityContext.container) -}}
-  {{- end -}}
-{{- end -}}
-{{- if and (not $wrapped) (kindIs "map" $input) -}}
-  {{- range $key := list "allowPrivilegeEscalation" "runAsNonRoot" "privileged" "readOnlyRootFilesystem" "capabilities" "localhostProfile" "seccompProfile" "procMount" "seLinuxOptions" "windowsOptions" -}}
-    {{- if hasKey $input $key -}}
-      {{- $_ := set $secCtx $key (index $input $key) -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
+{{- $secCtx := include "common._securityContext.merge" (dict
+    "scope" "container"
+    "root" $root
+    "component" $component
+    "input" $input
+    "wrapped" $wrapped
+    "overrideKeys" (list "allowPrivilegeEscalation" "runAsNonRoot" "privileged" "readOnlyRootFilesystem" "capabilities" "localhostProfile" "seccompProfile" "procMount" "seLinuxOptions" "windowsOptions")) | fromYaml | default dict -}}
 {{- if gt (len $secCtx) 0 }}
 securityContext:
   {{- if hasKey $secCtx "allowPrivilegeEscalation" }}

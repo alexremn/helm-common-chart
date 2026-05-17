@@ -361,29 +361,13 @@ Usage:
   {{- $root = default dict $input.root -}}
   {{- $wrapped = true -}}
 {{- end -}}
-{{- $secCtx := dict -}}
-{{- $profile := include "common.profile" $root -}}
-{{- if eq $profile "rails" -}}
-  {{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
-  {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" "pod" dict $profileDefaults)) -}}
-{{- end -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
-{{- $globalSecCtx := dig "global" "securityContext" "pod" dict $values -}}
-{{- if kindIs "map" $globalSecCtx -}}
-  {{- $_ := mergeOverwrite $secCtx (deepCopy $globalSecCtx) -}}
-{{- end -}}
-{{- if and (kindIs "map" $component) (hasKey $component "securityContext") -}}
-  {{- if and (kindIs "map" $component.securityContext) (hasKey $component.securityContext "pod") (kindIs "map" $component.securityContext.pod) -}}
-    {{- $_ := mergeOverwrite $secCtx (deepCopy $component.securityContext.pod) -}}
-  {{- end -}}
-{{- end -}}
-{{- if and (not $wrapped) (kindIs "map" $input) -}}
-  {{- range $key := list "runAsUser" "runAsGroup" "fsGroup" "seccompType" "seccompProfile" "fsGroupChangePolicy" "supplementalGroups" "sysctls" -}}
-    {{- if hasKey $input $key -}}
-      {{- $_ := set $secCtx $key (index $input $key) -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
+{{- $secCtx := include "common._securityContext.merge" (dict
+    "scope" "pod"
+    "root" $root
+    "component" $component
+    "input" $input
+    "wrapped" $wrapped
+    "overrideKeys" (list "runAsUser" "runAsGroup" "fsGroup" "seccompType" "seccompProfile" "fsGroupChangePolicy" "supplementalGroups" "sysctls")) | fromYaml | default dict -}}
 {{- if gt (len $secCtx) 0 }}
 securityContext:
   {{- if hasKey $secCtx "runAsUser" }}
