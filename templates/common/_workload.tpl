@@ -41,7 +41,7 @@ Usage: {{ include "common.image.toString" $imgValue }}
     {{- else if .version -}}
 {{ printf "%s:%s" $base (.version | toString) }}
     {{- else -}}
-{{ $base }}
+{{- fail (printf "Image %q has no tag, digest, or version, and .Chart.AppVersion is empty. Refusing to render an untagged image." $base) -}}
     {{- end -}}
   {{- end -}}
 {{- else -}}
