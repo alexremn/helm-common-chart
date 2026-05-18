@@ -226,7 +226,15 @@ Usage: {{ include "common.env.fieldRef" (dict "name" "POD_NAME" "fieldPath" "met
 {{- end }}
 
 {{/*
-Process environment variables from a dictionary
+Process environment variables from a dictionary.
+
+SECURITY: env values are rendered through Helm's `tpl` against the chart
+root context (`$`). Any Go-template syntax in a value is executed,
+including reads against `.Values.global.*`. Treat env values as a code
+surface — only set them from a trusted values source. For
+multi-tenant setups, gate untrusted env values behind a separate helper
+or strip template syntax before passing them in.
+
 Usage: {{ include "common.envs" .Values.myComponent }}
 */}}
 {{- define "common.envs" }}
