@@ -127,7 +127,16 @@ Resolve `imagePullPolicy`. See `docs/values-contract.md` for resolution order.
 {{- if and (kindIs "map" $component) (hasKey $component "image") (kindIs "map" $component.image) -}}
   {{- $componentImagePullPolicy = $component.image.pullPolicy -}}
 {{- end -}}
-{{- $policy := coalesce $component.imagePullPolicy $componentImagePullPolicy (dig "global" "imagePullPolicy" nil $values) (dig "global" "image" "pullPolicy" nil $values) (dig "werf" "image" "pullPolicy" nil $values) "IfNotPresent" -}}
+{{- /* Default pull policy is IfNotPresent, but switch to Always when the
+     resolved image string ends with ":latest" to avoid stale-cache skew
+     across nodes. Explicit override (component.imagePullPolicy or global)
+     always wins regardless of tag. */ -}}
+{{- $resolvedImage := include "common.workload.image" (dict "root" $root "component" $component "cmp" "") | trim -}}
+{{- $defaultPolicy := "IfNotPresent" -}}
+{{- if hasSuffix ":latest" $resolvedImage -}}
+  {{- $defaultPolicy = "Always" -}}
+{{- end -}}
+{{- $policy := coalesce $component.imagePullPolicy $componentImagePullPolicy (dig "global" "imagePullPolicy" nil $values) (dig "global" "image" "pullPolicy" nil $values) (dig "werf" "image" "pullPolicy" nil $values) $defaultPolicy -}}
 {{ $policy }}
 {{- end }}
 
