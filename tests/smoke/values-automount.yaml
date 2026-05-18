@@ -1,0 +1,21 @@
+name: smoke
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/automount-demo
+    tag: "1.0.0"
+
+web:
+  replicas: 1
+  ports:
+    http: 8080
+  serviceAccount:
+    name: api-caller
+    automount: true
+  rbac:
+    role:
+      rules:
+        - apiGroups: [""]
+          resources: ["configmaps"]
+          verbs: ["get", "list", "watch"]
