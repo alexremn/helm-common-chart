@@ -1,0 +1,35 @@
+checks:
+  doNotAutoAddDefaults: true
+  exclude:
+    # Library-shape noise: consumers are expected to set these per-workload
+    - no-anti-affinity            # smoke fixtures use 1 replica; anti-affinity is a consumer concern
+    - no-extensions-v1beta        # chart already targets apps/v1; no smoke fixture exercises extensions
+    - unset-cpu-requirements      # resource limits are a consumer concern for a library chart
+    - unset-memory-requirements   # resource limits are a consumer concern for a library chart
+    - minimum-three-replicas      # smoke fixtures use 1 replica by design
+    - use-namespace               # helm renders without --namespace in smoke; namespace is Release.Namespace at runtime
+    - no-read-only-root-fs        # many valid app types (Rails, Python) need writable root; consumer-configured
+    - run-as-non-root             # UID/GID is app-specific; consumer-configured
+    - latest-tag                  # smoke Job/CronJob fixtures intentionally use :latest for image-resolution testing
+    - no-liveness-probe           # batch Jobs/CronJobs do not use liveness probes by design
+    - no-readiness-probe          # batch Jobs/CronJobs do not use readiness probes by design
+  include:
+    - privileged-container
+    - dangling-service
+    - mismatching-selector
+    - sensitive-host-mounts
+    - drop-net-raw-capability
+
+customChecks:
+  - name: required-app-kubernetes-io-name
+    description: Workloads must carry app.kubernetes.io/name.
+    template: required-label
+    params:
+      key: "app.kubernetes.io/name"
+    scope:
+      objectKinds:
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+        - Job
+        - CronJob
