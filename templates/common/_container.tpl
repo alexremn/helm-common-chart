@@ -44,7 +44,12 @@ Usage: {{ include "common.ports" .Values.myComponent }}
 {{- if kindIs "map" . }}
 {{- if hasKey . "ports" }}
 ports:
-{{- range $name, $value := .ports }}
+{{- /* Iterate over sorted keys so render order is part of the contract,
+       independent of Sprig/Go map-iteration internals. Keeps golden tests
+       stable across Helm minor-version bumps. */ -}}
+{{- $portMap := .ports }}
+{{- range $name := keys $portMap | sortAlpha }}
+{{- $value := index $portMap $name }}
 {{- if kindIs "map" $value }}
 - name: {{ $name }}
   containerPort: {{ $value.containerPort | int }}
