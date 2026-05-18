@@ -6,7 +6,13 @@ GOLDEN_DIR ?= tests/golden
 CANARYBOT_CHART ?= ../../../bots/canarybot/.helm
 TMP_CANARYBOT ?= /tmp/canarybot-common-compat
 
-.PHONY: lint lint-library lint-smoke render-smoke golden-update golden-check lint-canarybot-compat
+.PHONY: lint lint-library lint-smoke render-smoke golden-update golden-check lint-canarybot-compat \
+        validate validate-kubeconform validate-kube-linter
+
+# Phase C1 — validation tooling.
+KUBECONFORM_VERSION ?= v0.7.0
+KUBE_LINTER_VERSION ?= v0.8.3
+K8S_VERSIONS ?= 1.24.0 1.28.0 1.31.0
 
 lint: lint-library lint-smoke
 
@@ -82,3 +88,29 @@ lint-canarybot-compat:
 	else \
 	  echo "Skip canarybot compatibility check: $(CANARYBOT_CHART) not found"; \
 	fi
+
+# Run all validation gates. Assumes /tmp/common-smoke-*.out exists from render-smoke.
+validate: render-smoke validate-kubeconform validate-kube-linter
+
+# kubeconform schema validation against multiple k8s versions.
+# Files are fed via stdin because kubeconform only auto-detects .yaml/.json extensions.
+validate-kubeconform:
+	@set -e; \
+	for variant in $(SMOKE_VARIANTS); do \
+	  for ver in $(K8S_VERSIONS); do \
+	    kubeconform -strict -ignore-missing-schemas -summary \
+	      -schema-location default \
+	      -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{ .Group }}/{{ .ResourceKind }}_{{ .ResourceAPIVersion }}.json' \
+	      -kubernetes-version $$ver \
+	      - < /tmp/common-smoke-$$variant.out \
+	      || { echo "FAIL kubeconform: $$variant @ k8s $$ver" >&2; exit 1; }; \
+	  done; \
+	done
+
+# kube-linter anti-pattern detection.
+validate-kube-linter:
+	@set -e; \
+	for variant in $(SMOKE_VARIANTS); do \
+	  kube-linter lint /tmp/common-smoke-$$variant.out --config .kube-linter.yaml \
+	    || { echo "FAIL kube-linter: $$variant" >&2; exit 1; }; \
+	done
