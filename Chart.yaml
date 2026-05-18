@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.0.2"
+version: "2.0.3"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,8 +29,11 @@ annotations:
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
     - kind: added
-      description: CI validation via kubeconform (multi-k8s-version) and kube-linter
+      description: Cosign keyless OIDC signing of the OCI chart artifact
     - kind: added
-      description: smoke variant tests/smoke/values-automount.yaml exercising serviceAccount.automount opt-in
-    - kind: changed
-      description: helm version requirement is now Helm v4
+      description: SBOM (SPDX + CycloneDX) attached to each GitHub Release
+    - kind: added
+      description: SECURITY.md verification section + README cosign badge
+  artifacthub.io/signKey: |
+    fingerprint: keyless
+    url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
