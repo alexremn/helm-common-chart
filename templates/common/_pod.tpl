@@ -198,6 +198,11 @@ tolerations:
 
 {{/*
 Pod-level networking and runtime knobs. Emits only fields that are set.
+
+Strings use `with` so an empty / unset value is skipped. Booleans use
+`if hasKey` so an explicit `false` is preserved — `with` treats `false`
+as empty and would silently drop a deliberate disable.
+
 Usage: {{ include "common.podRuntime" .Values.myComponent }}
 */}}
 {{- define "common.podRuntime" }}
