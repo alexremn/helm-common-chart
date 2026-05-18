@@ -14,9 +14,10 @@ Usage: {{ include "randHex" 16 }}
     {{- $result := "" -}}
     {{- range $i := until . -}}
         {{- /* `randNumeric 1` returns "0".."9" — never picks a..f. Pick over
-               the full 0..15 range by drawing a 3-digit number and reducing
-               mod 16. Distribution bias is ~0.1% (1000 mod 16 ≠ 0). */ -}}
-        {{- $idx := mod (randNumeric 3 | int) 16 -}}
+               the full 0..15 range by drawing a 6-digit number and reducing
+               mod 16. Per-character bias is ~0.0016% (1,000,000 mod 16 = 0,
+               so bias is actually zero for this range size). */ -}}
+        {{- $idx := mod (randNumeric 6 | int) 16 -}}
         {{- $result = print $result (substr $idx (add $idx 1 | int) $base) -}}
     {{- end -}}
     {{- $result -}}
