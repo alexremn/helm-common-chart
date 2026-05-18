@@ -1,0 +1,81 @@
+name: Bug report
+description: Report unexpected behaviour, broken renders, or template logic errors.
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Please fill the fields below. If your issue is
+        an upgrade question, check `docs/migration-v1-to-v2.md` first — it lists
+        every v1→v2 break and the migration knob.
+
+  - type: input
+    id: chart-version
+    attributes:
+      label: Chart version
+      description: From `helm dependency list` or your `Chart.yaml` pin.
+      placeholder: "2.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: helm-version
+    attributes:
+      label: Helm version
+      description: Output of `helm version --short`.
+      placeholder: "v3.16.2"
+    validations:
+      required: true
+
+  - type: input
+    id: kubernetes-version
+    attributes:
+      label: Kubernetes version
+      description: Output of `kubectl version --short` (server side).
+      placeholder: "v1.28.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: values
+    attributes:
+      label: Minimal values reproducer
+      description: |
+        Smallest `values.yaml` snippet that triggers the bug. Strip everything
+        not needed to reproduce.
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages verbatim.
+    validations:
+      required: true
+
+  - type: textarea
+    id: render
+    attributes:
+      label: (Optional) Full `helm template` output
+      description: If the bug is render-shape rather than render-error.
+      render: yaml
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues and didn't find a duplicate.
+          required: true
+        - label: My reproducer is minimal (no unrelated values).
+          required: true

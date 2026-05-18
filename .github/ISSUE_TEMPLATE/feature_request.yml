@@ -1,0 +1,46 @@
+name: Feature request
+description: Propose a new template, helper, or behaviour for the library chart.
+title: "[feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature. This is a **library chart** — it provides
+        reusable helpers consumed by application charts. New helpers should be
+        useful to many consumers, not specific to one application.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What real workload pattern is poorly served by the current API? Who hits this?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: Proposed API
+      description: |
+        Concrete shape of the values input + the helper signature (or new
+        template). Code blocks welcome.
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Why aren't existing helpers / overrides enough?
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: This is a library-shape concern (not specific to one app).
+          required: true
+        - label: I searched existing issues and didn't find a duplicate.
+          required: true
