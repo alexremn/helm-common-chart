@@ -5,7 +5,7 @@ make changes in this repo. Keep it under ~80 lines.
 
 ## What this is
 
-A Helm v3 library chart (`Chart.yaml` `type: library`) providing reusable
+A Helm v4 library chart (`Chart.yaml` `type: library`) providing reusable
 templates for Kubernetes workloads, services, autoscaling, observability,
 RBAC, configs/secrets, and storage. Library charts emit no resources of their
 own; they expose `common.*` helpers and template definitions consumed by

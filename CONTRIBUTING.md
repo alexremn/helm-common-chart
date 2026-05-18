@@ -5,7 +5,7 @@ Thanks for considering a contribution. This chart is a public OSS library; PRs a
 ## Dev setup
 
 Required:
-- Helm v3 (`helm version` should report `v3.x`)
+- Helm v4 (`helm version` should report `v4.x`)
 - `make`
 - A Bourne-compatible shell (Makefile auto-detects `zsh`, `bash`, or `sh`)
 
