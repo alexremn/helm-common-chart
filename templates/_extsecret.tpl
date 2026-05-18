@@ -20,7 +20,19 @@ Usage: {{ include "chart.extsecret" (dict "svc" "app-name" "cmp" "component" "Va
 {{- define "secrets.annotations.default" }}
 {{- $env := .env }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
+{{- /* `force-sync` drives ESO to re-reconcile when its value changes.
+       Default: stable per-revision value so CI diffing and helm upgrades
+       are noise-free. Opt into per-render rotation with
+       `global.externalSecrets.forceSync: true`, which restores the
+       previous `{{ now }}` behavior. */ -}}
+{{- $forceSync := dig "global" "externalSecrets" "forceSync" false $values }}
+{{- if $forceSync }}
 force-sync: {{ now | quote }}
+{{- else }}
+{{- $rev := "1" }}
+{{- if .Release }}{{- $rev = .Release.Revision | toString }}{{- end }}
+force-sync: {{ $rev | quote }}
+{{- end }}
 {{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list "review") $values }}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values }}
 {{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
