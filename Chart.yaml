@@ -2,8 +2,8 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.0.0"
-appVersion: "1.0.0"
+version: "2.0.1"
+kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
   - https://github.com/alexremn/helm-common-chart
@@ -18,3 +18,15 @@ keywords:
 icon: https://remniov.com/icon.png
 annotations:
   artifacthub.io/license: Apache-2.0
+  artifacthub.io/operator: "false"
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/links: |
+    - name: Source
+      url: https://github.com/alexremn/helm-common-chart
+    - name: Migration v1 → v2
+      url: https://github.com/alexremn/helm-common-chart/blob/main/docs/migration-v1-to-v2.md
+    - name: Values reference
+      url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
+  artifacthub.io/changes: |
+    - kind: changed
+      description: Phase C4 — repo hygiene + ArtifactHub metadata. No template changes.
