@@ -23,10 +23,9 @@ This template renders a KEDA ScaledObject for autoscaling Kubernetes resources.
        the metadata block emits. Keeps the original whitespace pattern intact
        (common.annotations emits nothing when there are no annotations) so existing
        renders without pausedReplicaCount stay byte-identical. */ -}}
+{{- $effectiveAnn := dig "annotations" dict $scaleConfig -}}
 {{- if $scaleConfig.pausedReplicaCount -}}
-  {{- $existingAnn := default dict $scaleConfig.annotations -}}
-  {{- $newAnn := mergeOverwrite (deepCopy $existingAnn) (dict "autoscaling.keda.sh/paused-replicas" (printf "%v" $scaleConfig.pausedReplicaCount)) -}}
-  {{- $_ := set $scaleConfig "annotations" $newAnn -}}
+  {{- $effectiveAnn = mergeOverwrite (deepCopy $effectiveAnn) (dict "autoscaling.keda.sh/paused-replicas" (printf "%v" $scaleConfig.pausedReplicaCount)) -}}
 {{- end }}
 
 apiVersion: keda.sh/v1alpha1
@@ -35,7 +34,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $scaleConfig | trim }}
+  {{- $ann := include "common.annotations" (dict "annotations" $effectiveAnn) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 2 }}
