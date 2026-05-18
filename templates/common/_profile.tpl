@@ -20,7 +20,12 @@ Lookup order:
 */}}
 {{- define "common.profile" -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- dig "global" "profile" "generic" $values -}}
+{{- $profile := dig "global" "profile" "generic" $values -}}
+{{- $valid := list "generic" "rails" "python" "go" -}}
+{{- if not (has $profile $valid) -}}
+{{- fail (printf "Unknown global.profile %q. Valid profiles: %s." $profile (join ", " $valid)) -}}
+{{- end -}}
+{{- $profile -}}
 {{- end -}}
 
 {{/*
