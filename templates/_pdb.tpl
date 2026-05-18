@@ -37,7 +37,7 @@ spec:
     matchLabels:
       {{- include "common.labels.matchLabels" $labelCtx | nindent 6 }}
     {{- with $pdbConfig.selectorMatchLabels }}
-      {{ toYaml . | indent 6 }}
+      {{- toYaml . | nindent 6 }}
     {{- end }}
   {{- with $pdbConfig.unhealthyPodEvictionPolicy }}
   unhealthyPodEvictionPolicy: {{ . }}
