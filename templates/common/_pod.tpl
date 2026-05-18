@@ -295,7 +295,21 @@ podAntiAffinity:
 {{- end }}
 
 {{/*
-Node affinity helper
+Node affinity helper.
+
+Accepts two input shapes:
+  Map  — passed through verbatim via toYaml; supports any nodeAffinity
+          structure (required/preferred, multiple matchExpressions, multi-
+          value In/NotIn lists, etc.).
+  Slice — legacy convenience form. Each slice entry must have fields:
+          key, operator (default "In"), value (SINGLE string).
+          LIMITATION: the slice form supports only one value per
+          matchExpression entry. To express "key X In [v1, v2]" you must
+          switch to the map form. This limitation is intentional — the
+          slice form is retained for backward compatibility only. New
+          consumers should use the map form.
+          Deprecation to Phase C is tracked in the B3 audit (R3/N7).
+
 Usage: {{ include "common.nodeAffinity" .Values.global.nodeAffinity }}
 */}}
 {{- define "common.nodeAffinity" -}}
