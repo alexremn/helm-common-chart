@@ -255,6 +255,9 @@ metadata:
     app.kubernetes.io/component: run-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+  annotations:
+    werf.io/no-activity-timeout: "6m"
+    werf.io/failures-allowed-per-replica: "3"
 spec:
   backoffLimit: 0
   template:
@@ -286,6 +289,9 @@ metadata:
     app.kubernetes.io/component: sync-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+  annotations:
+    werf.io/no-activity-timeout: "6m"
+    werf.io/failures-allowed-per-replica: "3"
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: "Forbid"

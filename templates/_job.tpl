@@ -19,11 +19,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $componentValues | trim }}
-  {{- if $ann }}
-  annotations:
-    {{- $ann | nindent 2 }}
-  {{- end }}
+  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
   backoffLimit: {{ default 0 $componentValues.backoffLimit | int }}
   {{- with $componentValues.activeDeadlineSeconds }}
