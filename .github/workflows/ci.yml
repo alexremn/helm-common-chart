@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Validate Chart.yaml
+        run: |
+          helm show chart . > /tmp/chart-meta.yaml
+          grep -E '^name: common$' /tmp/chart-meta.yaml
+          grep -E '^type: library$' /tmp/chart-meta.yaml
+
+      - name: Helm lint (library + every smoke variant)
+        run: make lint
+
+      - name: Golden render check
+        run: make golden-check

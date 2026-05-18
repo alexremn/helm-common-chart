@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  package-and-push:
+    runs-on: ubuntu-latest
+    env:
+      REF_NAME: ${{ github.ref_name }}
+      REPO_OWNER: ${{ github.repository_owner }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Verify tag matches Chart.yaml version
+        run: |
+          tag="${REF_NAME#v}"
+          chart_version="$(helm show chart . | awk '/^version:/ {print $2}' | tr -d '"')"
+          if [ "$tag" != "$chart_version" ]; then
+            echo "Tag $REF_NAME (=> $tag) does not match Chart.yaml version $chart_version" >&2
+            exit 1
+          fi
+
+      - name: Lint and golden-check before release
+        run: |
+          make lint
+          make golden-check
+
+      - name: Package chart
+        id: package
+        run: |
+          mkdir -p dist
+          helm package . --destination dist
+          pkg="$(ls dist/common-*.tgz | head -n1)"
+          echo "pkg=$pkg" >> "$GITHUB_OUTPUT"
+
+      - name: Helm registry login (GHCR)
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" \
+            | helm registry login ghcr.io \
+                --username "$ACTOR" \
+                --password-stdin
+
+      - name: Push chart to GHCR (OCI)
+        env:
+          PKG: ${{ steps.package.outputs.pkg }}
+        run: |
+          helm push "$PKG" "oci://ghcr.io/${REPO_OWNER}/charts"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.pkg }}
+          generate_release_notes: true
+          body: |
+            Helm OCI chart pushed to `ghcr.io/${{ github.repository_owner }}/charts/common:${{ github.ref_name }}`.
+
+            Pull with:
+            ```
+            helm pull oci://ghcr.io/${{ github.repository_owner }}/charts/common --version ${{ github.ref_name }}
+            ```
