@@ -266,7 +266,7 @@ podAntiAffinity:
           operator: In
           values:
           - {{ .cmp }}
-        - key: app.kubernetes.io/environment
+        - key: helm.sh/environment
           operator: In
           values:
           - {{ .env }}
@@ -283,7 +283,7 @@ podAntiAffinity:
           operator: In
           values:
           - {{ .cmp }}
-        - key: app.kubernetes.io/environment
+        - key: helm.sh/environment
           operator: In
           values:
           - {{ .env }}

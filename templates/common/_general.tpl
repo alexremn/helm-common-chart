@@ -46,7 +46,7 @@ Lookup order:
 {{- end }}
 
 {{/*
-Resolve the environment label (`app.kubernetes.io/environment`).
+Resolve the environment label (`helm.sh/environment`).
 Lookup order:
   1. .env passed via helper context
   2. .Values.global.environment / .Values.global.env
