@@ -19,10 +19,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- with $componentValues.annotations }}
-  annotations:
-    {{ toYaml . | nindent 4 }}
-  {{- end }}
+  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
   minReadySeconds: {{ default 0 (coalesce $dsConfig.minReadySeconds $componentValues.minReadySeconds) }}
   {{- with $dsConfig.revisionHistoryLimit }}
