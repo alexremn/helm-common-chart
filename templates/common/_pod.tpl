@@ -163,7 +163,7 @@ Usage: {{ include "common.tolerations" . }}
 */}}
 {{- define "common.tolerations" -}}
 {{- $component := dict -}}
-{{- $profile := "rails" -}}
+{{- $profile := "generic" -}}
 {{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") -}}
   {{- $component = default dict .component -}}
   {{- $profile = include "common.profile" .root -}}
