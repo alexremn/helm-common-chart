@@ -133,6 +133,35 @@ Resolve `imagePullPolicy`. See `docs/values-contract.md` for resolution order.
 
 {{/*
 Render a full pod spec body for a workload.
+
+Toggle flags — all default to false when omitted. For a "full" workload
+(Deployment, StatefulSet, DaemonSet) pass all flags as true. Job and
+CronJob intentionally omit probes, lifecycle, and termination-grace to
+match Kubernetes semantics for short-lived pods.
+
+  includePorts                  — emit container ports block
+  includeProbes                 — emit liveness/readiness/startup probes
+  includeLifecycle              — emit lifecycle hook block
+  includePriorityClassName      — emit priorityClassName
+  includeHostAliases            — emit hostAliases
+  includeTopologySpreadConstraints — emit topologySpreadConstraints
+  includeTerminationGracePeriod — emit terminationGracePeriodSeconds
+
+Canonical "full" toggle set (Deployment / StatefulSet / DaemonSet):
+  includePorts: true
+  includeProbes: true
+  includeLifecycle: true
+  includePriorityClassName: true
+  includeHostAliases: true
+  includeTopologySpreadConstraints: true
+  includeTerminationGracePeriod: true
+
+NOTE: Defaulting all toggles to false means a new workload kind that
+forgets a flag will silently emit pods without that section. This is a
+known footgun (B3 audit R4/N10). Inverting defaults to true (with Job/
+CronJob opting out) is deferred to Phase C because it would flip golden
+output for Job/CronJob variants.
+
 Usage:
 {{ include "common.workload.podSpec" (dict
   "root" $
