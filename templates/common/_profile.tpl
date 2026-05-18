@@ -44,9 +44,7 @@ rails:
   probe:
     type: http
     path: /health_check/full
-    command:
-      - cat
-      - /app/tmp/sidekiq_readiness_probe
+    command: []
     port: http
     initialDelaySeconds: 0
     periodSeconds: 10
