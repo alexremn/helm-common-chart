@@ -58,3 +58,37 @@ instead):
 - Override `serviceAccount.automount: true` explicitly only for workloads
   that call the Kubernetes API. The library default is `false` since v2.0.0.
 - Set `secrets.<name>.secretStore` and `scaledObject.triggers[].metadata.serverAddress` explicitly — both are required (no default) since v2.0.0.
+
+## Verification
+
+Every tagged release is signed with [Sigstore Cosign](https://www.sigstore.dev/)
+via GitHub Actions OIDC (keyless — no long-lived signing keys). Verify
+before installing:
+
+```
+cosign verify \
+  --certificate-identity-regexp "^https://github.com/alexremn/helm-common-chart/" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  ghcr.io/alexremn/charts/common:<version>
+```
+
+A successful verification confirms:
+- The OCI artifact was signed by a GitHub Actions workflow run in this repository.
+- The signature is recorded in the Sigstore public transparency log (Rekor).
+- The image digest has not been altered since signing.
+
+### SBOM
+
+Each release ships SBOMs in two formats:
+
+- `common-v<version>.spdx.json` — SPDX 2.3 format
+- `common-v<version>.cdx.json` — CycloneDX 1.5 format
+
+Both are attached to the GitHub Release page. Download them alongside the
+chart `.tgz` to inspect the file inventory and licensing.
+
+### Tooling
+
+Install `cosign` from <https://github.com/sigstore/cosign/releases>.
+Install `syft` from <https://github.com/anchore/syft/releases> if you
+want to regenerate SBOMs locally.
