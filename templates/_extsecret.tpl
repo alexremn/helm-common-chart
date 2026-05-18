@@ -78,7 +78,11 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  annotations: {{ include "secrets.annotations.default" (dict "env" $env "Values" $.Values) | nindent 4 }}
+  {{- $ann := include "secrets.annotations.default" (dict "env" $env "Values" $.Values "Release" $.Release) | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
   secretStoreRef:

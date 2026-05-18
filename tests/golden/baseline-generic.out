@@ -405,8 +405,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
-  annotations: 
-    
+  annotations:
     force-sync: "<NOW>"
 spec:
   refreshInterval: "10000h"

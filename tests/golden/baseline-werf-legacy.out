@@ -355,8 +355,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
-  annotations: 
-    
+  annotations:
     force-sync: "<NOW>"
     werf.io/weight: "-1"
 spec:
