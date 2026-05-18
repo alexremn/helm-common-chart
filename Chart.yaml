@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.0.1"
+version: "2.0.2"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -28,5 +28,9 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: added
+      description: CI validation via kubeconform (multi-k8s-version) and kube-linter
+    - kind: added
+      description: smoke variant tests/smoke/values-automount.yaml exercising serviceAccount.automount opt-in
     - kind: changed
-      description: Phase C4 — repo hygiene + ArtifactHub metadata. No template changes.
+      description: helm version requirement is now Helm v4
