@@ -22,6 +22,12 @@ Keys: `workloadType`, `replicas`, `strategy`, `image`, `command`, `args`, `env`,
 
 Selects the kind of workload (`Deployment` | `StatefulSet` | `DaemonSet` | `Job` | `CronJob`) and its rollout behavior. `image.repository` + `image.tag` are the most common required keys.
 
+**CronJob default `concurrencyPolicy: Forbid`** — overrides the Kubernetes default `Allow`. Forbid is the safer choice for single-instance pipelines (no overlapping runs if a previous invocation is still going) and matches how most chart consumers use cron-style batch jobs. If your cron is parallel-safe and you want overlapping runs, set `concurrencyPolicy: Allow` per CronJob.
+
+**Job default `backoffLimit: 0`** — overrides the Kubernetes default `6`. Jobs do not retry on failure by default; set `backoffLimit` explicitly per Job if you want retry-on-pod-failure semantics.
+
+**Deployment default `minReadySeconds: 10`** — overrides the Kubernetes default `0`. Adds a 10-second readiness debounce to rollouts. StatefulSet and DaemonSet keep the Kubernetes default of `0`.
+
 See: [`examples/values.generic.yaml`](../examples/values.generic.yaml), [`examples/values.daemonset.yaml`](../examples/values.daemonset.yaml).
 
 ## Container
