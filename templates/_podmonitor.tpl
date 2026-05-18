@@ -12,18 +12,25 @@ Uses explicit configuration if available, otherwise tries to smartly select a po
 {{- define "podMonitor.getMetricsPort" -}}
 {{- $componentValues := . }}
 {{- $default := "metrics" }}
-
+{{- $resolved := "" }}
 {{- if and $componentValues.podMonitor $componentValues.podMonitor.portName }}
-{{ $componentValues.podMonitor.portName }}
+  {{- $resolved = $componentValues.podMonitor.portName }}
 {{- else if and $componentValues.ports (hasKey $componentValues.ports "metrics") }}
-{{ $default }}
+  {{- $resolved = $default }}
 {{- else if and $componentValues.ports (hasKey $componentValues.ports "prometheus") }}
-{{ "prometheus" }}
+  {{- $resolved = "prometheus" }}
 {{- else if $componentValues.ports }}
-{{ keys $componentValues.ports | first }}
+  {{- $resolved = keys $componentValues.ports | sortAlpha | first }}
 {{- else }}
-{{ $default }}
+  {{- $resolved = $default }}
 {{- end }}
+{{- /* If the component declares ports, the resolved name MUST be one of
+       them — otherwise the PodMonitor is silently broken (Prometheus
+       sees a "target down" but the chart accepts the resource). */ -}}
+{{- if and $componentValues.ports (not (hasKey $componentValues.ports $resolved)) }}
+  {{- fail (printf "podMonitor: resolved port name %q not in component ports %v. Set podMonitor.portName to one of the listed names." $resolved (keys $componentValues.ports | sortAlpha)) }}
+{{- end }}
+{{ $resolved }}
 {{- end -}}
 
 {{/*
