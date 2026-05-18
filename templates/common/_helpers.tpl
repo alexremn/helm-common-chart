@@ -37,17 +37,11 @@ Usage: {{ include "config.define" (dict "name" "config-name" "key" "KEY_NAME" "v
   {{- $key        := required "Key is required" .key -}}
   {{- $namespace  := default .Release.Namespace .ns -}}
   {{- $value      := .value -}}
-  {{- if and $key $name -}}
-    {{- $configMap := (lookup "v1" "ConfigMap" $namespace $name).data -}}
-    {{- if and $configMap (index $configMap $key) -}}
-      {{- $value := index $configMap $key -}}
-      {{- printf "%s: %s" $key ($value | toString | quote) -}}
-    {{- else -}}
-      {{- printf "%s: %s" $key ($value | toString | quote) -}}
-    {{- end -}}
-  {{- else -}}
-    {{- printf "%s: %s" $key ($value | toString | quote) -}}
+  {{- $configMap  := (lookup "v1" "ConfigMap" $namespace $name).data -}}
+  {{- if and $configMap (index $configMap $key) -}}
+    {{- $value = index $configMap $key -}}
   {{- end -}}
+  {{- printf "%s: %s" $key ($value | toString | quote) -}}
 {{- end -}}
 
 {{/*
