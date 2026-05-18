@@ -8,13 +8,13 @@ A **library chart** (`type: library`) — it is not installable standalone. Cons
 
 ## Install
 
-In your application chart's `Chart.yaml`, add:
+Releases are published as OCI artifacts on GitHub Container Registry. In your application chart's `Chart.yaml`, add:
 
 ```yaml
 dependencies:
   - name: common
-    version: "^1.0.0"
-    repository: "https://alexremn.github.io/helm-common-chart"
+    version: "^2.0.0"
+    repository: "oci://ghcr.io/alexremn/charts"
 ```
 
 Then:
@@ -23,7 +23,11 @@ Then:
 helm dependency update
 ```
 
-(Until a public Helm repo is published, point `repository:` at a local path or git URL.)
+To pull the chart directly:
+
+```bash
+helm pull oci://ghcr.io/alexremn/charts/common --version 2.0.0
+```
 
 ## Quick start
 
@@ -69,8 +73,8 @@ Common helper library (`templates/common/`): workload composition, container bui
 
 ## Docs
 
-- [Breaking changes](./BREAKING.md) — version-by-version migration notes
 - [Values reference](./docs/values-reference.md) — top-level keys grouped by concern
+- [Migrating v1 → v2](./docs/migration-v1-to-v2.md) — required input changes and breaking-default audit
 - [Examples](./examples/) — working `values.*.yaml` per feature
 - [Contributing](./CONTRIBUTING.md) — dev setup, tests, golden workflow
 - `values.schema.json` — full JSON schema (validated by `helm lint`)
