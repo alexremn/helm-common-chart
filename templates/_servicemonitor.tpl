@@ -48,9 +48,9 @@ kind: ServiceMonitor
 metadata:
   name: {{ $cmp }}
   labels:
-    {{ include "common.labels" $labelCtx | nindent 4 }}
+    {{- include "common.labels" $labelCtx | nindent 4 }}
     {{- with $sm.labels }}
-    {{ toYaml . | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- with $sm.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

@@ -133,7 +133,6 @@ kind: ServiceMonitor
 metadata:
   name: web
   labels:
-    
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
