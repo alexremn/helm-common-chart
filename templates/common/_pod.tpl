@@ -185,6 +185,12 @@ tolerations:
     {{- end }}
     operator: {{ $operator | quote }}
     {{- if ne $operator "Exists" }}
+    {{- /* NOTE: omitting .value on an Equal-operator toleration produces
+         value: "true" by convention. This is intentional for the common
+         case where "true" is the intended toleration value. For other
+         intended values, always supply .value explicitly. Option 1 in
+         the B3 audit (fail on missing .value) is deferred to Phase C
+         as a contract change. */ -}}
     value: {{ default "true" .value | toString | quote }}
     {{- end }}
     effect: {{ default "NoSchedule" .effect | toString | quote }}
