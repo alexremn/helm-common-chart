@@ -23,6 +23,9 @@ Usage: {{ include "common.image.toString" $imgValue }}
 {{ . }}
 {{- else if kindIs "map" . -}}
   {{- if hasKey . "image" -}}
+    {{- if not (kindIs "string" .image) -}}
+      {{- fail (printf "Image map field 'image' must be a pre-formatted string (e.g. 'registry/repo:tag'). Got %s. Use 'repository'+'tag' (or 'digest') instead." (kindOf .image)) -}}
+    {{- end -}}
 {{ .image }}
   {{- else -}}
     {{- $repository := coalesce .repository .name -}}
