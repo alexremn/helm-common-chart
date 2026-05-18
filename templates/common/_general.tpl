@@ -307,11 +307,13 @@ SPECIALIZED HELPERS
 */}}
 
 {{/*
-Format an HTTP URL with protocol, host and optional path.
-Usage: {{ include "common.formatUrl" (dict "protocol" "http" "host" "example.com" "path" "/api/v1") }}
+Format a URL with protocol, host and optional path.
+Defaults `protocol` to `https`. Pass `protocol: "http"` explicitly to opt
+into insecure transport.
+Usage: {{ include "common.formatUrl" (dict "protocol" "https" "host" "example.com" "path" "/api/v1") }}
 */}}
 {{- define "common.formatUrl" }}
-{{- $protocol := default "http" .protocol }}
+{{- $protocol := default "https" .protocol }}
 {{- $host := .host }}
 {{- $path := default "" .path }}
 {{- if and $host $protocol }}
