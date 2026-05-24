@@ -92,7 +92,11 @@ spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
   secretStoreRef:
     name: {{ required (printf "secrets.%s.secretStore is required for ExternalSecret" $name) (dig "secretStore" "" $val) }}
-    kind: {{ dig "secretStoreKind" "ClusterSecretStore" $val }}
+    {{- $kind := dig "secretStoreKind" "ClusterSecretStore" $val }}
+    {{- if not (has $kind (list "ClusterSecretStore" "SecretStore")) }}
+    {{- fail (printf "invalid secretStoreKind %q for component %s (secret %s); must be ClusterSecretStore or SecretStore" $kind $cmp $name) }}
+    {{- end }}
+    kind: {{ $kind }}
   target:
     name: {{ default $name $val.secretName }}
     creationPolicy: {{ default "Owner" $val.creationPolicy }}
