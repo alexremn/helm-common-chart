@@ -41,8 +41,11 @@ data: {{ toYaml . | nindent 2 }}
 {{- end }}
 {{- with $val.stringData }}
 stringData:
+{{- /* F2: scope tpl context to Values/Release/Chart + this secret's
+       componentValues ($val) instead of leaking the full chart root via `$`. */ -}}
+{{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
 {{- range $k, $v := . }}
-  {{ $k }}: {{ tpl (toString $v) $ | quote }}
+  {{ $k }}: {{ tpl (toString $v) $tplCtx | quote }}
 {{- end }}
 {{- end }}
 {{- end }}

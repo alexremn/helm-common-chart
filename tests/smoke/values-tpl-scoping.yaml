@@ -1,0 +1,41 @@
+# Smoke variant for F2 — verifies the scoped tpl context.
+#
+# Each consumer-supplied template string below must render via the curated
+# dict passed to `tpl` in templates/common/_container.tpl,
+# templates/_configmap.tpl, templates/_secret.tpl and
+# templates/_scaledobject.tpl. They MUST NOT have access to anything outside
+# (Values, Release, Chart, componentValues).
+name: tpl-scoping
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "9.9.9"
+
+web:
+  replicas: 1
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  ports:
+    http: 8080
+  env:
+    # Root .Values access path — exercises that the curated dict still
+    # carries .Values through.
+    SAFE: "{{ .Values.web.image.tag }}"
+    # Curated componentValues path — exercises the rename from `$` to a
+    # named handle so consumer templates can address the current component
+    # without reaching into the chart root.
+    SCOPED_OK: "{{ .componentValues.image.repository }}"
+  configmap:
+    data:
+      # Configmap data is rendered via tpl with the same curated dict.
+      URL: "https://{{ .Values.web.image.repository }}.example.org"
+      OWN_TAG: "{{ .componentValues.image.tag }}"
+
+nativeSecrets:
+  app-bootstrap:
+    stringData:
+      TOKEN_SCOPE: "{{ .componentValues.type | default \"Opaque\" }}"
+      RELEASE_REV: "{{ .Release.Revision }}"

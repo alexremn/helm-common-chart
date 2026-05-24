@@ -234,7 +234,10 @@ containers:
     {{- if $envFrom }}
     {{- $envFrom | nindent 4 }}
     {{- end }}
-    {{- $envs := include "common.envs" $component | trim }}
+    {{- /* F2: pass a curated context (Values/Release/Chart + componentValues)
+           so consumer env templates can read root .Values without exposing
+           the full chart root (sibling components, helm built-ins). */ -}}
+    {{- $envs := include "common.envs" (dict "Values" $root.Values "Release" $root.Release "Chart" $root.Chart "componentValues" $component) | trim }}
     {{- if $envs }}
     {{- $envs | nindent 4 }}
     {{- end }}

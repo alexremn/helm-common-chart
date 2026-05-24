@@ -69,8 +69,11 @@ metadata:
 immutable: true
 {{- end }}
 data:
+{{- /* F2: scope tpl context to Values/Release/Chart + this configmap's
+       componentValues instead of leaking the full chart root via `$`. */ -}}
+{{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
 {{- range $key, $value := $val.data }}
-  {{ $key }}: {{ tpl (toString $value) $ | quote }}
+  {{ $key }}: {{ tpl (toString $value) $tplCtx | quote }}
 {{- end }}
 {{- range $glob := $val.fromFiles | default list }}
 {{- range $path, $content := $.Files.Glob $glob }}
@@ -100,8 +103,11 @@ data:
   {{ $envConfig | nindent 2 }}
 {{- end }}
 {{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "data") }}
+  {{- /* F2: scope tpl context to Values/Release/Chart + componentValues
+         instead of leaking the full chart root via `$`. */ -}}
+  {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValue }}
   {{- range $key, $value := $componentValue.configmap.data }}
-  {{ $key }}: {{ tpl (toString $value) $ | quote }}
+  {{ $key }}: {{ tpl (toString $value) $tplCtx | quote }}
   {{- end }}
 {{- end }}
 {{- end }}

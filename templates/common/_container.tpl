@@ -238,21 +238,41 @@ or strip template syntax before passing them in.
 Usage: {{ include "common.envs" .Values.myComponent }}
 */}}
 {{- define "common.envs" }}
+{{- /* F2: support two call shapes:
+       (a) wrapped dict from internal callers — has "componentValues" key
+           and carries "Values"/"Release"/"Chart" so consumer env templates
+           can read root .Values via the curated context, OR
+       (b) bare component-values dict from external consumers — preserves
+           the historical {{ include "common.envs" .Values.myComponent }}
+           API. In this shape no root context is exposed: consumer
+           templates only see .componentValues.* — by design, since that
+           was the whole point of closing the injection surface. */ -}}
 {{- if kindIs "map" . }}
-{{- if hasKey . "env" }}
+{{- $componentValues := . }}
+{{- $rootValues := dict }}
+{{- $rootRelease := dict }}
+{{- $rootChart := dict }}
+{{- if and (hasKey . "componentValues") (kindIs "map" .componentValues) }}
+  {{- $componentValues = .componentValues }}
+  {{- if hasKey . "Values" }}{{- $rootValues = .Values }}{{- end }}
+  {{- if hasKey . "Release" }}{{- $rootRelease = .Release }}{{- end }}
+  {{- if hasKey . "Chart" }}{{- $rootChart = .Chart }}{{- end }}
+{{- end }}
+{{- if hasKey $componentValues "env" }}
+{{- $tplCtx := dict "Values" $rootValues "Release" $rootRelease "Chart" $rootChart "componentValues" $componentValues }}
 env:
-{{- range $key, $value := .env }}
+{{- range $key, $value := $componentValues.env }}
 {{- if kindIs "map" $value }}
 {{- if hasKey $value "valueFrom" }}
 - name: {{ $key }}
   valueFrom: {{ toYaml $value.valueFrom | nindent 4 }}
 {{- else }}
 - name: {{ $key }}
-  value: {{ tpl (toString $value.value) $ | quote }}
+  value: {{ tpl (toString $value.value) $tplCtx | quote }}
 {{- end }}
 {{- else }}
 - name: {{ $key }}
-  value: {{ tpl (toString $value) $ | quote }}
+  value: {{ tpl (toString $value) $tplCtx | quote }}
 {{- end }}
 {{- end }}
 {{- end }}
