@@ -185,6 +185,12 @@ Usage: {{ include "common.tolerations" . }}
 tolerations:
 {{- toYaml $component.tolerations | nindent 2 }}
 {{- else }}
+{{/*
+Tolerations contract (rails profile):
+  - operator: Exists  -> emits operator: Exists, no value:
+  - operator: Equal (or unset, k8s default) -> requires explicit `value`;
+    fails loudly if missing. No implicit string default.
+*/}}
 tolerations:
 {{- range $component.tolerations }}
 {{- $operator := default "Equal" .operator | toString }}
@@ -195,13 +201,10 @@ tolerations:
     {{- end }}
     operator: {{ $operator | quote }}
     {{- if ne $operator "Exists" }}
-    {{- /* NOTE: omitting .value on an Equal-operator toleration produces
-         value: "true" by convention. This is intentional for the common
-         case where "true" is the intended toleration value. For other
-         intended values, always supply .value explicitly. Option 1 in
-         the B3 audit (fail on missing .value) is deferred to Phase C
-         as a contract change. */ -}}
-    value: {{ default "true" .value | toString | quote }}
+    {{- if not (hasKey . "value") }}
+    {{- fail (printf "toleration with operator=%s requires a value for key %q" $operator (default "" .key | toString)) }}
+    {{- end }}
+    value: {{ .value | toString | quote }}
     {{- end }}
     effect: {{ default "NoSchedule" .effect | toString | quote }}
     {{- with .tolerationSeconds }}
