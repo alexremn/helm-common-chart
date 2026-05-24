@@ -110,11 +110,52 @@ See: [`examples/values.rbac.yaml`](../examples/values.rbac.yaml).
 
 ## Profiles
 
-Keys: `profile.name`, `profile.<language>.*`.
+Keys: `global.profile`, `<cmp>.profile`.
 
-Language/runtime profile defaults (`go`, `python`, generic). Applies opinionated defaults for resource shape, probes, and security context. Override individual keys per component.
+Language/runtime profile defaults (`generic`, `rails`, `python`, `go`). Applies opinionated defaults for probes, podMonitor relabelings, envFrom phantoms, and pod/container security context. Override individual keys per component as usual.
 
 See: [`examples/values.profile-go.yaml`](../examples/values.profile-go.yaml), [`examples/values.profile-python.yaml`](../examples/values.profile-python.yaml).
+
+### Profile resolution
+
+Profile is resolved per component using this chain:
+
+```
+<cmp>.profile  ->  global.profile  ->  "generic"
+```
+
+- `<cmp>.profile`: per-component override (v2.1+). Lets you mix profiles
+  across components in a single chart (e.g., a generic-profile Python web
+  pod alongside a rails-profile background worker).
+- `global.profile`: chart-wide default. Backward-compatible with v2.0.
+- Fallback default: `"generic"`.
+
+Allowed values: `rails`, `python`, `go`, `generic`. Invalid values fail
+loudly at render time (no silent fallback).
+
+| Path | Type | Default | Notes |
+|------|------|---------|-------|
+| `global.profile` | string | `generic` | Chart-wide default. |
+| `<cmp>.profile` | string | inherits `global.profile` | Per-component override (v2.1+). |
+
+Example:
+
+```yaml
+global:
+  profile: generic        # chart-wide default
+
+web:
+  # inherits global -> generic
+  image: { repository: ghcr.io/example/api, tag: "1.0.0" }
+
+worker:
+  profile: rails          # per-component override
+  image: { repository: ghcr.io/example/worker, tag: "1.0.0" }
+```
+
+See the `mixed-profiles` smoke fixture
+([`tests/smoke/values-mixed-profiles.yaml`](../tests/smoke/values-mixed-profiles.yaml))
+for a worked end-to-end example.
 
 ## Misc
 

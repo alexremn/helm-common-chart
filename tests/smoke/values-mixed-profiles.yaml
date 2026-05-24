@@ -1,0 +1,70 @@
+# Exercises per-component profile overrides (Task 15, X6+X7).
+#
+# Resolution chain under test:
+#   <component>.profile  ->  global.profile  ->  "generic"
+#
+# This fixture mixes profile=generic at the chart level with a per-component
+# profile=rails override on the `stateful` component. Generic and rails have
+# visibly different rendering behavior (probe paths, podMonitor relabelings,
+# envFrom phantom defaults, runAsUser/runAsGroup) so a single golden diff
+# proves both branches of the resolution chain are wired correctly.
+name: features-app
+environment: production
+
+global:
+  profile: generic
+  image:
+    registry: ghcr.io
+    repository: example/features-app
+    tag: "3.1.4"
+  imagePullPolicy: Always
+  imagePullSecrets:
+    - name: ghcr-pull
+  ingress:
+    className: nginx
+  hooks:
+    enabled: true
+    weight: "-7"
+  envFrom:
+    configs: []
+    secrets: []
+
+# Inherits global.profile = generic.
+# Expect generic-profile defaults: probe path /healthz, no podMonitor
+# metricRelabelings, no phantom envFrom configmap/secret.
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  podMonitor:
+    enabled: true
+  ingress:
+    - name: public
+      domains:
+        - app.example.com
+
+# Per-component override: rails.
+# Expect rails-profile defaults: probe path /health_check/full, podMonitor
+# rails metricRelabelings, phantom envFrom config/secrets with optional:true,
+# runAsUser 1000 / runAsGroup 3000.
+stateful:
+  profile: rails
+  ports:
+    http: 8081
+  persistence:
+    name: data
+    size: 10Gi
+
+# Per-component override on a Job.
+jobs:
+  run_task:
+    profile: rails
+    command: ["/bin/sh", "-c"]
+    args: ["echo features"]
+
+# Inherits global.profile = generic.
+cronjobs:
+  sync_task:
+    schedule: "0 0 * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron features"]

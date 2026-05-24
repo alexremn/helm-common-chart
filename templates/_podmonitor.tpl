@@ -138,7 +138,7 @@ spec:
              (see common.profile.defaults) so the rails default emits byte-identically
              to the v1.3.1 hardcoded text. Empty string under generic/python/go means
              no default metricRelabelings are emitted. */ -}}
-      {{- $profileRelabelings := index (include "common.profile.defaults" $ | fromYaml) (include "common.profile" $) "podMonitor" "metricRelabelings" -}}
+      {{- $profileRelabelings := index (include "common.profile.defaults" $ | fromYaml) (include "common.profile" (dict "root" $ "component" $componentValues)) "podMonitor" "metricRelabelings" -}}
       {{- include "common.prometheus.metricRelabelings" (dict "explicit" $componentValues.podMonitor.metricRelabelings "profile" $profileRelabelings) }}
       {{- with $componentValues.podMonitor.relabelings }}
       relabelings: {{ toYaml . | nindent 8 }}

@@ -19,7 +19,7 @@ both helpers fail fast if the component has both .podMonitor and
 {{- fail (printf "Component '%s' has both podMonitor and serviceMonitor enabled — pick one." $cmp) }}
 {{- end }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $profileRelabelings := index (include "common.profile.defaults" $ | fromYaml) (include "common.profile" $) "podMonitor" "metricRelabelings" }}
+{{- $profileRelabelings := index (include "common.profile.defaults" $ | fromYaml) (include "common.profile" (dict "root" $ "component" $componentValues)) "podMonitor" "metricRelabelings" }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

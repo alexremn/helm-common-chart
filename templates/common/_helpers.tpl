@@ -210,7 +210,7 @@ Parameters:
 {{- $overrideKeys := default (list) .overrideKeys -}}
 {{- $wrapped := default false .wrapped -}}
 {{- $secCtx := dict -}}
-{{- $profile := include "common.profile" $root -}}
+{{- $profile := include "common.profile" (dict "root" $root "component" $component) -}}
 {{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
 {{- if and (kindIs "map" $profileDefaults) (hasKey $profileDefaults "securityContext") -}}
   {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" $scope dict $profileDefaults)) -}}

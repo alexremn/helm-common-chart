@@ -13,17 +13,48 @@ runtimes. See docs/profiles.md.
 
 {{/*
 Resolve the active profile name.
-Lookup order:
-  1. .Values.global.profile
-  2. literal "generic" (vanilla K8s defaults; set `global.profile: rails`
-     to retain v1.x behavior)
+
+Lookup order (per-component override, v2.1+):
+  1. <component>.profile          (per-workload override)
+  2. .Values.global.profile       (chart-wide default)
+  3. literal "generic"            (vanilla K8s defaults; set
+                                   `global.profile: rails` to retain
+                                   v1.x behavior)
+
+Callers may pass either:
+  - legacy: a root context (carries `.Values`). Resolves to
+    `Values.global.profile > "generic"`. Preserves v2.0 behavior.
+  - new:    a dict `(dict "root" $root "component" $componentValues)`.
+    Resolves the per-component override first, falling back to
+    `Values.global.profile`, then `"generic"`.
+
+Validation: result must be one of `generic|rails|python|go`. Invalid
+values fail loudly at render time so misconfiguration never silently
+falls through to a "default" profile.
 */}}
 {{- define "common.profile" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- $profile := dig "global" "profile" "generic" $values -}}
+{{- $root := . -}}
+{{- $component := dict -}}
+{{- if and (kindIs "map" .) (hasKey . "root") (or (hasKey . "component") (hasKey . "componentValues")) -}}
+  {{- $root = default dict .root -}}
+  {{- if hasKey . "component" -}}
+    {{- $component = default dict .component -}}
+  {{- else -}}
+    {{- $component = default dict .componentValues -}}
+  {{- end -}}
+{{- end -}}
+{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $globalProfile := dig "global" "profile" "generic" $values -}}
+{{- $profile := $globalProfile -}}
+{{- if and (kindIs "map" $component) (hasKey $component "profile") -}}
+  {{- $cmpProfile := index $component "profile" -}}
+  {{- if and (kindIs "string" $cmpProfile) (ne $cmpProfile "") -}}
+    {{- $profile = $cmpProfile -}}
+  {{- end -}}
+{{- end -}}
 {{- $valid := list "generic" "rails" "python" "go" -}}
 {{- if not (has $profile $valid) -}}
-{{- fail (printf "Unknown global.profile %q. Valid profiles: %s." $profile (join ", " $valid)) -}}
+{{- fail (printf "Unknown profile %q. Valid profiles: %s." $profile (join ", " $valid)) -}}
 {{- end -}}
 {{- $profile -}}
 {{- end -}}
@@ -31,8 +62,8 @@ Lookup order:
 {{/*
 Profile defaults map. Returns a YAML literal keyed by profile name. Helpers
 consume it via:
-  {{- $profile := include "common.profile" . -}}
-  {{- $defaults := index (include "common.profile.defaults" . | fromYaml) $profile -}}
+  {{- $profile := include "common.profile" (dict "root" $ "component" $componentValues) -}}
+  {{- $defaults := index (include "common.profile.defaults" $ | fromYaml) $profile -}}
 
 Carries Rails-flavored defaults that need to flip when the profile changes,
 plus shared K8s defaults that we expose here so future profiles (and

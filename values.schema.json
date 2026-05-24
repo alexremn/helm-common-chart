@@ -272,6 +272,11 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
+        "profile": {
+          "type": "string",
+          "enum": ["rails", "generic", "python", "go"],
+          "description": "Per-component profile override (v2.1+). Resolution chain: <cmp>.profile -> global.profile -> 'generic'. Lets mixed-tech charts pick a different profile per workload."
+        },
         "image": { "$ref": "#/$defs/imageOrString" },
         "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
         "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },

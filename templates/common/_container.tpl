@@ -84,7 +84,10 @@ Usage: {{ include "common.probe" .Values.myComponent }}
        preserving v1.3.1 behavior for any direct caller that doesn't pass _root. */ -}}
 {{- $root := default . ._root -}}
 {{- $phase := default "" ._phase -}}
-{{- $profile := include "common.profile" $root -}}
+{{- /* `.` here is the component map merged with `_root`/`_phase` keys —
+       passing it as `component` lets common.profile see a per-component
+       `profile:` override before falling back to global. */ -}}
+{{- $profile := include "common.profile" (dict "root" $root "component" .) -}}
 {{- $defaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}
 {{- $globalProbe := dig "global" "probe" dict $values -}}
@@ -321,7 +324,7 @@ Usage: {{ include "common.envFrom" (dict "svc" .Values.myComponent "global" .Val
        names. */ -}}
 {{- $profileDefaults := dict -}}
 {{- if .root -}}
-  {{- $profile := include "common.profile" .root -}}
+  {{- $profile := include "common.profile" (dict "root" .root "component" (default dict .svc)) -}}
   {{- $profileDefaults = index (include "common.profile.defaults" .root | fromYaml) $profile -}}
 {{- end -}}
 {{- $defaultConfigName := dig "envFrom" "defaultConfigName" "config" $profileDefaults -}}

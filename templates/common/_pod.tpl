@@ -152,7 +152,7 @@ other profiles omit the line and let Kubernetes apply its own default.
 {{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") -}}
   {{- $component = default dict .component -}}
   {{- $cmp = default "" .cmp -}}
-  {{- $profile := include "common.profile" .root -}}
+  {{- $profile := include "common.profile" (dict "root" .root "component" $component) -}}
   {{- if ne $profile "rails" -}}
     {{- $emitDefault = false -}}
   {{- end -}}
@@ -176,7 +176,7 @@ Usage: {{ include "common.tolerations" . }}
 {{- $profile := "generic" -}}
 {{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") -}}
   {{- $component = default dict .component -}}
-  {{- $profile = include "common.profile" .root -}}
+  {{- $profile = include "common.profile" (dict "root" .root "component" $component) -}}
 {{- else if kindIs "map" . -}}
   {{- $component = . -}}
 {{- end -}}
