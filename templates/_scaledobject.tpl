@@ -83,7 +83,7 @@ spec:
         serverAddress: {{ required "scaledObject.triggers[].type=prometheus requires global.prometheusEndpoint to be set" $.Values.global.prometheusEndpoint }}
         threshold: {{ .threshold | quote }}
         {{- /* F2: scope tpl context to Values/Release/Chart + componentValues
-               instead of leaking the full chart root via `$`. */ -}}
+               instead of leaking the full chart root via `$`. */}}
         query: {{ tpl .query (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValues) | quote }}
         {{- with .authModes }}
         authModes: {{ . | quote }}

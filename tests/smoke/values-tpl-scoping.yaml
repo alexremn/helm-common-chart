@@ -12,6 +12,7 @@ global:
   image:
     repository: ghcr.io/example/app
     tag: "9.9.9"
+  prometheusEndpoint: "http://prometheus.monitoring.svc:9090"
 
 web:
   replicas: 1
@@ -33,6 +34,16 @@ web:
       # Configmap data is rendered via tpl with the same curated dict.
       URL: "https://{{ .Values.web.image.repository }}.example.org"
       OWN_TAG: "{{ .componentValues.image.tag }}"
+  scaling:
+    min: 1
+    max: 3
+    triggers:
+      # KEDA prometheus trigger: query is rendered through tpl with the
+      # curated (Values, Release, Chart, componentValues) dict. Exercises
+      # _scaledobject.tpl's scoped tpl call (the former `tpl … $` site).
+      - type: prometheus
+        threshold: "100"
+        query: "rate(http_requests_total{app='{{ .componentValues.image.repository }}'}[1m])"
 
 nativeSecrets:
   app-bootstrap:

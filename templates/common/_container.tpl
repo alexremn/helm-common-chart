@@ -228,35 +228,65 @@ Usage: {{ include "common.env.fieldRef" (dict "name" "POD_NAME" "fieldPath" "met
 {{/*
 Process environment variables from a dictionary.
 
-SECURITY: env values are rendered through Helm's `tpl` against the chart
-root context (`$`). Any Go-template syntax in a value is executed,
-including reads against `.Values.global.*`. Treat env values as a code
-surface — only set them from a trusted values source. For
-multi-tenant setups, gate untrusted env values behind a separate helper
-or strip template syntax before passing them in.
+SECURITY: env values are rendered through Helm's `tpl`. Any Go-template
+syntax in a value is executed. Treat env values as a code surface — only
+set them from a trusted values source. For multi-tenant setups, gate
+untrusted env values behind a separate helper or strip template syntax
+before passing them in.
 
-Usage: {{ include "common.envs" .Values.myComponent }}
+This helper accepts two call shapes:
+
+  (a) PREFERRED — wrapped dict from internal callers:
+        (dict "Values" $.Values "Release" $.Release "Chart" $.Chart
+              "componentValues" $componentValues)
+      Consumer env templates can address `.Values`, `.Release`, `.Chart`,
+      and `.componentValues` on the curated context. Sibling components
+      are reachable via `.Values.<other>` but the full helm root (`$`)
+      and built-ins like `$.Files`, `$.Template`, `$.Capabilities` are
+      NOT exposed.
+
+  (b) LEGACY — bare component-values map:
+        {{ include "common.envs" .Values.myComponent }}
+      BREAKING for legacy shape: in this mode `.Values`, `.Release` and
+      `.Chart` are passed to `tpl` as EMPTY dicts. Consumer templates that
+      reference `{{ .Values.foo }}` etc. silently render as empty string.
+      This is the deliberate cost of closing the F2 injection surface for
+      callers that did not migrate to shape (a). Migrate to shape (a) to
+      regain root access.
+
+Usage (shape a, preferred):
+  {{ include "common.envs" (dict
+       "Values" $.Values "Release" $.Release "Chart" $.Chart
+       "componentValues" .Values.myComponent) }}
+
+Usage (shape b, legacy):
+  {{ include "common.envs" .Values.myComponent }}
 */}}
 {{- define "common.envs" }}
-{{- /* F2: support two call shapes:
-       (a) wrapped dict from internal callers — has "componentValues" key
-           and carries "Values"/"Release"/"Chart" so consumer env templates
-           can read root .Values via the curated context, OR
-       (b) bare component-values dict from external consumers — preserves
-           the historical {{ include "common.envs" .Values.myComponent }}
-           API. In this shape no root context is exposed: consumer
-           templates only see .componentValues.* — by design, since that
-           was the whole point of closing the injection surface. */ -}}
+{{- /* F2 follow-up: tighten dual-shape detection. A caller is treated as
+       shape (a) only when ALL FOUR curated-context keys are present and
+       map-typed: Values, Release, Chart, componentValues. If any are
+       missing or not map-typed, fall back to shape (b) — the input is
+       the component map itself. This prevents an external caller whose
+       component map happens to contain a `componentValues:` sub-map from
+       being misclassified as wrapped. */ -}}
 {{- if kindIs "map" . }}
 {{- $componentValues := . }}
 {{- $rootValues := dict }}
 {{- $rootRelease := dict }}
 {{- $rootChart := dict }}
-{{- if and (hasKey . "componentValues") (kindIs "map" .componentValues) }}
+{{- $isWrapped := and (hasKey . "Values") (hasKey . "Release") (hasKey . "Chart") (hasKey . "componentValues") }}
+{{- if $isWrapped }}
+  {{- /* .Values is map[string]interface{} from chartutil; .componentValues
+         is a values sub-map; both must be map-typed. .Release and .Chart
+         are Helm structs (not maps) — presence via hasKey is sufficient. */ -}}
+  {{- $isWrapped = and (kindIs "map" .Values) (kindIs "map" .componentValues) }}
+{{- end }}
+{{- if $isWrapped }}
   {{- $componentValues = .componentValues }}
-  {{- if hasKey . "Values" }}{{- $rootValues = .Values }}{{- end }}
-  {{- if hasKey . "Release" }}{{- $rootRelease = .Release }}{{- end }}
-  {{- if hasKey . "Chart" }}{{- $rootChart = .Chart }}{{- end }}
+  {{- $rootValues = .Values }}
+  {{- $rootRelease = .Release }}
+  {{- $rootChart = .Chart }}
 {{- end }}
 {{- if hasKey $componentValues "env" }}
 {{- $tplCtx := dict "Values" $rootValues "Release" $rootRelease "Chart" $rootChart "componentValues" $componentValues }}

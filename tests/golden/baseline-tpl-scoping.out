@@ -92,7 +92,6 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
-  replicas: 1
   minReadySeconds: 10
   strategy:
     type: RollingUpdate
@@ -142,3 +141,33 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: tpl-scoping
+    app.kubernetes.io/component: web
+    helm.sh/environment: production
+    app.kubernetes.io/instance: smoke
+spec:
+  scaleTargetRef:
+    name: web
+    kind: Deployment
+  pollingInterval: 30
+  cooldownPeriod: 180
+  minReplicaCount: 1
+  maxReplicaCount: 3
+  advanced:
+    restoreToOriginalReplicaCount: false
+  fallback:
+    failureThreshold: 3
+    replicas: 1
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus.monitoring.svc:9090
+        threshold: "100"
+        query: "rate(http_requests_total{app='ghcr.io/example/web'}[1m])"
