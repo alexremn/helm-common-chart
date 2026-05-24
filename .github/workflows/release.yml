@@ -45,6 +45,11 @@ jobs:
             exit 1
           fi
 
+      - name: Compute bare-numeric OCI tag
+        id: tag
+        run: |
+          echo "OCI_TAG=${REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Lint and golden-check before release
         run: |
           make lint
@@ -107,19 +112,19 @@ jobs:
             dist/common-${{ github.ref_name }}.cdx.json
           generate_release_notes: true
           body: |
-            Helm OCI chart pushed to `ghcr.io/${{ github.repository_owner }}/charts/common:${{ github.ref_name }}`.
+            Helm OCI chart pushed to `ghcr.io/${{ github.repository_owner }}/charts/common:${{ steps.tag.outputs.OCI_TAG }}`.
 
             **Signed** with Sigstore Cosign (keyless OIDC). Verify:
             ```
             cosign verify \
               --certificate-identity-regexp "^https://github.com/${{ github.repository_owner }}/helm-common-chart/" \
               --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-              ghcr.io/${{ github.repository_owner }}/charts/common:${{ github.ref_name }}
+              ghcr.io/${{ github.repository_owner }}/charts/common:${{ steps.tag.outputs.OCI_TAG }}
             ```
 
             SBOMs attached (SPDX + CycloneDX). See [SECURITY.md#verification](./SECURITY.md#verification).
 
             Pull with:
             ```
-            helm pull oci://ghcr.io/${{ github.repository_owner }}/charts/common --version ${{ github.ref_name }}
+            helm pull oci://ghcr.io/${{ github.repository_owner }}/charts/common --version ${{ steps.tag.outputs.OCI_TAG }}
             ```
