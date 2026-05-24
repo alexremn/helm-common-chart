@@ -1,0 +1,290 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+  annotations:
+    example.com/pdb-note: voluntary-disruption-budget
+    example.com/pdb-owner: platform-team
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-sa
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/web
+    example.com/owner: platform-team
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+data:
+---
+# Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+  annotations:
+    example.com/pvc-owner: storage-team
+    volume.beta.kubernetes.io/storage-class: standard
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "5Gi"
+  storageClassName: standard
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/instance: smoke
+  publishNotReadyAddresses: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  replicas: 2
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: web
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/web:2.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          - name: metrics
+            containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: web-sa
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: stateful
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: stateful
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/internal-app:1.2.3
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: internal-platform
+          app.kubernetes.io/component: stateful
+          helm.sh/environment: staging
+          app.kubernetes.io/instance: smoke
+        annotations: 
+          example.com/pvc-owner: storage-team
+          volume.beta.kubernetes.io/storage-class: standard
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "5Gi"
+        storageClassName: standard
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+  annotations:
+    example.com/scrape-note: default-30s-interval
+    example.com/scrape-owner: observability-team
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-platform
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+  podMetricsEndpoints:
+    - filterRunning: true
+      followRedirects: true
+      interval: 30s
+      path: /metrics
+      port: "metrics"
+  namespaceSelector:
+    matchNames:
+      - default

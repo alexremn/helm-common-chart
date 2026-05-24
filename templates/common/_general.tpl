@@ -226,15 +226,25 @@ werf.io/failures-allowed-per-replica: {{ default "3" .failures | quote }}
 {{- end -}}
 
 {{/*
-Process annotations from a dictionary or nested structure.
-Usage: {{ include "common.annotations" .Values.myComponent.annotations }}
+Process annotations from a dictionary that has an `annotations` sub-key.
+
+Returns ONLY the YAML body of the annotations map (no leading `annotations:` key).
+The caller is responsible for emitting the `annotations:` line itself, gated on
+the helper output being non-empty. This avoids doubled `annotations:` blocks
+when a caller (which also needs to indent the output) wraps the include site.
+
+Usage:
+  {{- $ann := include "common.annotations" $myConfig | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
 */}}
 {{- define "common.annotations" -}}
 {{- if kindIs "map" . -}}
 {{- if hasKey . "annotations" -}}
 {{- with .annotations }}
-annotations:
-  {{- . | toYaml | nindent 2 }}
+{{- . | toYaml }}
 {{- end }}
 {{- end }}
 {{- end }}

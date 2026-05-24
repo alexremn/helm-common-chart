@@ -26,7 +26,7 @@ metadata:
   {{- $ann := include "common.annotations" $saConfig | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 automountServiceAccountToken: {{ dig "automount" false $saConfig }}
 {{- with $saConfig.imagePullSecrets }}

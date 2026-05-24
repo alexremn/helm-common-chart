@@ -31,7 +31,7 @@ metadata:
   {{- $ann := include "common.annotations" $persistence | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 spec:
   {{- include "common.pvc.spec" $persistence | nindent 2 }}
@@ -48,7 +48,7 @@ metadata:
   {{- $ann := include "common.annotations" $pvc | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 spec:
   {{- include "common.pvc.spec" $pvc | nindent 2 }}

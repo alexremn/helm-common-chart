@@ -72,7 +72,7 @@ metadata:
   {{- $ann := include "common.annotations" $serviceConfig | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 spec:
   type: {{ dig "type" "ClusterIP" $serviceConfig }}
@@ -167,7 +167,7 @@ metadata:
   {{- $ann := include "common.annotations" $serviceConfig | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 spec:
   type: ClusterIP

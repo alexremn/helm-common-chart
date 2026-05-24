@@ -1,0 +1,27 @@
+name: internal-platform
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/internal-app
+    tag: "1.2.3"
+  imagePullPolicy: IfNotPresent
+
+jobs:
+  run_task:
+    image: ghcr.io/example/jobs:latest
+    command: ["/bin/sh", "-c"]
+    args: ["echo job"]
+    podAnnotations:
+      checksum/config: "abc123"
+      example.com/job-owner: "platform-team"
+
+cronjobs:
+  sync_task:
+    schedule: "*/5 * * * *"
+    image: ghcr.io/example/cron:latest
+    command: ["/bin/sh", "-c"]
+    args: ["echo cron"]
+    podAnnotations:
+      checksum/config: "def456"
+      example.com/cron-owner: "platform-team"

@@ -89,15 +89,25 @@ Usage: {{ include "common.hostAliases" .Values.myComponent }}
 {{- end }}
 
 {{/*
-Configure pod annotations
-Usage: {{ include "common.podAnnotations" .Values.myComponent }}
+Configure pod annotations.
+
+Returns ONLY the YAML body of the annotations map (no leading `annotations:` key).
+The caller is responsible for emitting the `annotations:` line itself, gated on
+the helper output being non-empty. This avoids doubled `annotations:` blocks
+when a caller (which also needs to indent the output) wraps the include site.
+
+Usage:
+  {{- $podAnn := include "common.podAnnotations" .Values.myComponent | trim }}
+  {{- if $podAnn }}
+  annotations:
+    {{- $podAnn | nindent 4 }}
+  {{- end }}
 */}}
 {{- define "common.podAnnotations" -}}
 {{- if kindIs "map" . -}}
 {{- if hasKey . "podAnnotations" -}}
 {{- with .podAnnotations }}
-annotations:
-  {{- . | toYaml | nindent 2 }}
+{{- . | toYaml }}
 {{- end }}
 {{- end }}
 {{- end }}

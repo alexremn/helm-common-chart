@@ -56,7 +56,7 @@ spec:
       {{- $podAnn := include "common.podAnnotations" $componentValues | trim }}
       {{- if $podAnn }}
       annotations:
-        {{- $podAnn | nindent 2 }}
+        {{- $podAnn | nindent 8 }}
       {{- end }}
     spec:
       {{- include "common.workload.podSpec" (dict

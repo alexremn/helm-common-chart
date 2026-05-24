@@ -1,0 +1,74 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-task
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: run-task
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-platform
+        app.kubernetes.io/component: run-task
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+      annotations:
+        checksum/config: abc123
+        example.com/job-owner: platform-team
+    spec:
+      containers:
+        - name: run-task
+          image: ghcr.io/example/jobs:latest
+          imagePullPolicy: "IfNotPresent"
+          command: 
+            - /bin/sh
+            - -c
+          args: 
+            - echo job
+      restartPolicy: "Never"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-task
+  labels:
+    app.kubernetes.io/name: internal-platform
+    app.kubernetes.io/component: sync-task
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: internal-platform
+            app.kubernetes.io/component: sync-task
+            helm.sh/environment: staging
+            app.kubernetes.io/instance: smoke
+          annotations:
+            checksum/config: def456
+            example.com/cron-owner: platform-team
+        spec:
+          containers:
+            - name: sync-task
+              image: ghcr.io/example/cron:latest
+              imagePullPolicy: "IfNotPresent"
+              command: 
+                - /bin/sh
+                - -c
+              args: 
+                - echo cron
+          restartPolicy: "Never"

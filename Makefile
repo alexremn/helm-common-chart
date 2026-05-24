@@ -21,7 +21,8 @@ lint-library:
 
 SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic profile-rails profile-python profile-go \
                   daemonset hpa vpa networkpolicy secret rbac servicemonitor \
-                  prometheusrule priorityclass triggerauth automount
+                  prometheusrule priorityclass triggerauth automount \
+                  job-podannotations pdb-podmonitor-pvc-sa-annotations
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

@@ -1,0 +1,46 @@
+name: internal-platform
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/internal-app
+    tag: "1.2.3"
+  imagePullPolicy: IfNotPresent
+
+web:
+  replicas: 2
+  image:
+    repository: ghcr.io/example/web
+    tag: "2.0.0"
+  ports:
+    http: 8080
+    metrics:
+      containerPort: 9090
+  serviceAccount:
+    name: web-sa
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/web
+      example.com/owner: platform-team
+  pdb:
+    maxUnavailable: 1
+    annotations:
+      example.com/pdb-owner: platform-team
+      example.com/pdb-note: "voluntary-disruption-budget"
+  podMonitor:
+    enabled: true
+    interval: 30s
+    annotations:
+      example.com/scrape-owner: observability-team
+      example.com/scrape-note: "default-30s-interval"
+
+stateful:
+  replicas: 1
+  ports:
+    http: 8081
+  persistence:
+    - name: data
+      size: 5Gi
+      storageClass: standard
+      annotations:
+        example.com/pvc-owner: storage-team
+        volume.beta.kubernetes.io/storage-class: standard

@@ -25,7 +25,7 @@ metadata:
   {{- $ann := include "common.annotations" $pdbConfig | trim }}
   {{- if $ann }}
   annotations:
-    {{- $ann | nindent 2 }}
+    {{- $ann | nindent 4 }}
   {{- end }}
 spec:
   {{- if hasKey $pdbConfig "minAvailable" }}
