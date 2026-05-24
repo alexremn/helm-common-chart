@@ -387,11 +387,6 @@ metadata:
   
 spec:
   
-  tls:
-    - hosts:
-        - web.example.com
-      secretName: web-external-ingress
-  
   rules:
     - host: web.example.com
       http:
@@ -424,7 +419,7 @@ spec:
   tls:
     - hosts:
         - web.internal.example.com
-      secretName: web-internal-ingress
+      secretName: web-internal-tls
   
   rules:
     - host: web.internal.example.com

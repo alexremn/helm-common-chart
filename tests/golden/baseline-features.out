@@ -422,7 +422,7 @@ spec:
   tls:
     - hosts:
         - admin.example.com
-      secretName: web-admin
+      secretName: web-admin-tls
   
   rules:
     - host: admin.example.com

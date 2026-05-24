@@ -39,6 +39,7 @@ web:
         - app.example.com
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: 32m
+      tls: true
     - name: admin
       className: nginx-internal
       domains:
@@ -47,6 +48,8 @@ web:
             - path: /
               pathType: Prefix
               port: http
+      tls:
+        secretName: web-admin-tls
   scaling:
     min: 3
     max: 10

@@ -1,0 +1,26 @@
+# Locks F6: an Ingress without a configured TLS block must NOT emit `tls:` at
+# all. Prior to the fix, `$conf.tls | default true` produced an empty/auto TLS
+# section on every enabled Ingress, yielding an invalid resource on apply when
+# no certificate Secret existed.
+name: ingress-no-tls
+environment: staging
+
+global:
+  profile: generic
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  ingress:
+    public:
+      className: nginx
+      domains:
+        - host: api.example.org
+          paths:
+            - path: /
+              pathType: Prefix
+              port: http
+      # intentionally no tls block — must NOT render `tls:` in the output.

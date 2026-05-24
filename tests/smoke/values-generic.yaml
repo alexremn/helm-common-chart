@@ -35,9 +35,12 @@ web:
               port: http
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: 64m
+      tls:
+        secretName: web-internal-tls
     external:
       domains:
         - web.example.com
+      # no tls — exercise the F6 omit-tls path alongside the explicit-tls entry above.
   scaling:
     min: 2
     max: 5

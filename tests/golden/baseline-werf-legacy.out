@@ -377,11 +377,6 @@ metadata:
   
 spec:
   
-  tls:
-    - hosts:
-        - legacy.example.com
-      secretName: web-external-ingress
-  
   rules:
     - host: legacy.example.com
       http:

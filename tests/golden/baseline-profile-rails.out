@@ -403,11 +403,6 @@ metadata:
 spec:
   ingressClassName: nginx
   
-  tls:
-    - hosts:
-        - app.example.com
-      secretName: web-public
-  
   rules:
     - host: app.example.com
       http:

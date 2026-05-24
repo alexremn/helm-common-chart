@@ -67,7 +67,11 @@ Generate TLS config for ingress
 {{- define "ingress.tls" -}}
 {{- $conf := .conf }}
 {{- $secretName := .secretName }}
-{{- $explicitHosts := dig "tls" "hosts" nil $conf }}
+{{- /* `tls` may be a bool (e.g. `tls: true`) or a map; only dig into it when
+       it's a map so booleans don't blow up `dig`. */ -}}
+{{- $tlsMap := dict }}
+{{- if kindIs "map" $conf.tls }}{{ $tlsMap = $conf.tls }}{{- end }}
+{{- $explicitHosts := dig "hosts" nil $tlsMap }}
 tls:
   - hosts:
       {{- if $explicitHosts }}
@@ -79,7 +83,7 @@ tls:
       - {{ if kindIs "map" . }}{{ .host }}{{ else }}{{ . }}{{ end }}
       {{- end }}
       {{- end }}
-    secretName: {{ dig "tls" "secretName" $secretName $conf }}
+    secretName: {{ dig "secretName" $secretName $tlsMap }}
 {{- end -}}
 
 {{/*
@@ -145,7 +149,12 @@ spec:
   {{- if $className }}
   ingressClassName: {{ $className }}
   {{- end }}
-  {{- if $conf.tls | default true }}
+  {{- /* F6: Only emit `tls:` when the consumer opts in. A consumer omitting
+         `tls:` (or setting it to `false`) gets a plain HTTP Ingress instead of
+         a malformed block that references a non-existent Secret. An empty map
+         (`tls: {}`) or `tls: true` is still truthy, preserving the auto-host
+         + auto-secretName behaviour for consumers that explicitly request it. */ -}}
+  {{- if $conf.tls }}
   {{- include "ingress.tls" (dict "conf" $conf "secretName" $ingressName) | nindent 2 }}
   {{- end }}
   {{- include "ingress.rules" (dict "conf" $conf "cmp" $cmp) | nindent 2 }}
