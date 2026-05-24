@@ -17,6 +17,11 @@ Usage: {{ include "chart.extsecret" (dict "svc" "app-name" "cmp" "component" "Va
 {{- define "secrets.dict.dev" }}{{- end }}
 {{- define "secrets.dict.sandbox" }}{{- end }}
 
+{{/*
+Returns the list of environments where pre-install hook annotations
+should be added. Default: empty list (no hook annotation).
+Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
+*/}}
 {{- define "secrets.annotations.default" }}
 {{- $env := .env }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
@@ -33,7 +38,7 @@ force-sync: {{ now | quote }}
 {{- if .Release }}{{- $rev = .Release.Revision | toString }}{{- end }}
 force-sync: {{ $rev | quote }}
 {{- end }}
-{{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list "review") $values }}
+{{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values }}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values }}
 {{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
 helm.sh/hook: pre-install,pre-upgrade

@@ -16,10 +16,15 @@ Usage: {{ include "chart.configmap" (dict "svc" "app-name" "cmp" "component" "Va
 {{- define "config.dict.dev" }}{{- end }}
 {{- define "config.dict.sandbox" }}{{- end }}
 
+{{/*
+Returns the list of environments where pre-install hook annotations
+should be added. Default: empty list (no hook annotation).
+Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
+*/}}
 {{- define "config.annotations.default" -}}
 {{- $env := .env -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list "review") $values -}}
+{{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values -}}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values -}}
 {{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
 helm.sh/hook: pre-install,pre-upgrade
