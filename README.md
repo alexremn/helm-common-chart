@@ -37,32 +37,32 @@ helm pull oci://ghcr.io/alexremn/charts/common --version 2.0.0
 
 ## Quick start
 
-Minimal `values.yaml` that renders a Deployment + Service via the library:
+Minimal `values.yaml` for a consumer chart that depends on `common`:
 
 ```yaml
 name: my-app
 environment: dev
 
-app:
+web:
   replicas: 2
   image:
     repository: ghcr.io/example/my-app
     tag: "1.0.0"
   ports:
     http: 8080
-  service:
-    type: ClusterIP
-    ports:
-      http: 80
 ```
 
-And in your chart's `templates/deployment.yaml`:
+And in your chart's `templates/all.yaml`:
 
 ```yaml
-{{ include "common.workload" (dict "context" . "name" "app") }}
+{{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+---
+{{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 ```
 
-See [`examples/`](./examples/) for richer fixtures (HPA, VPA, NetworkPolicy, ServiceMonitor, profiles, etc.).
+Each per-resource template is invoked the same way — pass a `dict` carrying the root `Values`/`Release`/`Chart` plus a `cmp` key naming the component subtree to render (here, `web`). Available entrypoints include `chart.deployment`, `chart.statefulset`, `chart.daemonset`, `chart.job`, `chart.cronjob`, `chart.service`, `chart.service.headless`, `chart.ingress`, `chart.networkpolicy`, `chart.configmap`, `chart.secret`, `chart.extsecret`, `chart.serviceAccount`, `chart.rbac`, `chart.hpa`, `chart.vpa`, `chart.scaledobject`, `chart.triggerauth`, `chart.pdb`, `chart.pvc`, `chart.podmonitor`, `chart.servicemonitor`, `chart.prometheusrule`, `chart.priorityclass`.
+
+See [`tests/smoke/templates/all.yaml`](./tests/smoke/templates/all.yaml) for a complete consumer-side template wiring multiple resources, and [`examples/`](./examples/) for richer fixtures (HPA, VPA, NetworkPolicy, ServiceMonitor, profiles, etc.).
 
 ## What's inside
 
