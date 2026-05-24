@@ -58,6 +58,21 @@ Keys: `service`, `ingress`, `networkPolicy`.
 
 See: [`examples/values.networkpolicy.yaml`](../examples/values.networkpolicy.yaml).
 
+### `<cmp>.networkPolicy`
+
+| Path | Type | Default | Notes |
+|------|------|---------|-------|
+| `<cmp>.networkPolicy.enabled` | bool | `false` | Render a NetworkPolicy for this component. |
+| `<cmp>.networkPolicy.policyTypes` | list | `[Ingress]` | Standard k8s `policyTypes`. To restrict egress, set `[Ingress, Egress]` and supply `egress` rules. |
+| `<cmp>.networkPolicy.ingress` | list | `[]` | Standard k8s ingress rules. |
+| `<cmp>.networkPolicy.egress` | list | unset | Standard k8s egress rules. Empty list under Egress policyType means deny-all egress. |
+| `<cmp>.networkPolicy.annotations` | map | `{}` | Extra metadata annotations. |
+
+**Security note:** The default `policyTypes: [Ingress]` is permissive on egress
+(matches Kubernetes default). For egress restriction, set `policyTypes:
+[Ingress, Egress]` and add explicit egress rules. v3.0 will flip the default
+to `[Ingress, Egress]` with a deny-all default.
+
 ## Autoscaling & Disruption
 
 Keys: `hpa`, `vpa`, `scaledObject`, `pdb`.

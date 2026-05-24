@@ -20,7 +20,7 @@ lint-library:
 	$(HELM) lint .
 
 SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic profile-rails profile-python profile-go \
-                  daemonset hpa vpa networkpolicy secret rbac servicemonitor \
+                  daemonset hpa vpa networkpolicy networkpolicy-egress secret rbac servicemonitor \
                   prometheusrule priorityclass triggerauth automount \
                   automount-pod-default securitycontext \
                   job-podannotations pdb-podmonitor-pvc-sa-annotations \

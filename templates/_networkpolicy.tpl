@@ -4,6 +4,15 @@ NETWORKPOLICY TEMPLATE
 Per-component (selects the component's pods automatically) and top-level
 (.Values.networkPolicies map; freeform passthrough).
 =============================================================================
+
+DEFAULT: policyTypes = [Ingress] only. Egress is unrestricted by default
+(matches Kubernetes default behavior when an Egress rule is absent).
+Consumers wanting egress restriction MUST set:
+  <cmp>.networkPolicy.policyTypes: [Ingress, Egress]
+and supply <cmp>.networkPolicy.egress rules. An empty egress: [] under
+Egress policyType means deny-all egress.
+
+See tests/smoke/values-networkpolicy-egress.yaml for an example.
 */}}
 
 {{/*
