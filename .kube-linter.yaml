@@ -8,8 +8,6 @@ checks:
     - unset-memory-requirements   # resource limits are a consumer concern for a library chart
     - minimum-three-replicas      # smoke fixtures use 1 replica by design
     - use-namespace               # helm renders without --namespace in smoke; namespace is Release.Namespace at runtime
-    - no-read-only-root-fs        # many valid app types (Rails, Python) need writable root; consumer-configured
-    - run-as-non-root             # UID/GID is app-specific; consumer-configured
     - latest-tag                  # smoke Job/CronJob fixtures intentionally use :latest for image-resolution testing
     - no-liveness-probe           # batch Jobs/CronJobs do not use liveness probes by design
     - no-readiness-probe          # batch Jobs/CronJobs do not use readiness probes by design

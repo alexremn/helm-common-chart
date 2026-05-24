@@ -166,7 +166,17 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
       terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
@@ -225,10 +235,20 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
           volumeMounts:
             - name: data
               mountPath: /mnt/data
       terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -279,7 +299,17 @@ spec:
             - -c
           args: 
             - echo features
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
       restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
@@ -319,7 +349,17 @@ spec:
                 - -c
               args: 
                 - echo cron features
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                  - ALL
           restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           imagePullSecrets:
             - name: ghcr-pull
           automountServiceAccountToken: false

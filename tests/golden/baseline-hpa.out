@@ -118,7 +118,17 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
       terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml

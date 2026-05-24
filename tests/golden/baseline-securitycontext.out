@@ -5,15 +5,15 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   maxUnavailable: 25%
   selector:
     matchLabels:
-      app.kubernetes.io/name: image-resolution-app
+      app.kubernetes.io/name: securitycontext-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
 
@@ -26,9 +26,9 @@ kind: ServiceAccount
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 automountServiceAccountToken: false
 ---
@@ -38,9 +38,9 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 data:
 ---
@@ -50,9 +50,9 @@ kind: Service
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   type: ClusterIP
@@ -62,7 +62,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
 ---
@@ -72,9 +72,9 @@ kind: Deployment
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: image-resolution-app
+    app.kubernetes.io/name: securitycontext-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
 spec:
   replicas: 1
@@ -86,20 +86,20 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: image-resolution-app
+      app.kubernetes.io/name: securitycontext-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: image-resolution-app
+        app.kubernetes.io/name: securitycontext-app
         app.kubernetes.io/component: web
-        helm.sh/environment: dev
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
     spec:
       containers:
         - name: web
-          image: ghcr.io/example/global-app:7.8.9
+          image: ghcr.io/example/api:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: http

@@ -211,8 +211,8 @@ Parameters:
 {{- $wrapped := default false .wrapped -}}
 {{- $secCtx := dict -}}
 {{- $profile := include "common.profile" $root -}}
-{{- if eq $profile "rails" -}}
-  {{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
+{{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
+{{- if and (kindIs "map" $profileDefaults) (hasKey $profileDefaults "securityContext") -}}
   {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" $scope dict $profileDefaults)) -}}
 {{- end -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}

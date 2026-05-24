@@ -93,6 +93,16 @@ generic:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
+  securityContext:
+    pod:
+      seccompType: RuntimeDefault
+    container:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
 python:
   probe:
     type: http
@@ -112,6 +122,16 @@ python:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
+  securityContext:
+    pod:
+      seccompType: RuntimeDefault
+    container:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
 go:
   probe:
     type: http
@@ -131,4 +151,14 @@ go:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
+  securityContext:
+    pod:
+      seccompType: RuntimeDefault
+    container:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
 {{- end -}}
