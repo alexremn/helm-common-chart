@@ -32,9 +32,52 @@ See: [`examples/values.generic.yaml`](../examples/values.generic.yaml), [`exampl
 
 ## Container
 
-Keys under each component: `resources` (requests/limits), `livenessProbe`, `readinessProbe`, `startupProbe`, `lifecycle`, `securityContext`, `ports`.
+Keys under each component: `resources` (requests/limits), `probes`, `lifecycle`, `securityContext`, `ports`.
 
 Per-container settings. `ports` accepts a map of name → port (e.g. `http: 8080`) and is reused for Service + ServiceMonitor wiring.
+
+### Probes
+
+The library renders `livenessProbe`, `readinessProbe`, and (optionally) `startupProbe` per container from a single `<cmp>.probes` block. Each field is resolved per-phase with this chain (lowest to highest priority):
+
+```
+profile default  →  global.probe.<field>  →  <cmp>.probes.<field>  →  <cmp>.probes.<phase>.<field>
+```
+
+The probe transport is selected by `type` (a flat keyword, **not** a `httpGet`/`tcpSocket`/`exec` sub-map):
+
+| `type` | Required fields | Rendered Kubernetes shape |
+|--------|-----------------|---------------------------|
+| `http` (default for built-in profiles) | `path`, `port` | `httpGet: { path, port, httpHeaders? }` |
+| `tcp` | `port` | `tcpSocket: { port }` |
+| `exec` | `command` (list of strings) | `exec: { command }` |
+| `grpc` | `port`, optional `service` | `grpc: { port, service? }` |
+
+Unknown `type` values fail the render with `common.probe: unknown probe type ...`.
+
+Per-component / per-phase keys:
+
+| Path | Type | Default | Notes |
+|------|------|---------|-------|
+| `<cmp>.probes.enabled` | bool | `true` | `false` (or shorthand `<cmp>.probes: false`) disables all three phases. |
+| `<cmp>.probes.<phase>.type` | string | profile default | One of `http`, `tcp`, `exec`, `grpc`. |
+| `<cmp>.probes.<phase>.path` | string | profile default | HTTP probe path (`type: http`). |
+| `<cmp>.probes.<phase>.port` | string\|int | profile default (`http`) | Port name or number. Used by `http`, `tcp`, `grpc`. |
+| `<cmp>.probes.<phase>.command` | list | profile default (`[]`) | Exec probe argv (`type: exec`). |
+| `<cmp>.probes.<phase>.httpHeaders` | list | unset | Extra HTTP headers for `type: http`. |
+| `<cmp>.probes.<phase>.service` | string | unset | gRPC service name for `type: grpc`. |
+| `<cmp>.probes.<phase>.initialDelaySeconds` | int | profile default (`0`) | |
+| `<cmp>.probes.<phase>.periodSeconds` | int | profile default (`10`) | |
+| `<cmp>.probes.<phase>.timeoutSeconds` | int | profile default (varies) | |
+| `<cmp>.probes.<phase>.failureThreshold` | int | profile default (varies) | |
+| `<cmp>.probes.<phase>.successThreshold` | int | unset | Only emitted when set. |
+| `<cmp>.probes.<phase>.terminationGracePeriodSeconds` | int | unset | Only emitted when set. |
+
+`<phase>` is one of `liveness`, `readiness`, `startup`. `startup` is only rendered when `<cmp>.probes.startup` is explicitly set; `liveness` and `readiness` are always rendered (unless probes are disabled).
+
+`<cmp>.probes.<field>` (without a phase) sets a shared override that applies to all three phases. `.Values.global.probe.<field>` sets a chart-wide override below the per-component value. Resolution uses `dig` so falsy-but-valid values (`0`, `[]`) are honored.
+
+Profile defaults (probe `type`, `path`, `port`, thresholds) live in `templates/common/_profile.tpl` under `common.profile.defaults`. See [Profiles](#profiles).
 
 ## Pod
 
@@ -94,11 +137,56 @@ See: [`examples/values.servicemonitor.yaml`](../examples/values.servicemonitor.y
 
 ## Config & Secrets
 
-Keys: `configMap`, `secret`, `externalSecret`.
+Keys: `configMap`, `secret`, `externalSecret`, `envFrom`.
 
 - `configMap` — inline data, mounted as env or file
 - `secret` — opaque secret, mounted as env or file
 - `externalSecret` — `ExternalSecret` CRD (requires External Secrets Operator); references a remote backing store
+- `envFrom` — list of ConfigMap/Secret refs projected into container env
+
+### `envFrom` shape and rails-profile phantom defaults
+
+`envFrom` is **not** a flat list of Kubernetes `envFrom` entries. It is a structured map with two keys:
+
+```yaml
+<cmp>:
+  envFrom:
+    configs:                 # rendered as configMapRef entries
+      - my-config            # bare string -> { configMapRef: { name: my-config } }
+      - name: opt-config     # map form lets you set optional
+        optional: true
+    secrets:                 # rendered as secretRef entries
+      - my-secret
+      - name: opt-secret
+        optional: false
+```
+
+`.Values.global.envFrom.{configs,secrets}` works the same way and is emitted before component-specific entries.
+
+**Rails profile injects phantom defaults.** When the resolved profile (per [Profile resolution](#profile-resolution)) is `rails` and `.global.envFrom` is set (the helper only activates when `global.envFrom` exists), the rendered pod spec gets two implicit entries — one ConfigMap, one Secret — if you do not supply your own:
+
+```yaml
+envFrom:
+  - configMapRef:
+      name: config
+      optional: true
+  - secretRef:
+      name: secrets
+      optional: true
+```
+
+The hardcoded names (`config`, `secrets`) come from the rails profile's `envFrom.defaultConfigName` / `defaultSecretName` (see `templates/common/_profile.tpl`). `optional: true` means the workload starts even if those ConfigMap/Secret objects are absent — preserving v1.3.1 behavior.
+
+**Opting out:** supply explicit empty lists at the global level:
+
+```yaml
+global:
+  envFrom:
+    configs: []
+    secrets: []
+```
+
+Both `global` and per-component lists are appended to the rendered `envFrom` (not merged), so a custom list at `global.envFrom.configs` replaces the phantom default. Generic / python / go profiles have empty `defaultConfigName` and `defaultSecretName`, so no phantom defaults are emitted under those profiles.
 
 ## RBAC
 
@@ -163,11 +251,34 @@ for a worked end-to-end example.
 - `hooks` — Helm hook weights/annotations for release-time orchestration.
 - `compat.legacySelectorLabels` — opt-in to older selector label scheme for charts migrated from `werf`.
 
-### Global flags
+### Global knobs
 
-| Key | Type | Default | Description |
+Chart-wide values consumed across multiple templates. Each path is read via `dig "global" ...` so the keys are always optional and missing values resolve to the documented default.
+
+| Path | Type | Default | Notes |
 |---|---|---|---|
+| `global.profile` | string | `generic` | Chart-wide profile default. See [Profile resolution](#profile-resolution). |
+| `global.name` | string | unset | Falls back to `app.name` / top-level `name` / `werf.name` / chart name. Used as the application identifier. |
+| `global.environment` | string | unset | Falls back to top-level `environment` / `env` / `werf.env` / `default`. Used as the deploy environment identifier. |
+| `global.image` | map | unset | Default image map (`repository`, `tag`, `pullPolicy`) used when a component does not set its own. |
+| `global.imagePullPolicy` | string | unset | Cluster-wide default pull policy fallback (after component-level, before `Always`/`IfNotPresent` heuristic). |
+| `global.imagePullSecrets` | list | unset | Image pull secrets appended to every pod spec after per-component `imagePullSecrets`. |
+| `global.hooks.enabled` | bool | unset | Enables Helm hook annotations on chart-managed `ConfigMap` and `ExternalSecret` resources. |
+| `global.hooks.weight` | string | `"-5"` | Hook weight emitted alongside `helm.sh/hook` annotations. |
+| `global.hooks.preInstallEnvironments` | list | `[]` | Environments where ConfigMap / ExternalSecret resources are rendered as `pre-install,pre-upgrade` hooks. |
+| `global.ingress.className` | string | unset | Default Ingress `spec.ingressClassName`. Per-component `<cmp>.ingress.className` overrides. |
+| `global.ingress.annotations` | map | `{}` | Chart-wide Ingress annotations merged into every rendered Ingress. |
+| `global.probe.<field>` | map | unset | Chart-wide probe field overrides. Slots between profile default and per-component value. See [Probes](#probes). |
+| `global.envFrom.configs` / `.secrets` | list | unset | Chart-wide `envFrom` projections. See [`envFrom` shape and rails-profile phantom defaults](#envfrom-shape-and-rails-profile-phantom-defaults). |
+| `global.securityContext.pod` | map | profile default | Chart-wide pod-level `securityContext` defaults merged under profile defaults. |
+| `global.securityContext.container` | map | profile default | Chart-wide container-level `securityContext` defaults merged under profile defaults. |
+| `global.prometheusEndpoint` | string | unset | Default `serverAddress` for KEDA `ScaledObject` Prometheus triggers. Required when any trigger has `type: prometheus` and no explicit `serverAddress`. |
+| `global.pdb.maxUnavailable` | int\|string | `25%` | Fallback `maxUnavailable` for PodDisruptionBudgets when neither `<cmp>.pdb.maxUnavailable` nor `<cmp>.pdb.minAvailable` is set. |
+| `global.externalSecrets.forceSync` | bool | `false` | Adds the `force-sync` annotation to every rendered `ExternalSecret`, triggering a re-fetch on each `helm upgrade`. |
+| `global.deployment.replicasOnCreationAnnotation` | string | unset (`""`) | Annotation key for the "replicas at first install" hint. When `werf` annotations are enabled this falls back to `werf.io/replicas-on-creation`. Set to a non-empty string to opt in outside of werf. |
 | `global.emitEnvironmentLabel` | bool | `true` | Emit `helm.sh/environment: <env>` label on all rendered resources. Set to `false` to opt out of this non-standard label. v3.0 will flip the default to `false`. |
+| `global.compat.legacySelectorLabels` | bool | `false` | Use the pre-v2 selector label scheme for charts migrated from `werf`. |
+| `global.werf.annotations` | bool | unset | Explicitly enable / disable werf-style annotation emission. |
 
 ## Where things live in templates
 
