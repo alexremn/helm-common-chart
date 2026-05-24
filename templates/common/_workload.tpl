@@ -122,6 +122,7 @@ Resolve `imagePullPolicy`. See `docs/values-contract.md` for resolution order.
 {{- define "common.workload.imagePullPolicy" -}}
 {{- $root := .root -}}
 {{- $component := default dict .component -}}
+{{- $image := default "" .image -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}
 {{- $componentImagePullPolicy := "" -}}
 {{- if and (kindIs "map" $component) (hasKey $component "image") (kindIs "map" $component.image) -}}
@@ -130,10 +131,11 @@ Resolve `imagePullPolicy`. See `docs/values-contract.md` for resolution order.
 {{- /* Default pull policy is IfNotPresent, but switch to Always when the
      resolved image string ends with ":latest" to avoid stale-cache skew
      across nodes. Explicit override (component.imagePullPolicy or global)
-     always wins regardless of tag. */ -}}
-{{- $resolvedImage := include "common.workload.image" (dict "root" $root "component" $component "cmp" "") | trim -}}
+     always wins regardless of tag. The resolved image string is passed in
+     by the caller (see render-pod-spec) so we don't re-invoke
+     common.workload.image just to peek at the tag. */ -}}
 {{- $defaultPolicy := "IfNotPresent" -}}
-{{- if hasSuffix ":latest" $resolvedImage -}}
+{{- if hasSuffix ":latest" (trim $image) -}}
   {{- $defaultPolicy = "Always" -}}
 {{- end -}}
 {{- $policy := coalesce $component.imagePullPolicy $componentImagePullPolicy (dig "global" "imagePullPolicy" nil $values) (dig "global" "image" "pullPolicy" nil $values) (dig "werf" "image" "pullPolicy" nil $values) $defaultPolicy -}}
@@ -212,10 +214,13 @@ Usage:
 {{ $ha }}
 {{ end -}}
 {{- end -}}
+{{- /* F10: resolve image string ONCE; share with imagePullPolicy so the
+       :latest-suffix check doesn't re-invoke common.workload.image. */ -}}
+{{- $imageStr := include "common.workload.image" (dict "root" $root "component" $component "cmp" $cmp) -}}
 containers:
   - name: {{ $cmp }}
-    image: {{ include "common.workload.image" (dict "root" $root "component" $component "cmp" $cmp) }}
-    imagePullPolicy: {{ include "common.workload.imagePullPolicy" (dict "root" $root "component" $component) | quote }}
+    image: {{ $imageStr }}
+    imagePullPolicy: {{ include "common.workload.imagePullPolicy" (dict "root" $root "component" $component "image" $imageStr) | quote }}
     {{- $cmd := include "common.command" $component | trim }}
     {{- if $cmd }}
     {{- $cmd | nindent 4 }}
