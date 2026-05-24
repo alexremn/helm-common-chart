@@ -132,11 +132,13 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
 {{- $cmp := default "" .cmp -}}
 {{- $env := include "common.environment" . | trim -}}
 {{- $instance := include "common.releaseName" . | trim -}}
+{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values -}}
 app.kubernetes.io/name: {{ $svc }}
 {{- if $cmp }}
 app.kubernetes.io/component: {{ $cmp }}
 {{- end }}
-{{- if $env }}
+{{- if and $env $emitEnv }}
 helm.sh/environment: {{ $env }}
 {{- end }}
 {{- if $instance }}

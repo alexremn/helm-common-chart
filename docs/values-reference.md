@@ -122,6 +122,12 @@ See: [`examples/values.profile-go.yaml`](../examples/values.profile-go.yaml), [`
 - `hooks` — Helm hook weights/annotations for release-time orchestration.
 - `compat.legacySelectorLabels` — opt-in to older selector label scheme for charts migrated from `werf`.
 
+### Global flags
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `global.emitEnvironmentLabel` | bool | `true` | Emit `helm.sh/environment: <env>` label on all rendered resources. Set to `false` to opt out of this non-standard label. v3.0 will flip the default to `false`. |
+
 ## Where things live in templates
 
 | Concern | Template | Helper |

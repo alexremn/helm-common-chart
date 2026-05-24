@@ -1,0 +1,12 @@
+name: no-env-label-app
+environment: staging
+
+global:
+  emitEnvironmentLabel: false
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080

@@ -24,7 +24,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   prometheusrule priorityclass triggerauth automount \
                   automount-pod-default securitycontext \
                   job-podannotations pdb-podmonitor-pvc-sa-annotations \
-                  tpl-scoping ingress-no-tls extsecret-namespaced
+                  tpl-scoping ingress-no-tls extsecret-namespaced \
+                  no-environment-label
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
