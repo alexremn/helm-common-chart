@@ -174,3 +174,4 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
+      automountServiceAccountToken: false

@@ -165,6 +165,7 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -231,6 +232,7 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: data
+      automountServiceAccountToken: false
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -278,6 +280,7 @@ spec:
           args: 
             - echo legacy job
       restartPolicy: "Never"
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -318,6 +321,7 @@ spec:
               args: 
                 - echo legacy cron
           restartPolicy: "Never"
+          automountServiceAccountToken: false
 
 ---
 # Source: common-smoke/templates/all.yaml

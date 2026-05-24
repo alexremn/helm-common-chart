@@ -160,3 +160,4 @@ spec:
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
       serviceAccountName: api-caller
+      automountServiceAccountToken: false

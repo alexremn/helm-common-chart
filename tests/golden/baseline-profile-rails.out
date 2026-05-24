@@ -185,6 +185,7 @@ spec:
       serviceAccountName: web
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -266,6 +267,7 @@ spec:
             claimName: data
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -328,6 +330,7 @@ spec:
       serviceAccountName: run-task
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -383,6 +386,7 @@ spec:
           serviceAccountName: sync-task
           imagePullSecrets:
             - name: ghcr-pull
+          automountServiceAccountToken: false
 
 ---
 # Source: common-smoke/templates/all.yaml

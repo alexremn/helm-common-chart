@@ -119,6 +119,7 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: autoscaling.k8s.io/v1

@@ -57,5 +57,6 @@ spec:
       tolerations:
         - effect: NoSchedule
           operator: Exists
+      automountServiceAccountToken: false
       hostNetwork: true
       hostPID: true

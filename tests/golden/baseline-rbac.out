@@ -235,3 +235,4 @@ spec:
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
       serviceAccountName: web-sa
+      automountServiceAccountToken: false

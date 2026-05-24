@@ -32,6 +32,7 @@ spec:
           args: 
             - echo job
       restartPolicy: "Never"
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -72,3 +73,4 @@ spec:
               args: 
                 - echo cron
           restartPolicy: "Never"
+          automountServiceAccountToken: false

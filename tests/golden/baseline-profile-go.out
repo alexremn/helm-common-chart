@@ -169,6 +169,7 @@ spec:
       terminationGracePeriodSeconds: 30
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -234,6 +235,7 @@ spec:
             claimName: data
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -280,6 +282,7 @@ spec:
       restartPolicy: "Never"
       imagePullSecrets:
         - name: ghcr-pull
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -319,6 +322,7 @@ spec:
           restartPolicy: "Never"
           imagePullSecrets:
             - name: ghcr-pull
+          automountServiceAccountToken: false
 
 ---
 # Source: common-smoke/templates/all.yaml

@@ -5,7 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -13,9 +13,12 @@ spec:
   maxUnavailable: 25%
   selector:
     matchLabels:
-      app.kubernetes.io/name: hpa-app
+      app.kubernetes.io/name: smoke
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -23,7 +26,7 @@ kind: ServiceAccount
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -35,7 +38,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -47,7 +50,7 @@ kind: Service
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -59,7 +62,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
 ---
@@ -69,7 +72,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
-    app.kubernetes.io/name: hpa-app
+    app.kubernetes.io/name: smoke
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -83,20 +86,20 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: hpa-app
+      app.kubernetes.io/name: smoke
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: hpa-app
+        app.kubernetes.io/name: smoke
         app.kubernetes.io/component: web
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
     spec:
       containers:
         - name: web
-          image: ghcr.io/example/web:1.0.0
+          image: ghcr.io/example/automount-pod-default:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: http
@@ -120,37 +123,3 @@ spec:
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
       automountServiceAccountToken: false
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: web
-  labels:
-    app.kubernetes.io/name: hpa-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: web
-  minReplicas: 2
-  maxReplicas: 10
-  metrics: 
-    - resource:
-        name: cpu
-        target:
-          averageUtilization: 70
-          type: Utilization
-      type: Resource
-    - resource:
-        name: memory
-        target:
-          averageUtilization: 80
-          type: Utilization
-      type: Resource
-  behavior: 
-    scaleDown:
-      stabilizationWindowSeconds: 300

@@ -241,8 +241,11 @@ enableServiceLinks: {{ .enableServiceLinks }}
 {{- if hasKey . "shareProcessNamespace" }}
 shareProcessNamespace: {{ .shareProcessNamespace }}
 {{- end }}
+{{- /* Default to false (secure-by-default) when unset; explicit consumer values override. */}}
 {{- if hasKey . "automountServiceAccountToken" }}
 automountServiceAccountToken: {{ .automountServiceAccountToken }}
+{{- else }}
+automountServiceAccountToken: false
 {{- end }}
 {{- if hasKey . "hostNetwork" }}
 hostNetwork: {{ .hostNetwork }}

@@ -126,6 +126,7 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       terminationGracePeriodSeconds: 30
+      automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1
