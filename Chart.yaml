@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.0.3"
+version: "2.1.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -28,12 +28,38 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: security
+      description: "Default automountServiceAccountToken to false at pod level (F4)"
+    - kind: security
+      description: "Add secure-by-default securityContext to generic/python/go profiles (F5)"
+    - kind: security
+      description: "Replace tpl ... $ with scoped dict to close template-injection surface (F2)"
+    - kind: fixed
+      description: "Strip leading annotations: from common.{pod,}Annotations helpers to fix doubled YAML key (F1, F3)"
+    - kind: fixed
+      description: "Only emit Ingress tls: block when secretName or hosts present (F6)"
+    - kind: fixed
+      description: "Require explicit value for Equal-operator tolerations (F11)"
+    - kind: fixed
+      description: "Strip v-prefix from cosign verify example in release body (G1)"
+    - kind: fixed
+      description: "Fix README quick-start example to use chart.deployment + dict-wrap pattern (X11)"
     - kind: added
-      description: Cosign keyless OIDC signing of the OCI chart artifact
+      description: "Configurable externalSecrets.secretStoreKind (default ClusterSecretStore) (F9)"
     - kind: added
-      description: SBOM (SPDX + CycloneDX) attached to each GitHub Release
+      description: "Per-component profile override (<cmp>.profile) (X6, X7)"
     - kind: added
-      description: SECURITY.md verification section + README cosign badge
+      description: "global.emitEnvironmentLabel flag to opt out of helm.sh/environment (X4)"
+    - kind: changed
+      description: "NetworkPolicy default policyTypes contract documented (F7)"
+    - kind: changed
+      description: "Drop hardcoded review hook env default (F8)"
+    - kind: changed
+      description: "Document probes, envFrom, and global.* knobs in values-reference (X8, X9, X10)"
+    - kind: changed
+      description: "Move common.prometheus.metricRelabelings helper to its own file (F12)"
+    - kind: changed
+      description: "Refactor imagePullPolicy to share resolved image string (F10)"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
