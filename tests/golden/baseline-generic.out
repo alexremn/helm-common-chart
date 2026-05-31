@@ -439,12 +439,12 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: web-secrets
-  labels:
+  labels: 
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
-  annotations:
+  annotations: 
     force-sync: "<NOW>"
 spec:
   refreshInterval: "10000h"
@@ -454,12 +454,7 @@ spec:
   target:
     name: web-secrets
     creationPolicy: Owner
-
-  
   data:
-
-
-    
       - secretKey: DB_PASSWORD
         remoteRef:
           key: /apps/internal/web

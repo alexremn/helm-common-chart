@@ -395,12 +395,12 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: legacy-secrets
-  labels:
+  labels: 
     app.kubernetes.io/name: legacy-service
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
-  annotations:
+  annotations: 
     force-sync: "<NOW>"
     werf.io/weight: "-1"
 spec:
@@ -411,12 +411,7 @@ spec:
   target:
     name: legacy-secrets
     creationPolicy: Owner
-
-  
   data:
-
-
-    
       - secretKey: TOKEN
         remoteRef:
           key: /legacy/app

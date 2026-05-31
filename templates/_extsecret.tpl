@@ -26,11 +26,10 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 {{- $env := .env }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
 {{- /* `force-sync` drives ESO to re-reconcile when its value changes.
-       Default: stable per-revision value so CI diffing and helm upgrades
-       are noise-free. Opt into per-render rotation with
-       `global.externalSecrets.forceSync: true`, which restores the
-       previous `{{ now }}` behavior. */ -}}
-{{- $forceSync := dig "global" "externalSecrets" "forceSync" false $values }}
+       Default: per-render `now` timestamp so ESO always reconciles on upgrade.
+       Opt out with `global.externalSecrets.forceSync: false`, which falls
+       back to a stable per-revision value (noise-free diffs, no churn). */ -}}
+{{- $forceSync := dig "global" "externalSecrets" "forceSync" true $values }}
 {{- if $forceSync }}
 force-sync: {{ now | quote }}
 {{- else }}
@@ -81,12 +80,10 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: {{ $name }}
-  labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
+  labels: {{ include "common.labels" $labelCtx | nindent 4 }}
   {{- $ann := include "secrets.annotations.default" (dict "env" $env "Values" $.Values "Release" $.Release) | trim }}
   {{- if $ann }}
-  annotations:
-    {{- $ann | nindent 4 }}
+  annotations: {{ $ann | nindent 4 }}
   {{- end }}
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
@@ -94,7 +91,7 @@ spec:
     name: {{ required (printf "secrets.%s.secretStore is required for ExternalSecret" $name) (dig "secretStore" "" $val) }}
     {{- $kind := dig "secretStoreKind" "ClusterSecretStore" $val }}
     {{- if not (has $kind (list "ClusterSecretStore" "SecretStore")) }}
-    {{- fail (printf "invalid secretStoreKind %q for component %s (secret %s); must be ClusterSecretStore or SecretStore" $kind $cmp $name) }}
+    {{ fail (printf "invalid secretStoreKind %q for component %s (secret %s); must be ClusterSecretStore or SecretStore" $kind $cmp $name) }}
     {{- end }}
     kind: {{ $kind }}
   target:
@@ -106,27 +103,26 @@ spec:
     {{- with $val.template }}
     template: {{ toYaml . | nindent 6 }}
     {{- end }}
-{{ include "secrets.external.generated" $val | nindent 2 }}
+  {{- with (include "secrets.external.generated" $val | trim) }}
+  {{- . | nindent 2 }}
+  {{- end }}
   {{- with $val.dataFrom }}
   dataFrom: {{ toYaml . | nindent 4 }}
   {{- end }}
   data:
-{{/* Generate secrets from the provided key and values */}}
-{{ include "secrets.generate" (dict "key" $val.secretKey "values" $val.properties) | nindent 4 }}
-{{/* Include environment-specific secrets - safely catch template not found errors */}}
-{{ range $inc := $val.includes }}
-{{- $envSecretsTemplate := printf "secrets.dict.%s" $inc }}
-{{/* Wrap template include in an if/else block to capture error and provide empty default */}}
-{{- $envSecrets := include $envSecretsTemplate $ | default "" | trim }}
-{{- if ne $envSecrets "" }}
-  {{- if contains "key:" $envSecrets }}
+    {{- include "secrets.generate" (dict "key" $val.secretKey "values" $val.properties) | trimPrefix "\n" | nindent 4}}
+    {{- range $inc := $val.includes }}
+    {{- $envSecretsTemplate := printf "secrets.dict.%s" $inc }}
+    {{- $envSecrets := include $envSecretsTemplate $ | default "" | trim }}
+    {{- if ne $envSecrets "" }}
+    {{- if contains "key:" $envSecrets }}
     {{- $secretData := fromYaml $envSecrets }}
     {{- if and $secretData (hasKey $secretData "key") (hasKey $secretData "values") }}
-      {{ include "secrets.generate" $secretData | indent 4 }}
+    {{- include "secrets.generate" $secretData | trimPrefix "\n" | nindent 4}}
     {{- end }}
-  {{- end }}
-{{- end }}
-{{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
