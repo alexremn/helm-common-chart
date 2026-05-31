@@ -40,7 +40,7 @@ jobs:
         run: make render-smoke
 
       - name: Upload smoke renders
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: smoke-renders
           path: /tmp/common-smoke-*.out
