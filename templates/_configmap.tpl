@@ -69,7 +69,7 @@ metadata:
 
 {{- if hasKey .Values "configs" }}
 {{- range $name, $val := .Values.configs }}
-{{- include "chart._configmap.header" (dict "name" $name "labelCtx" $labelCtx "env" $env "Values" $.Values) }}
+{{ include "chart._configmap.header" (dict "name" $name "labelCtx" $labelCtx "env" $env "Values" $.Values) }}
 {{- if $val.immutable }}
 immutable: true
 {{- end }}

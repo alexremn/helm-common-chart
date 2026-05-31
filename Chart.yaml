@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.1.0"
+version: "2.1.1"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
