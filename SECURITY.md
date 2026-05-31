@@ -7,7 +7,7 @@ Please **do not** open a public GitHub issue for security vulnerabilities.
 Use GitHub's private security-advisory flow:
 <https://github.com/alexremn/helm-common-chart/security/advisories/new>
 
-Or email the maintainers: `services@hubstaff.com`.
+Or email the maintainers: `alexander@remniov.com`.
 
 You will receive an acknowledgement within **5 business days**. Coordinated
 disclosure timelines are negotiated per report — typically 30 to 90 days
