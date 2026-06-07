@@ -21,3 +21,7 @@
 .idea/
 *.tmproj
 .vscode/
+# Repo logo (served via raw URL, not needed inside the package)
+icon.png
+icon.svg
+artifacthub-repo.yml

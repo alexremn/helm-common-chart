@@ -15,8 +15,9 @@ keywords:
   - library
   - kubernetes
   - helm
-icon: https://remniov.com/icon.png
+icon: https://raw.githubusercontent.com/alexremn/helm-common-chart/main/icon.png
 annotations:
+  artifacthub.io/category: integration-delivery
   artifacthub.io/license: Apache-2.0
   artifacthub.io/operator: "false"
   artifacthub.io/prerelease: "false"
