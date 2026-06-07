@@ -144,6 +144,13 @@ Accepts either a plain component map (legacy) or
 the rails profile emits a `serviceAccountName` line so the pod stays
 bound to the chart's RBAC (resolved through `common.serviceAccountName`);
 other profiles omit the line and let Kubernetes apply its own default.
+
+Only pins a `serviceAccountName` the cluster will actually have:
+`chart.serviceAccount` creates the SA unless `serviceAccount.enabled: false`
+or `serviceAccount.create: false`. When the SA is not created, the line is
+emitted only if the operator supplied an explicit `serviceAccount.name`
+(an externally-managed SA); otherwise it is omitted so the pod falls back
+to the namespace `default` SA instead of a dangling reference.
 */}}
 {{- define "common.serviceAccount" }}
 {{- $component := dict -}}
@@ -159,9 +166,17 @@ other profiles omit the line and let Kubernetes apply its own default.
 {{- else if kindIs "map" . -}}
   {{- $component = . -}}
 {{- end -}}
-{{- if and (kindIs "map" $component) (hasKey $component "serviceAccount") }}
-serviceAccountName: {{ include "common.serviceAccountName" (dict "component" $component "fallback" (default "default" $cmp)) }}
-{{- else if $emitDefault }}
+{{- $hasSA := and (kindIs "map" $component) (hasKey $component "serviceAccount") -}}
+{{- $saConfig := dict -}}
+{{- if and $hasSA (kindIs "map" $component.serviceAccount) -}}
+  {{- $saConfig = $component.serviceAccount -}}
+{{- end -}}
+{{- /* Mirrors chart.serviceAccount: SA is created unless enabled/create is
+       explicitly false. An explicit name is honored even when not created
+       (points at an externally-managed SA). */ -}}
+{{- $created := and (ne (dig "enabled" true $saConfig) false) (ne (dig "create" true $saConfig) false) -}}
+{{- $explicitName := ne (dig "name" "" $saConfig) "" -}}
+{{- if and (or $hasSA $emitDefault) (or $created $explicitName) }}
 serviceAccountName: {{ include "common.serviceAccountName" (dict "component" $component "fallback" (default "default" $cmp)) }}
 {{- end }}
 {{- end }}

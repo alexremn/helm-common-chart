@@ -4,10 +4,13 @@ PROFILE HELPERS
 Resolves the active profile name and exposes a profile-keyed defaults map.
 
 Profiles let helpers swap previously-hardcoded literals for a lookup. The
-`generic` profile (default in v2.x) ships vanilla K8s defaults. The
-`rails` profile is opt-in via `global.profile: rails` for charts
-upgrading from v1.x. `python` and `go` profiles cover other common
-runtimes. See docs/profiles.md.
+`generic` profile (default) ships vanilla K8s defaults. The `rails` profile
+is opt-in via `global.profile: rails` for charts upgrading from v1.x.
+`python` and `go` profiles cover other common runtimes. See docs/profiles.md.
+
+Security posture is a SEPARATE axis — see `common.security` below and the
+`global.security` flag (`minimal` | `generic`). Profiles no longer carry a
+securityContext.
 =============================================================================
 */}}
 
@@ -23,7 +26,7 @@ Lookup order (per-component override, v2.1+):
 
 Callers may pass either:
   - legacy: a root context (carries `.Values`). Resolves to
-    `Values.global.profile > "generic"`. Preserves v2.0 behavior.
+    `Values.global.profile > "generic"`.
   - new:    a dict `(dict "root" $root "component" $componentValues)`.
     Resolves the per-component override first, falling back to
     `Values.global.profile`, then `"generic"`.
@@ -97,14 +100,6 @@ rails:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
-  securityContext:
-    pod:
-      runAsUser: 1000
-      runAsGroup: 3000
-      seccompType: RuntimeDefault
-    container:
-      allowPrivilegeEscalation: false
-      runAsNonRoot: true
 generic:
   probe:
     type: http
@@ -124,16 +119,6 @@ generic:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
-  securityContext:
-    pod:
-      seccompType: RuntimeDefault
-    container:
-      runAsNonRoot: true
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      capabilities:
-        drop:
-          - ALL
 python:
   probe:
     type: http
@@ -153,16 +138,6 @@ python:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
-  securityContext:
-    pod:
-      seccompType: RuntimeDefault
-    container:
-      runAsNonRoot: true
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      capabilities:
-        drop:
-          - ALL
 go:
   probe:
     type: http
@@ -182,14 +157,60 @@ go:
     type: ClusterIP
   pvc:
     accessMode: ReadWriteOnce
-  securityContext:
-    pod:
-      seccompType: RuntimeDefault
-    container:
-      runAsNonRoot: true
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      capabilities:
-        drop:
-          - ALL
+{{- end -}}
+
+{{/*
+=============================================================================
+SECURITY POSTURE
+A standalone axis, independent of the runtime profile. Controls the default
+pod/container securityContext only. Selected via `global.security`:
+
+  minimal  (default)  — vanilla K8s; no container hardening enforced, so
+                        charts that write to disk or run as root work out of
+                        the box. Pod-level seccompProfile stays RuntimeDefault.
+  generic             — hardened: runAsNonRoot, allowPrivilegeEscalation:false,
+                        readOnlyRootFilesystem, drop-ALL capabilities.
+
+Both postures are overridable per-scope by `global.securityContext.<scope>`
+and `<component>.securityContext.<scope>` (layered after, last wins). See
+`common._securityContext.merge`.
+=============================================================================
+*/}}
+
+{{/*
+Resolve the active security posture name. Takes a root context (carries
+`.Values`). Result must be one of `minimal|generic`; invalid values fail
+loudly at render time.
+*/}}
+{{- define "common.security" -}}
+{{- $root := . -}}
+{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $security := dig "global" "security" "minimal" $values -}}
+{{- $valid := list "minimal" "generic" -}}
+{{- if not (has $security $valid) -}}
+{{- fail (printf "Unknown security posture %q. Valid postures: %s." $security (join ", " $valid)) -}}
+{{- end -}}
+{{- $security -}}
+{{- end -}}
+
+{{/*
+Security posture defaults map. Returns a YAML literal keyed by posture name,
+each carrying `pod` and `container` securityContext scopes. Consumed by
+`common._securityContext.merge`.
+*/}}
+{{- define "common.security.defaults" -}}
+minimal:
+  pod:
+    seccompType: RuntimeDefault
+  container: {}
+generic:
+  pod:
+    seccompType: RuntimeDefault
+  container:
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 {{- end -}}

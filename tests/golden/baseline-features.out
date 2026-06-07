@@ -168,13 +168,6 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-              - ALL
       terminationGracePeriodSeconds: 30
       securityContext:
         seccompProfile:
@@ -237,13 +230,6 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-              - ALL
           volumeMounts:
             - name: data
               mountPath: /mnt/data
@@ -301,13 +287,6 @@ spec:
             - -c
           args: 
             - echo features
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-              - ALL
       restartPolicy: "Never"
       securityContext:
         seccompProfile:
@@ -351,13 +330,6 @@ spec:
                 - -c
               args: 
                 - echo cron features
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop:
-                  - ALL
           restartPolicy: "Never"
           securityContext:
             seccompProfile:

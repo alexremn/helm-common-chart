@@ -1,0 +1,20 @@
+# Asserts security posture is independent of the runtime profile.
+# rails profile (probe /health_check/full, rails podMonitor relabelings,
+# phantom envFrom) combined with global.security: generic (hardened
+# container securityContext). Neither axis leaks into the other:
+#   - rails probe path /health_check/full is present
+#   - container.readOnlyRootFilesystem / runAsNonRoot / drop-ALL are present
+#   - rails no longer injects pod runAsUser/runAsGroup (security carries no uid)
+name: security-decoupled
+environment: production
+
+global:
+  profile: rails
+  security: generic
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080

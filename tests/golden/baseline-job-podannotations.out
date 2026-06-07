@@ -31,13 +31,6 @@ spec:
             - -c
           args: 
             - echo job
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-              - ALL
       restartPolicy: "Never"
       securityContext:
         seccompProfile:
@@ -82,13 +75,6 @@ spec:
                 - -c
               args: 
                 - echo cron
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop:
-                  - ALL
           restartPolicy: "Never"
           securityContext:
             seccompProfile:

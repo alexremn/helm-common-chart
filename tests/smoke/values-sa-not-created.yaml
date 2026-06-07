@@ -1,0 +1,30 @@
+# Asserts the serviceAccountName guard in common.serviceAccount:
+# under the rails profile (which normally pins serviceAccountName), when the
+# ServiceAccount is not created (create: false) and no explicit name is given,
+# the pod MUST NOT emit a dangling `serviceAccountName` (web).
+# The external/named SA case (stateful: create false + name) MUST still pin
+# the operator-supplied name.
+name: sa-guard
+environment: production
+
+global:
+  profile: rails
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+# create: false, no name -> no ServiceAccount and no serviceAccountName line.
+web:
+  ports:
+    http: 8080
+  serviceAccount:
+    create: false
+
+# create: false + explicit name -> external SA, name still pinned on the pod.
+stateful:
+  replicas: 1
+  ports:
+    http: 8081
+  serviceAccount:
+    create: false
+    name: external-managed-sa

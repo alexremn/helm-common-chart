@@ -194,7 +194,7 @@ Returns the YAML-marshaled merged map (use `fromYaml` to consume).
 
 Parameters:
   scope         — "pod" or "container"
-  root          — chart root (for profile + global lookups)
+  root          — chart root (for security posture + global lookups)
   component     — component values map (reads .securityContext.<scope>)
   input         — for the legacy unwrapped call shape, the raw input
                   map whose top-level <overrideKeys> are layered last
@@ -210,10 +210,10 @@ Parameters:
 {{- $overrideKeys := default (list) .overrideKeys -}}
 {{- $wrapped := default false .wrapped -}}
 {{- $secCtx := dict -}}
-{{- $profile := include "common.profile" (dict "root" $root "component" $component) -}}
-{{- $profileDefaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
-{{- if and (kindIs "map" $profileDefaults) (hasKey $profileDefaults "securityContext") -}}
-  {{- $_ := mergeOverwrite $secCtx (deepCopy (dig "securityContext" $scope dict $profileDefaults)) -}}
+{{- $security := include "common.security" $root -}}
+{{- $secDefaults := index (include "common.security.defaults" $root | fromYaml) $security -}}
+{{- if kindIs "map" $secDefaults -}}
+  {{- $_ := mergeOverwrite $secCtx (deepCopy (dig $scope dict $secDefaults)) -}}
 {{- end -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}
 {{- $globalSecCtx := dig "global" "securityContext" $scope dict $values -}}

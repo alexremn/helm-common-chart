@@ -166,13 +166,6 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-              - ALL
       terminationGracePeriodSeconds: 30
       securityContext:
         seccompProfile:
@@ -242,16 +235,11 @@ spec:
             periodSeconds: 10
             failureThreshold: 5
             timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
           volumeMounts:
             - name: data
               mountPath: /mnt/data
       terminationGracePeriodSeconds: 30
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: stateful
@@ -312,13 +300,8 @@ spec:
             - secretRef:
                 name: "secrets"
                 optional: true
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
       restartPolicy: "Never"
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: run-task
@@ -361,13 +344,6 @@ spec:
                 - -c
               args: 
                 - echo cron features
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop:
-                  - ALL
           restartPolicy: "Never"
           securityContext:
             seccompProfile:

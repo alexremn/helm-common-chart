@@ -1,15 +1,16 @@
-# Asserts that the generic profile now emits secure-by-default pod and
-# container securityContext blocks (F5):
-#   pod.runAsNonRoot: true, pod.seccompProfile.type: RuntimeDefault
+# Asserts the `generic` security posture (global.security) emits the hardened
+# pod/container securityContext, independent of the runtime profile:
+#   container.runAsNonRoot: true
 #   container.allowPrivilegeEscalation: false
 #   container.readOnlyRootFilesystem: true
 #   container.capabilities.drop: [ALL]
-# python / go profiles get the same defaults; rails keeps its legacy shape.
+#   pod.seccompProfile.type: RuntimeDefault
+# Profile stays at the default `generic`; security is the separate axis here.
 name: securitycontext-app
 environment: production
 
 global:
-  profile: generic
+  security: generic
   image:
     repository: ghcr.io/example/api
     tag: "1.0.0"

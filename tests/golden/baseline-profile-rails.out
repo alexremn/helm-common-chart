@@ -173,13 +173,8 @@ spec:
             periodSeconds: 10
             failureThreshold: 5
             timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
       terminationGracePeriodSeconds: 30
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: web
@@ -248,16 +243,11 @@ spec:
             periodSeconds: 10
             failureThreshold: 5
             timeoutSeconds: 3
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
           volumeMounts:
             - name: data
               mountPath: /mnt/data
       terminationGracePeriodSeconds: 30
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: stateful
@@ -318,13 +308,8 @@ spec:
             - secretRef:
                 name: "secrets"
                 optional: true
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
       restartPolicy: "Never"
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: run-task
@@ -374,13 +359,8 @@ spec:
                 - secretRef:
                     name: "secrets"
                     optional: true
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
           restartPolicy: "Never"
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 3000
             seccompProfile:
               type: RuntimeDefault
           serviceAccountName: sync-task
