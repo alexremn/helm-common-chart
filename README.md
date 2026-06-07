@@ -80,7 +80,6 @@ Common helper library (`templates/common/`): workload composition, container bui
 ## Docs
 
 - [Values reference](./docs/values-reference.md) — top-level keys grouped by concern
-- [Migrating v1 → v2](./docs/migration-v1-to-v2.md) — required input changes and breaking-default audit
 - [Examples](./examples/) — working `values.*.yaml` per feature
 - [Contributing](./CONTRIBUTING.md) — dev setup, tests, golden workflow
 - `values.schema.json` — full JSON schema (validated by `helm lint`)
