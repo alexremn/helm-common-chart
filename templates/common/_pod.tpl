@@ -259,12 +259,16 @@ enableServiceLinks: {{ .enableServiceLinks }}
 {{- if hasKey . "shareProcessNamespace" }}
 shareProcessNamespace: {{ .shareProcessNamespace }}
 {{- end }}
-{{- /* Default to false (secure-by-default) when unset; explicit consumer values override. */}}
-{{- if hasKey . "automountServiceAccountToken" }}
-automountServiceAccountToken: {{ .automountServiceAccountToken }}
-{{- else }}
-automountServiceAccountToken: false
-{{- end }}
+{{- /* Token automount is governed by the single knob `serviceAccount.automount`
+       (default false, secure-by-default). Emitted unconditionally on the pod so
+       it is effective whether the pod uses the chart's ServiceAccount or the
+       namespace `default` SA — the pod-level field always overrides the SA
+       object's setting. The same knob drives the ServiceAccount object in
+       _service_account.tpl, so both objects stay in sync. */}}
+{{- $sa := dig "serviceAccount" dict . }}
+{{- $saAutomount := false }}
+{{- if kindIs "map" $sa }}{{ $saAutomount = dig "automount" false $sa }}{{- end }}
+automountServiceAccountToken: {{ $saAutomount }}
 {{- if hasKey . "hostNetwork" }}
 hostNetwork: {{ .hostNetwork }}
 {{- end }}

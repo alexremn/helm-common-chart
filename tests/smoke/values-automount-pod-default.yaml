@@ -10,5 +10,6 @@ web:
   replicas: 1
   ports:
     http: 8080
-  # intentionally no automountServiceAccountToken — expect implicit `false`
-  # intentionally no serviceAccount block — expect default SA
+  # intentionally no serviceAccount block — expect default SA and, since
+  # serviceAccount.automount is unset, a pod-level
+  # automountServiceAccountToken: false (secure-by-default).

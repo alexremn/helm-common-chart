@@ -163,4 +163,4 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: api-caller
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true

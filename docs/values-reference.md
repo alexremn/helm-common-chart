@@ -194,13 +194,35 @@ Keys: `serviceAccount`, `role`, `roleBinding`, `clusterRole`, `clusterRoleBindin
 
 Each component may declare its own ServiceAccount and bind to Roles/ClusterRoles. Defaults to the workload's default ServiceAccount if unset.
 
+### ServiceAccount fields
+
+| Path | Type | Default | Notes |
+|------|------|---------|-------|
+| `<cmp>.serviceAccount.create` | bool | `true` | Render the ServiceAccount object. `false` skips it. |
+| `<cmp>.serviceAccount.enabled` | bool | `true` | Alias gate; `false` also skips creation. |
+| `<cmp>.serviceAccount.name` | string | component name | SA name. With `create: false` it points at an externally-managed SA. |
+| `<cmp>.serviceAccount.automount` | bool | `false` | **Single source of truth** for token mounting. Sets `automountServiceAccountToken` on **both** the ServiceAccount object and the pod spec, so it is effective whether the pod uses this SA or the namespace `default` SA. Default `false` = no token mounted (secure-by-default). |
+| `<cmp>.serviceAccount.annotations` | map | `{}` | Annotations on the SA object. |
+
+**`serviceAccountName` guard.** The pod only pins a `serviceAccountName` the
+cluster will actually have: when the SA is not created (`create: false` /
+`enabled: false`) and no explicit `name` is given, the line is omitted and the
+pod falls back to the namespace `default` SA instead of a dangling reference.
+
+> **Upgrade note:** token automount is now governed solely by
+> `serviceAccount.automount`. A pod-level `automountServiceAccountToken` set
+> directly on a component is no longer read — move the value to
+> `serviceAccount.automount`.
+
 See: [`examples/values.rbac.yaml`](../examples/values.rbac.yaml).
 
 ## Profiles
 
 Keys: `global.profile`, `<cmp>.profile`.
 
-Language/runtime profile defaults (`generic`, `rails`, `python`, `go`). Applies opinionated defaults for probes, podMonitor relabelings, envFrom phantoms, and pod/container security context. Override individual keys per component as usual.
+Language/runtime profile defaults (`generic`, `rails`, `python`, `go`). Applies opinionated defaults for probes, podMonitor relabelings, and envFrom phantoms. Override individual keys per component as usual.
+
+**Security context is a separate axis** — profiles no longer carry a `securityContext`. See [Security posture](#security-posture).
 
 See: [`examples/values.profile-go.yaml`](../examples/values.profile-go.yaml), [`examples/values.profile-python.yaml`](../examples/values.profile-python.yaml).
 
@@ -245,6 +267,41 @@ See the `mixed-profiles` smoke fixture
 ([`tests/smoke/values-mixed-profiles.yaml`](../tests/smoke/values-mixed-profiles.yaml))
 for a worked end-to-end example.
 
+## Security posture
+
+Key: `global.security`.
+
+The pod/container `securityContext` defaults are a **separate axis** from the
+runtime profile — any profile can run with any posture. Selected chart-wide via
+`global.security`:
+
+| Posture | Container hardening | Use when |
+|---|---|---|
+| `minimal` (**default**) | none enforced; pod-level `seccompProfile: RuntimeDefault` only | charts that write to disk or run as root |
+| `generic` | `runAsNonRoot`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem`, `capabilities.drop: [ALL]` | hardened workloads |
+
+Both postures are overridable per-scope by `global.securityContext.<scope>` and
+`<cmp>.securityContext.<scope>` (layered after the posture, last wins).
+
+Allowed values: `minimal`, `generic`. Invalid values fail loudly at render time.
+
+| Path | Type | Default | Notes |
+|------|------|---------|-------|
+| `global.security` | string | `minimal` | Chart-wide securityContext posture. |
+
+```yaml
+global:
+  profile: rails        # runtime defaults (probes, envFrom, ...)
+  security: generic     # hardened securityContext, independent of profile
+```
+
+> **Upgrade note:** before this split, the `generic`/`python`/`go` profiles
+> enforced the hardened context by default and `rails` injected
+> `runAsUser: 1000` / `runAsGroup: 3000`. Posture now defaults to `minimal`
+> (no enforced hardening) and carries no uid/gid. Set `global.security: generic`
+> to restore hardening; set `runAsUser`/`runAsGroup` explicitly under
+> `securityContext.pod` if you relied on the old rails uid/gid.
+
 ## Misc
 
 - `priorityClass` — define a `PriorityClass` (cluster-scoped). Map of name → spec.
@@ -258,6 +315,7 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | Path | Type | Default | Notes |
 |---|---|---|---|
 | `global.profile` | string | `generic` | Chart-wide profile default. See [Profile resolution](#profile-resolution). |
+| `global.security` | string | `minimal` | Chart-wide securityContext posture (`minimal` \| `generic`), independent of `profile`. See [Security posture](#security-posture). |
 | `global.name` | string | unset | Falls back to `app.name` / top-level `name` / `werf.name` / chart name. Used as the application identifier. |
 | `global.environment` | string | unset | Falls back to top-level `environment` / `env` / `werf.env` / `default`. Used as the deploy environment identifier. |
 | `global.image` | map | unset | Default image map (`repository`, `tag`, `pullPolicy`) used when a component does not set its own. |
@@ -270,8 +328,8 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | `global.ingress.annotations` | map | `{}` | Chart-wide Ingress annotations merged into every rendered Ingress. |
 | `global.probe.<field>` | map | unset | Chart-wide probe field overrides. Slots between profile default and per-component value. See [Probes](#probes). |
 | `global.envFrom.configs` / `.secrets` | list | unset | Chart-wide `envFrom` projections. See [`envFrom` shape and rails-profile phantom defaults](#envfrom-shape-and-rails-profile-phantom-defaults). |
-| `global.securityContext.pod` | map | profile default | Chart-wide pod-level `securityContext` defaults merged under profile defaults. |
-| `global.securityContext.container` | map | profile default | Chart-wide container-level `securityContext` defaults merged under profile defaults. |
+| `global.securityContext.pod` | map | posture default | Chart-wide pod-level `securityContext` defaults merged over the `global.security` posture. |
+| `global.securityContext.container` | map | posture default | Chart-wide container-level `securityContext` defaults merged over the `global.security` posture. |
 | `global.prometheusEndpoint` | string | unset | Default `serverAddress` for KEDA `ScaledObject` Prometheus triggers. Required when any trigger has `type: prometheus` and no explicit `serverAddress`. |
 | `global.pdb.maxUnavailable` | int\|string | `25%` | Fallback `maxUnavailable` for PodDisruptionBudgets when neither `<cmp>.pdb.maxUnavailable` nor `<cmp>.pdb.minAvailable` is set. |
 | `global.externalSecrets.forceSync` | bool | `false` | Adds the `force-sync` annotation to every rendered `ExternalSecret`, triggering a re-fetch on each `helm upgrade`. |
@@ -290,3 +348,4 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | Labels/annotations/naming | (everywhere) | `templates/common/_general.tpl`, `_helpers.tpl` |
 | Affinity / topology | (inside pod) | `templates/common/_affinities.tpl` |
 | Language profile defaults | (inside container) | `templates/common/_profile.tpl` |
+| Security posture defaults | (pod + container securityContext) | `templates/common/_profile.tpl` (`common.security`) |

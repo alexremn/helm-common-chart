@@ -53,6 +53,11 @@ instead):
 
 ## Hardening recommendations for consumers
 
+- Set `global.security: generic` to enable the hardened container
+  `securityContext` (`runAsNonRoot`, `allowPrivilegeEscalation: false`,
+  `readOnlyRootFilesystem`, `capabilities.drop: [ALL]`). The default posture is
+  `minimal` (no enforced container hardening) — profiles no longer imply a
+  securityContext.
 - Pin chart version: `version: "2.0.x"` (drop `^` to fully pin a patch).
 - Verify OCI artifact digest in CI: `helm pull oci://ghcr.io/alexremn/charts/common --version <ver>` and compare to the digest published on the GitHub Release page.
 - Override `serviceAccount.automount: true` explicitly only for workloads

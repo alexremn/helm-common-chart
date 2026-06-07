@@ -35,7 +35,12 @@
         "profile": {
           "type": "string",
           "enum": ["rails", "generic", "python", "go"],
-          "description": "Selects a set of library defaults (probe paths, podMonitor metricRelabelings, envFrom phantom names). Default `rails` preserves v1.3.1 behavior."
+          "description": "Selects a set of library defaults (probe paths, podMonitor metricRelabelings, envFrom phantom names). Default `generic`. Set `rails` to preserve v1.3.1 behavior. Security context is a separate axis — see `security`."
+        },
+        "security": {
+          "type": "string",
+          "enum": ["minimal", "generic"],
+          "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): no enforced container hardening (pod seccompProfile RuntimeDefault only). `generic`: runAsNonRoot, allowPrivilegeEscalation:false, readOnlyRootFilesystem, drop-ALL capabilities. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
         },
         "image": { "$ref": "#/$defs/imageOrString" },
         "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
