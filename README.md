@@ -1,6 +1,6 @@
 # helm-common-chart
 
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/common)](https://artifacthub.io/packages/helm/common/common)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/helm-common-chart)](https://artifacthub.io/packages/search?repo=helm-common-chart)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Helm](https://img.shields.io/badge/Helm-%5E4.x-0F1689)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-%3E%3D1.24-326CE5)
