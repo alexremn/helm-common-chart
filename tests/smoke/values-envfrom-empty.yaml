@@ -1,0 +1,16 @@
+name: envfrom-app
+environment: dev
+
+global:
+  profile: rails
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  # Explicit empty lists must DISABLE the rails phantom config/secrets envFrom.
+  envFrom:
+    configs: []
+    secrets: []
+
+web:
+  ports:
+    http: 8080
