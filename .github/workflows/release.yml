@@ -31,9 +31,6 @@ jobs:
         with:
           version: v4.2.0
 
-      - name: Set up crane
-        uses: imjasonh/setup-crane@31b88efe9de28ae0ffa220711af4b60be9435f6e # v0.4
-
       - name: Install Cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
@@ -82,29 +79,27 @@ jobs:
                 --username "$ACTOR" \
                 --password-stdin
 
-      - name: Crane registry login (GHCR)
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "$GHCR_TOKEN" \
-            | crane auth login ghcr.io \
-                --username "$ACTOR" \
-                --password-stdin
-
       - name: Push chart to GHCR (OCI)
+        id: push
         env:
           PKG: ${{ steps.package.outputs.pkg }}
         run: |
-          helm push "$PKG" "oci://ghcr.io/${REPO_OWNER}/charts"
+          set -euo pipefail
+          helm push "$PKG" "oci://ghcr.io/${REPO_OWNER}/charts" 2>&1 | tee /tmp/helm-push.log
+          digest="$(grep -oE 'sha256:[0-9a-f]{64}' /tmp/helm-push.log | head -n1)"
+          if [ -z "$digest" ]; then
+            echo "Failed to capture pushed digest from helm push output" >&2; exit 1
+          fi
+          echo "Pushed digest: ${digest}"
+          echo "DIGEST=${digest}" >> "$GITHUB_OUTPUT"
 
       - name: Sign OCI artifact with Cosign
         env:
           COSIGN_YES: "true"
+          DIGEST: ${{ steps.push.outputs.DIGEST }}
         run: |
-          tag="${REF_NAME#v}"
-          digest="$(crane digest ghcr.io/${REPO_OWNER}/charts/common:${tag})"
-          echo "Signing ghcr.io/${REPO_OWNER}/charts/common@${digest}"
-          cosign sign "ghcr.io/${REPO_OWNER}/charts/common@${digest}"
+          echo "Signing ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
+          cosign sign "ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
