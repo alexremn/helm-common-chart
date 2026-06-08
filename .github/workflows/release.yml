@@ -101,6 +101,28 @@ jobs:
           echo "Signing ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
           cosign sign "ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
 
+      - name: Attest SBOM to OCI artifact with Cosign
+        env:
+          COSIGN_YES: "true"
+          DIGEST: ${{ steps.push.outputs.DIGEST }}
+        run: |
+          ref="ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
+          echo "Attesting SPDX SBOM to ${ref}"
+          cosign attest --type spdxjson \
+            --predicate "dist/common-${REF_NAME}.spdx.json" \
+            "${ref}"
+          cosign attach sbom --sbom "dist/common-${REF_NAME}.spdx.json" \
+            "ghcr.io/${REPO_OWNER}/charts/common:${REF_NAME#v}"
+
+      - name: Verify signature (self-check, exact SECURITY.md command)
+        env:
+          DIGEST: ${{ steps.push.outputs.DIGEST }}
+        run: |
+          cosign verify \
+            --certificate-identity-regexp "^https://github.com/${REPO_OWNER}/helm-common-chart/.github/workflows/release.yml@refs/tags/v" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "ghcr.io/${REPO_OWNER}/charts/common@${DIGEST}"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
