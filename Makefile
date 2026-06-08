@@ -103,9 +103,9 @@ validate-kubeconform:
 	@set -e; \
 	for variant in $(SMOKE_VARIANTS); do \
 	  for ver in $(K8S_VERSIONS); do \
-	    kubeconform -strict -ignore-missing-schemas -summary \
+	    kubeconform -strict -ignore-missing-schemas -summary -verbose \
 	      -schema-location default \
-	      -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{ .Group }}/{{ .ResourceKind }}_{{ .ResourceAPIVersion }}.json' \
+	      -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/5f127a5ac3655e83d40f7ad8d4b7392c89e36b38/{{ .Group }}/{{ .ResourceKind }}_{{ .ResourceAPIVersion }}.json' \
 	      -kubernetes-version $$ver \
 	      - < /tmp/common-smoke-$$variant.out \
 	      || { echo "FAIL kubeconform: $$variant @ k8s $$ver" >&2; exit 1; }; \
