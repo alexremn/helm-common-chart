@@ -51,7 +51,7 @@ rules:
   - host: {{ if kindIs "map" . }}{{ .host }}{{ else }}{{ . }}{{ end }}
     http:
       paths:
-      {{- if kindIs "map" . }}
+      {{- if and (kindIs "map" .) .paths }}
         {{- range .paths }}
       - {{- include "ingress.path" (dict "path" .path "pathType" .pathType "svc" .svc "defaultSvc" $cmp "port" .port) | nindent 8 }}
         {{- end }}

@@ -27,7 +27,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   no-environment-label \
                   persistence-nameless \
                   hpa-statefulset \
-                  scale-to-zero
+                  scale-to-zero \
+                  ingress-map-nopaths
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
