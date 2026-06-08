@@ -38,7 +38,7 @@ metadata:
   {{- if $emitReplicasAnn }}{{- $_ := set $extraAnn $replicasOnCreationAnnotation ($componentValues.scaling.min | toString) }}{{- end }}
   {{- include "common.workload.annotations" (dict "root" . "component" $componentValues "extra" $extraAnn) }}
 spec:
-  {{- if not $componentValues.scaling }}
+  {{- if not (or $componentValues.scaling $componentValues.hpa) }}
   replicas: {{ default 1 $componentValues.replicas | int }}
   {{- end }}
   minReadySeconds: {{ default 10 $componentValues.minReadySeconds }}

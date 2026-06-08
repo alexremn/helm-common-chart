@@ -74,7 +74,6 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
 spec:
-  replicas: 1
   minReadySeconds: 10
   strategy:
     type: RollingUpdate
