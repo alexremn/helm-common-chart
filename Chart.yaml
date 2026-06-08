@@ -32,7 +32,7 @@ annotations:
     - kind: security
       description: "Default automountServiceAccountToken to false at pod level (F4)"
     - kind: security
-      description: "Add secure-by-default securityContext to generic/python/go profiles (F5)"
+      description: "Provide secure-by-default securityContext via the global.security posture (minimal|generic), decoupled from language profiles (F5)"
     - kind: security
       description: "Replace tpl ... $ with scoped dict to close template-injection surface (F2)"
     - kind: fixed
