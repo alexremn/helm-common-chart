@@ -375,6 +375,9 @@ Usage: {{ include "common.affinity" . }}
 {{- $val := .val -}}
 {{- if kindIs "map" $val -}}
 {{- with $val.affinity -}}
+{{- if not (kindIs "map" .) -}}
+{{- fail (printf "common.affinity: component '%s' .affinity must be a map, got %s" $cmp (kindOf .)) -}}
+{{- end -}}
 {{- $nodeAffinity := get . "nodeAffinity" -}}
 {{- $podAntiAffinity := get . "podAntiAffinity" -}}
 {{- $isLegacyNodeAffinity := kindIs "slice" $nodeAffinity -}}
