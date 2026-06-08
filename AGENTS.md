@@ -8,8 +8,10 @@ make changes in this repo. Keep it under ~80 lines.
 A Helm v4 library chart (`Chart.yaml` `type: library`) providing reusable
 templates for Kubernetes workloads, services, autoscaling, observability,
 RBAC, configs/secrets, and storage. Library charts emit no resources of their
-own; they expose `common.*` helpers and template definitions consumed by
-application charts via the `dependencies` mechanism.
+own. They expose two namespaces: public entrypoints `chart.*` (e.g.
+`chart.deployment`, `chart.service`) that consumer charts `include`, and
+internal helpers `common.*` (under `templates/common/`) that the entrypoints
+compose. Both are consumed via the `dependencies` mechanism.
 
 ## Layout
 
