@@ -1,0 +1,135 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pers-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+
+
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+data:
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: pers-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pers-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pers-app
+        app.kubernetes.io/component: web
+        helm.sh/environment: dev
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/web:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: data
+              mountPath: /var/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+      automountServiceAccountToken: false

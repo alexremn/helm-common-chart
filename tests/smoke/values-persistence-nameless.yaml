@@ -1,0 +1,16 @@
+name: pers-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+# Map-form persistence WITHOUT a `name` key. The volumes side defaults to
+# "data" but common.volumeMounts.spec hard-fails on the required name.
+web:
+  ports:
+    http: 8080
+  persistence:
+    size: 5Gi
+    mountPath: /var/data
