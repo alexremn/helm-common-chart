@@ -28,7 +28,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   persistence-nameless \
                   hpa-statefulset \
                   scale-to-zero \
-                  ingress-map-nopaths
+                  ingress-map-nopaths \
+                  hex-secret
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
@@ -49,6 +50,7 @@ render-smoke:
 	for variant in $(SMOKE_VARIANTS); do \
 	  $(HELM) template smoke . -f values-$$variant.yaml \
 	    | sed -E 's/force-sync: ".*"/force-sync: "<NOW>"/' \
+	    | sed -E 's/^( *TOKEN: ).*/\1<HEX>/' \
 	    >/tmp/common-smoke-$$variant.out || exit $$?; \
 	done )
 
