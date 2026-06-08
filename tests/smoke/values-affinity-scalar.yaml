@@ -1,0 +1,13 @@
+name: aff-scalar-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  # Misconfigured: affinity is a scalar (string) instead of a map.
+  affinity: "true"
