@@ -117,7 +117,7 @@ Lookup order:
 {{- end }}
 
 {{/*
-Resolve `imagePullPolicy`. See `docs/values-contract.md` for resolution order.
+Resolve `imagePullPolicy`. See `docs/values-reference.md` for resolution order.
 */}}
 {{- define "common.workload.imagePullPolicy" -}}
 {{- $root := .root -}}

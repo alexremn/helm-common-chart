@@ -8,7 +8,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Application name (label app.kubernetes.io/name). See docs/values-contract.md for the full resolution order."
+      "description": "Application name (label app.kubernetes.io/name). See docs/values-reference.md for the full resolution order."
     },
     "environment": {
       "type": "string",
