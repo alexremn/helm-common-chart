@@ -25,3 +25,16 @@
 icon.png
 icon.svg
 artifacthub-repo.yml
+# Dev/CI tooling and internal docs — not part of the published library chart.
+docs/
+tests/
+examples/
+.github/
+Makefile
+.kube-linter.yaml
+CLAUDE.md
+AGENTS.md
+RTK.md
+CODEOWNERS
+.claude/
+.rtk/
