@@ -343,7 +343,9 @@ Usage: {{ include "common.envFrom" (dict "svc" .Values.myComponent "global" .Val
 {{/* Append global defaults/config where present */}}
 {{- if and (kindIs "map" .global) (hasKey .global "envFrom") }}
   {{- with .global.envFrom }}
-    {{- range .configs | default $defaultConfigList }}
+    {{- $configs := $defaultConfigList }}
+    {{- if hasKey . "configs" }}{{- $configs = .configs }}{{- end }}
+    {{- range $configs }}
       {{- if kindIs "string" . }}
         {{- $entries = append $entries (dict "type" "configMapRef" "name" .) }}
       {{- else }}
@@ -354,7 +356,9 @@ Usage: {{ include "common.envFrom" (dict "svc" .Values.myComponent "global" .Val
         {{- $entries = append $entries $entry }}
       {{- end }}
     {{- end }}
-    {{- range .secrets | default $defaultSecretList }}
+    {{- $secrets := $defaultSecretList }}
+    {{- if hasKey . "secrets" }}{{- $secrets = .secrets }}{{- end }}
+    {{- range $secrets }}
       {{- if kindIs "string" . }}
         {{- $entries = append $entries (dict "type" "secretRef" "name" .) }}
       {{- else }}

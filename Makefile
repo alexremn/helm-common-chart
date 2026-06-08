@@ -30,7 +30,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   scale-to-zero \
                   ingress-map-nopaths \
                   hex-secret \
-                  nodeaffinity-legacy
+                  nodeaffinity-legacy \
+                  envfrom-empty
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

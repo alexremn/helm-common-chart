@@ -150,13 +150,6 @@ spec:
           - name: metrics
             containerPort: 9090
             protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: "config"
-                optional: true
-            - secretRef:
-                name: "secrets"
-                optional: true
           readinessProbe:
             httpGet:
               path: /health_check/full
@@ -220,13 +213,6 @@ spec:
           - name: http
             containerPort: 8081
             protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: "config"
-                optional: true
-            - secretRef:
-                name: "secrets"
-                optional: true
           readinessProbe:
             httpGet:
               path: /health_check/full
@@ -301,13 +287,6 @@ spec:
             - -c
           args: 
             - echo features
-          envFrom:
-            - configMapRef:
-                name: "config"
-                optional: true
-            - secretRef:
-                name: "secrets"
-                optional: true
       restartPolicy: "Never"
       securityContext:
         seccompProfile:
@@ -352,13 +331,6 @@ spec:
                 - -c
               args: 
                 - echo cron features
-              envFrom:
-                - configMapRef:
-                    name: "config"
-                    optional: true
-                - secretRef:
-                    name: "secrets"
-                    optional: true
           restartPolicy: "Never"
           securityContext:
             seccompProfile:
