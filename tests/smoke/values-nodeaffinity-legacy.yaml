@@ -1,0 +1,17 @@
+name: aff-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  # Legacy slice-form nodeAffinity with a NUMERIC zone id — must stay a string.
+  affinity:
+    nodeAffinity:
+      - key: topology.kubernetes.io/zone
+        operator: In
+        value: 12345
