@@ -359,7 +359,7 @@ nodeAffinity:
           - key: {{ .key }}
             operator: {{ default "In" .operator }}
             values:
-              - {{ .value }}
+              - {{ .value | quote }}
     {{- end }}
 {{- end -}}
 {{- end -}}
