@@ -42,7 +42,7 @@ If `git diff` shows anything unexpected, your change has a side-effect you didn'
 
 ## Adding a new template kind
 
-1. Create `templates/_<kind>.tpl` defining `common.<kind>` (follow patterns in existing templates, e.g. `templates/_deployment.tpl`).
+1. Create `templates/_<kind>.tpl` defining the public entrypoint `chart.<kind>` (follow patterns in existing templates, e.g. `templates/_deployment.tpl`, which defines `chart.deployment`). Public entrypoints consumers `include` are `chart.*`; the `common.*` definitions under `templates/common/` are internal helpers.
 2. Use shared helpers from `templates/common/` (`_workload.tpl`, `_pod.tpl`, `_container.tpl`, `_general.tpl`, `_helpers.tpl`).
 3. Add a feature fixture in `examples/values.<kind>.yaml` for users.
 4. Add a smoke fixture in `tests/smoke/values-<kind>.yaml`.
