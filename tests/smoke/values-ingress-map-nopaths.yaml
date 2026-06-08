@@ -1,0 +1,16 @@
+name: ing-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  ingress:
+    public:
+      # Map-form domain with NO `paths` key — must fall back to default path.
+      domains:
+        - host: app.example.com
