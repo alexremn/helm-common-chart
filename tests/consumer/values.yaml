@@ -1,0 +1,21 @@
+name: consumer-compat
+# Use a library-recognized environment so chart.configmap can resolve its
+# env-specific `config.dict.<env>` template (defined for the known envs in
+# templates/_configmap.tpl). An unknown env would crash the render.
+environment: staging
+
+# Top-level `web` is the schema the live `common` library actually consumes
+# (see tests/smoke/values-*.yaml). `components.*` is NOT a key the library
+# reads, so it would render nothing — this shape makes the consumer render
+# real manifests via the chart.* entrypoints included from templates/all.yaml.
+web:
+  image:
+    repository: ghcr.io/example/consumer-compat
+    tag: "1.0.0"
+  ports:
+    http: 8080
+  serviceAccount:
+    name: consumer-compat
+  configmap:
+    data:
+      APP_MODE: ci

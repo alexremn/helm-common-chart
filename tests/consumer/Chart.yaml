@@ -1,0 +1,9 @@
+apiVersion: v2
+name: consumer-compat
+description: Minimal synthetic consumer that depends on the local common library, for compatibility linting.
+version: 0.0.0
+type: application
+dependencies:
+  - name: common
+    version: "*"
+    repository: "file://../.."

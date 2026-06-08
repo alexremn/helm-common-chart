@@ -3,10 +3,8 @@ SHELL := $(shell command -v zsh 2>/dev/null || command -v bash 2>/dev/null || co
 HELM ?= helm
 SMOKE_DIR ?= tests/smoke
 GOLDEN_DIR ?= tests/golden
-CANARYBOT_CHART ?= ../../../bots/canarybot/.helm
-TMP_CANARYBOT ?= /tmp/canarybot-common-compat
 
-.PHONY: lint lint-library lint-smoke render-smoke golden-update golden-check lint-canarybot-compat \
+.PHONY: lint lint-library lint-smoke render-smoke golden-update golden-check lint-consumer \
         validate validate-kubeconform validate-kube-linter
 
 # Phase C1 — validation tooling.
@@ -70,29 +68,16 @@ golden-check: render-smoke
 	done; \
 	exit $$rc
 
-lint-canarybot-compat:
-	@if [ -d "$(CANARYBOT_CHART)" ]; then \
-	  rm -rf "$(TMP_CANARYBOT)" && \
-	  mkdir -p "$(TMP_CANARYBOT)" && \
-	  cp -R "$(CANARYBOT_CHART)"/* "$(TMP_CANARYBOT)"/ && \
-	  rm -rf "$(TMP_CANARYBOT)/charts/common" "$(TMP_CANARYBOT)/charts/common-1.1.4.tgz" && \
-	  cp -R . "$(TMP_CANARYBOT)/charts/common" && \
-	  printf '%s\n' \
-	    'apiVersion: v2' \
-	    'name: canarybot' \
-	    'version: 0.0.0' \
-	    'dependencies:' \
-	    '  - name: common' \
-	    '    version: "^1.0.0"' \
-	    '    repository: "file://charts/common"' > "$(TMP_CANARYBOT)/Chart.yaml" && \
-	  cd "$(TMP_CANARYBOT)" && \
-	  $(HELM) lint . -f values.yaml -f envs/common.yaml -f envs/dev.yaml --set werf.name=canarybot,werf.env=dev,werf.image.app=ghcr.io/example/canarybot:dev && \
-	  $(HELM) lint . -f values.yaml -f envs/common.yaml -f envs/prod.yaml --set werf.name=canarybot,werf.env=production,werf.image.app=ghcr.io/example/canarybot:prod && \
-	  $(HELM) template canarybot . -f values.yaml -f envs/common.yaml -f envs/dev.yaml --set werf.name=canarybot,werf.env=dev,werf.image.app=ghcr.io/example/canarybot:dev >/tmp/canarybot-dev-render.out && \
-	  $(HELM) template canarybot . -f values.yaml -f envs/common.yaml -f envs/prod.yaml --set werf.name=canarybot,werf.env=production,werf.image.app=ghcr.io/example/canarybot:prod >/tmp/canarybot-prod-render.out; \
-	else \
-	  echo "Skip canarybot compatibility check: $(CANARYBOT_CHART) not found"; \
-	fi
+# Render+lint a minimal synthetic consumer against the local library to catch
+# consumer-facing breakage. Vendored under tests/consumer; runs in CI.
+CONSUMER_DIR ?= tests/consumer
+
+lint-consumer:
+	( cd $(CONSUMER_DIR) && \
+	trap 'rm -f Chart.lock charts/common-*.tgz; rmdir charts 2>/dev/null || true' EXIT && \
+	$(HELM) dependency build --skip-refresh >/tmp/consumer-deps.log && \
+	$(HELM) lint . -f values.yaml && \
+	$(HELM) template consumer-compat . -f values.yaml >/tmp/consumer-render.out )
 
 # Run all validation gates. Assumes /tmp/common-smoke-*.out exists from render-smoke.
 validate: render-smoke validate-kubeconform validate-kube-linter
