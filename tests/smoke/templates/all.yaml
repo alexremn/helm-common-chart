@@ -66,3 +66,13 @@
 {{- if hasKey .Values "triggerAuthentications" }}
 {{ include "chart.triggerauth" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
+{{- if .Values.hexSecret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hex-bootstrap
+type: Opaque
+stringData:
+  {{ include "secrets.define" (dict "name" "hex-bootstrap" "key" "TOKEN" "var" "hex" "ns" .Release.Namespace) }}
+{{- end }}

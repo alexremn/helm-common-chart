@@ -17,7 +17,7 @@ Usage: {{ include "randHex" 16 }}
                the full 0..15 range by drawing a 6-digit number and reducing
                mod 16. Per-character bias is ~0.0016% (1,000,000 mod 16 = 0,
                so bias is actually zero for this range size). */ -}}
-        {{- $idx := mod (randNumeric 6 | int) 16 -}}
+        {{- $idx := mod (randNumeric 6 | int) 16 | int -}}
         {{- $result = print $result (substr $idx (add $idx 1 | int) $base) -}}
     {{- end -}}
     {{- $result -}}
@@ -123,7 +123,7 @@ Usage: {{ include "secrets.define" (dict "name" "secret-name" "key" "KEY_NAME" "
   {{- $var        := default "base" .var -}}
   {{- $name       := default "secrets" .name -}}
   {{- $key        := required "Key is required" .key -}}
-  {{- $namespace  := default .Release.Namespace .ns -}}
+  {{- $namespace  := .ns | default "" -}}
   {{- $value      := .value -}}
   {{- if or (not $value) (eq $value "") -}}
     {{- if eq $var "base" -}}
