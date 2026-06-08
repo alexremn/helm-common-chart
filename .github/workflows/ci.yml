@@ -48,6 +48,9 @@ jobs:
       - name: Golden render check
         run: make golden-check
 
+      - name: Consumer compatibility lint
+        run: make lint-consumer
+
       - name: Render smoke variants (for downstream validate job)
         run: make render-smoke
 

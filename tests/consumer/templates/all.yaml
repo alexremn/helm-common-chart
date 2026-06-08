@@ -1,0 +1,13 @@
+{{- /* Minimal consumer wiring: a real downstream chart must `include` the
+       library's chart.* entrypoints from its own templates/. This mirrors
+       tests/smoke/templates/all.yaml but stays intentionally small — just the
+       core web workload surface — so `make lint-consumer` renders a non-empty
+       manifest and genuinely exercises the library (it would FAIL to render if
+       a chart.* entrypoint were removed, which is the whole point). */ -}}
+{{- $hasWeb := and (hasKey .Values "web") (kindIs "map" (index .Values "web")) -}}
+{{- if $hasWeb }}
+{{ include "chart.configmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.serviceAccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
