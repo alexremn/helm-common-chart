@@ -18,7 +18,7 @@ spec:
     type: {{ default "RollingUpdate" $componentValues.updateStrategy | quote }}
   podManagementPolicy: {{ default "OrderedReady" $componentValues.podManagementPolicy | quote }}
   minReadySeconds: {{ default 0 $componentValues.minReadySeconds }}
-  {{- if not $componentValues.scaling }}
+  {{- if not (or $componentValues.scaling $componentValues.hpa) }}
   replicas: {{ default 1 $componentValues.replicas | int }}
   {{- end }}
   {{- with $componentValues.revisionHistoryLimit }}
