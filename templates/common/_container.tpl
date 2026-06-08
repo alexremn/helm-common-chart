@@ -518,7 +518,8 @@ volumeMounts:
 {{- if hasKey . "persistence" }}
 {{- $persistence := .persistence }}
 {{- if kindIs "map" $persistence }}
-{{- include "common.volumeMounts.spec" $persistence | nindent 2 }}
+{{- $namedPersistence := merge (dict "name" (default "data" $persistence.name)) $persistence }}
+{{- include "common.volumeMounts.spec" $namedPersistence | nindent 2 }}
 {{- else if kindIs "slice" $persistence }}
 {{- range $pvc := $persistence }}
 {{- include "common.volumeMounts.spec" $pvc | nindent 2 }}

@@ -553,7 +553,7 @@ volumes:
 {{- if kindIs "map" $persistence }}
   - name: {{ default "data" $persistence.name }}
     persistentVolumeClaim:
-      claimName: {{ default $persistence.name $persistence.claimName }}
+      claimName: {{ default (default "data" $persistence.name) $persistence.claimName }}
 {{- else if kindIs "slice" $persistence }}
 {{- range $pvc := $persistence }}
   - name: {{ required "PVC name is required" $pvc.name }}
