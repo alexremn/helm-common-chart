@@ -32,6 +32,19 @@ jobs:
       - name: Helm lint (library + every smoke variant)
         run: make lint
 
+      - name: Package hygiene gate (no internal paths in tgz)
+        run: |
+          helm package . --destination /tmp/ci-pkg
+          tgz="$(ls /tmp/ci-pkg/common-*.tgz | head -n1)"
+          echo "Inspecting $tgz"
+          leaked="$(tar -tzf "$tgz" | grep -E 'common/(docs/|tests/|examples/|\.github/|Makefile|\.kube-linter\.yaml|CLAUDE\.md|AGENTS\.md|RTK\.md|CODEOWNERS|\.claude/|\.rtk/)' || true)"
+          if [ -n "$leaked" ]; then
+            echo "FAIL: published chart would contain internal paths:" >&2
+            echo "$leaked" >&2
+            exit 1
+          fi
+          echo "PASS: package contains no excluded internal paths"
+
       - name: Golden render check
         run: make golden-check
 
