@@ -1,0 +1,22 @@
+name: keda-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  # Scale-to-zero: explicit min 0 must survive (KEDA idles the workload).
+  scaling:
+    min: 0
+    max: 0
+    idleReplicaCount: 0
+    triggers:
+      - type: cron
+        timezone: UTC
+        start: "0 8 * * *"
+        stop: "0 20 * * *"
+        desiredReplicas: "3"

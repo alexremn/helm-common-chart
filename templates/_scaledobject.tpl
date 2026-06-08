@@ -52,8 +52,8 @@ spec:
     {{- end }}
   pollingInterval: {{ default 30 $scaleConfig.pollingInterval }}
   cooldownPeriod: {{ default 180 $scaleConfig.cooldownPeriod }}
-  minReplicaCount: {{ default 1 $scaleConfig.min }}
-  maxReplicaCount: {{ default 1 $scaleConfig.max }}
+  minReplicaCount: {{ dig "min" 1 $scaleConfig }}
+  maxReplicaCount: {{ dig "max" 1 $scaleConfig }}
   {{- with $scaleConfig.idleReplicaCount }}
   idleReplicaCount: {{ . }}
   {{- end }}
