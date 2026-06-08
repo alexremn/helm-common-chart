@@ -26,7 +26,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   tpl-scoping ingress-no-tls extsecret-namespaced \
                   no-environment-label \
                   persistence-nameless \
-                  hpa-statefulset
+                  hpa-statefulset \
+                  scale-to-zero
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
