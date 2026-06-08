@@ -72,7 +72,7 @@ before installing:
 
 ```
 cosign verify \
-  --certificate-identity-regexp "^https://github.com/alexremn/helm-common-chart/" \
+  --certificate-identity-regexp "^https://github.com/alexremn/helm-common-chart/.github/workflows/release.yml@refs/tags/v" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
   ghcr.io/alexremn/charts/common:<version>
 ```
