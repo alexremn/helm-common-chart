@@ -10,6 +10,9 @@ stateful:
   ports:
     http: 8080
   hpa:
+    # StatefulSet components must target their own kind (chart.hpa defaults to Deployment).
+    apiVersion: apps/v1
+    kind: StatefulSet
     minReplicas: 2
     maxReplicas: 10
     metrics:

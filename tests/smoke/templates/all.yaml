@@ -42,6 +42,9 @@
 {{- if and $hasWeb (hasKey (index .Values "web") "hpa") }}
 {{ include "chart.hpa" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
+{{- if and $hasStateful (hasKey (index .Values "stateful") "hpa") }}
+{{ include "chart.hpa" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "stateful") }}
+{{- end }}
 {{- if and $hasWeb (hasKey (index .Values "web") "vpa") }}
 {{ include "chart.vpa" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
