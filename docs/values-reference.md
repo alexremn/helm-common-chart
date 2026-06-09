@@ -195,6 +195,27 @@ global:
 
 Both `global` and per-component lists are appended to the rendered `envFrom` (not merged), so a custom list at `global.envFrom.configs` replaces the phantom default. Generic / python / go profiles have empty `defaultConfigName` and `defaultSecretName`, so no phantom defaults are emitted under those profiles.
 
+## Ingress
+
+Keys: `<cmp>.ingress` (map or list form), `<cmp>.ingress.<entry>.className`,
+`global.ingress.className`, `global.ingress.annotations`.
+
+### IngressClass resolution
+
+`spec.ingressClassName` is set from, in priority order:
+
+```
+<cmp>.ingress.<entry>.className  ->  global.ingress.className
+```
+
+The legacy `kubernetes.io/ingress.class` **annotation is NOT auto-translated**
+into `spec.ingressClassName`. If you set it under `annotations:` it is passed
+through verbatim as an annotation (for controllers that still read it), but it
+will not populate `ingressClassName`. To target a class the modern way, set
+`className` (per entry) or `global.ingress.className`. This is deliberate — the
+annotation has been deprecated upstream since Kubernetes 1.18 and the chart does
+not silently map between the two mechanisms.
+
 ## Monitoring
 
 Keys: `<cmp>.serviceMonitor`, `<cmp>.podMonitor`, `prometheusRules`, `global.monitoring.releaseLabel`.
