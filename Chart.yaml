@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.1.4"
+version: "2.2.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,38 +29,48 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "Default volumeMounts/claimName name for nameless map-form persistence (P1-1)"
+    - kind: fixed
+      description: "Suppress static replicas when a native HPA manages the workload (P1-2)"
+    - kind: fixed
+      description: "Preserve explicit scale-to-zero min/max/idleReplicaCount 0 in KEDA ScaledObject (P1-3)"
+    - kind: fixed
+      description: "Emit a default path for map-form Ingress domains that omit paths (P1-4)"
+    - kind: fixed
+      description: "Fix randHex int64 panic and make config/secrets helper namespace lookups nil-safe (P1-5)"
+    - kind: fixed
+      description: "Quote legacy slice-form nodeAffinity values (P1-6)"
+    - kind: fixed
+      description: "Honor explicit empty envFrom configs/secrets to disable profile phantom defaults (P1-7)"
+    - kind: fixed
+      description: "Fail with a clear message when a component affinity is not a map (P1-8)"
+    - kind: fixed
+      description: "Coerce non-map global.probe/.probes to a dict instead of crashing (P1-9)"
+    - kind: fixed
+      description: "Quote scalar passthrough fields such as priorityClassName (P1-10)"
+    - kind: fixed
+      description: "Honor explicit DaemonSet minReadySeconds 0 (P1-11)"
+    - kind: fixed
+      description: "Emit priorityClassName on CronJob pods (P1-12)"
+    - kind: fixed
+      description: "Apply the profile metricRelabelings fallback per PodMonitor endpoint (P1-13)"
+    - kind: fixed
+      description: "Emit appProtocol on headless and extra Services (P1-14)"
+    - kind: fixed
+      description: "Default containerPort to the port value for map-form port definitions"
     - kind: security
-      description: "Default automountServiceAccountToken to false at pod level (F4)"
+      description: "Exclude internal dev paths (docs, tests, CI, Makefile) from the packaged chart (P0-1, P0-2)"
     - kind: security
-      description: "Provide secure-by-default securityContext via the global.security posture (minimal|generic), decoupled from language profiles (F5)"
+      description: "Generate the SBOM from the packaged artifact and attest+attach it to the OCI ref; add a cosign verify self-check (P0-8, P0-9)"
     - kind: security
-      description: "Replace tpl ... $ with scoped dict to close template-injection surface (F2)"
-    - kind: fixed
-      description: "Strip leading annotations: from common.{pod,}Annotations helpers to fix doubled YAML key (F1, F3)"
-    - kind: fixed
-      description: "Only emit Ingress tls: block when secretName or hosts present (F6)"
-    - kind: fixed
-      description: "Require explicit value for Equal-operator tolerations (F11)"
-    - kind: fixed
-      description: "Strip v-prefix from cosign verify example in release body (G1)"
-    - kind: fixed
-      description: "Fix README quick-start example to use chart.deployment + dict-wrap pattern (X11)"
-    - kind: added
-      description: "Configurable externalSecrets.secretStoreKind (default ClusterSecretStore) (F9)"
-    - kind: added
-      description: "Per-component profile override (<cmp>.profile) (X6, X7)"
-    - kind: added
-      description: "global.emitEnvironmentLabel flag to opt out of helm.sh/environment (X4)"
+      description: "Sign the push-emitted digest to close the publish TOCTOU window and scope the cosign certificate identity to the release workflow (P0-10, P0-11)"
+    - kind: security
+      description: "SHA-pin all GitHub Actions and add Dependabot for github-actions (P0-7)"
     - kind: changed
-      description: "NetworkPolicy default policyTypes contract documented (F7)"
+      description: "Add kubeconform -verbose, pin the CRDs-catalog schema source, and replace the dead canarybot compat target with a vendored consumer fixture (P0-12, P0-13)"
     - kind: changed
-      description: "Drop hardcoded review hook env default (F8)"
-    - kind: changed
-      description: "Document probes, envFrom, and global.* knobs in values-reference (X8, X9, X10)"
-    - kind: changed
-      description: "Move common.prometheus.metricRelabelings helper to its own file (F12)"
-    - kind: changed
-      description: "Refactor imagePullPolicy to share resolved image string (F10)"
+      description: "Restore docs/migration-v1-to-v2.md and repoint values-contract to values-reference (P0-3, P0-5, P0-6)"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
