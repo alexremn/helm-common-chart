@@ -6,7 +6,7 @@
 # This fixture mixes profile=generic at the chart level with a per-component
 # profile=rails override on the `stateful` component. Generic and rails have
 # visibly different rendering behavior (probe paths, podMonitor relabelings,
-# envFrom phantom defaults, runAsUser/runAsGroup) so a single golden diff
+# suppressed phantom envFrom, runAsUser/runAsGroup) so a single golden diff
 # proves both branches of the resolution chain are wired correctly.
 name: features-app
 environment: production
@@ -25,6 +25,8 @@ global:
   hooks:
     enabled: true
     weight: "-7"
+  # Explicit empty lists disable phantom configmap/secret envFrom chart-wide
+  # (P1-7 hasKey opt-out), so neither generic nor rails components emit them.
   envFrom:
     configs: []
     secrets: []
@@ -45,7 +47,7 @@ web:
 
 # Per-component override: rails.
 # Expect rails-profile defaults: probe path /health_check/full, podMonitor
-# rails metricRelabelings, phantom envFrom config/secrets with optional:true,
+# rails metricRelabelings, suppressed phantom envFrom (global opt-out above),
 # runAsUser 1000 / runAsGroup 3000.
 stateful:
   profile: rails
