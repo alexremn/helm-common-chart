@@ -36,7 +36,7 @@ Usage: {{ include "config.define" (dict "name" "config-name" "key" "KEY_NAME" "v
 {{- define "config.define" -}}
   {{- $name       := default "config" .name -}}
   {{- $key        := required "Key is required" .key -}}
-  {{- $namespace  := default .Release.Namespace .ns -}}
+  {{- $namespace  := .ns | default "" -}}
   {{- $value      := .value -}}
   {{- $configMap  := (lookup "v1" "ConfigMap" $namespace $name).data -}}
   {{- if and $configMap (index $configMap $key) -}}
@@ -85,7 +85,7 @@ Usage: {{ include "secrets.retrieve" (dict "name" "secret-name" "key" "KEY_NAME"
   {{- $type       := default "full" .type -}}
   {{- $name       := default "secrets" .name -}}
   {{- $key        := required "Key is required" .key -}}
-  {{- $namespace  := default .Release.Namespace .ns -}}
+  {{- $namespace  := .ns | default "" -}}
   {{- $secret     := (lookup "v1" "Secret" $namespace $name).data -}}
   {{- if and $secret (index $secret $key) -}}
     {{- $value := index $secret $key | b64dec -}}
