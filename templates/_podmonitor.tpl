@@ -149,13 +149,13 @@ spec:
       tlsConfig: {{ toYaml . | nindent 8 }}
       {{- end }}
   {{- end }}
+  {{- if hasKey $componentValues.podMonitor "namespaceSelector" }}
+  namespaceSelector: {{ toYaml $componentValues.podMonitor.namespaceSelector | nindent 4 }}
+  {{- else }}
   namespaceSelector:
-    {{- with $componentValues.podMonitor.namespaceSelector }}
-      {{ toYaml . | nindent 4 }}
-    {{- else }}
     matchNames:
       - {{ $.Release.Namespace }}
-    {{- end }}
+  {{- end }}
   {{- with $componentValues.podMonitor.attachMetadata }}
   attachMetadata: {{ toYaml . | nindent 4 }}
   {{- end }}
