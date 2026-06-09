@@ -81,9 +81,9 @@ Profile defaults (probe `type`, `path`, `port`, thresholds) live in `templates/c
 
 ## Pod
 
-Keys: `podSecurityContext`, `nodeSelector`, `affinity`, `tolerations`, `topologySpreadConstraints`, `priorityClassName`, `serviceAccountName`, `hostNetwork`, `dnsPolicy`, `terminationGracePeriodSeconds`.
+Keys: `securityContext.pod`, `nodeSelector`, `affinity`, `tolerations`, `topologySpreadConstraints`, `priorityClassName`, `serviceAccountName`, `hostNetwork`, `dnsPolicy`, `terminationGracePeriodSeconds`.
 
-Pod-level scheduling and isolation. Affinity helpers in `templates/common/_affinities.tpl` provide presets for common topologies.
+Pod-level scheduling and isolation. The pod `securityContext` is layered over the chart-wide `global.security` posture (see [Security posture](#security-posture)), not applied by the runtime profile. Affinity helpers in `templates/common/_affinities.tpl` provide presets for common topologies.
 
 ## Volumes & Storage
 
