@@ -141,6 +141,7 @@ spec:
   cooldownPeriod: 180
   minReplicaCount: 0
   maxReplicaCount: 0
+  idleReplicaCount: 0
   advanced:
     restoreToOriginalReplicaCount: false
   fallback:
