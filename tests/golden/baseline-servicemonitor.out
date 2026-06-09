@@ -5,6 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -23,6 +24,7 @@ kind: ServiceAccount
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -35,6 +37,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -47,6 +50,7 @@ kind: Service
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -73,6 +77,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -93,6 +98,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: sm-app
         app.kubernetes.io/component: web
         helm.sh/environment: dev
@@ -137,6 +143,7 @@ kind: ServiceMonitor
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: sm-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev

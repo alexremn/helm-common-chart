@@ -5,6 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -23,6 +24,7 @@ kind: ServiceAccount
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -35,6 +37,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -47,6 +50,7 @@ apiVersion: v1
 metadata:
   name: data
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
@@ -63,6 +67,7 @@ kind: Service
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -89,6 +94,7 @@ kind: Service
 metadata:
   name: stateful-headless
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
@@ -114,6 +120,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -134,6 +141,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: web
         helm.sh/environment: production
@@ -210,6 +218,7 @@ kind: StatefulSet
 metadata:
   name: stateful
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
@@ -229,6 +238,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: stateful
         helm.sh/environment: production
@@ -276,6 +286,7 @@ spec:
     - metadata:
         name: data
         labels:
+          helm.sh/chart: common-smoke-0.1.0
           app.kubernetes.io/name: features-app
           app.kubernetes.io/component: stateful
           helm.sh/environment: production
@@ -292,6 +303,7 @@ kind: Job
 metadata:
   name: run-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: run-task
     helm.sh/environment: production
@@ -301,6 +313,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: features-app
         app.kubernetes.io/component: run-task
         helm.sh/environment: production
@@ -329,6 +342,7 @@ kind: CronJob
 metadata:
   name: sync-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: sync-task
     helm.sh/environment: production
@@ -344,6 +358,7 @@ spec:
       template:
         metadata:
           labels:
+            helm.sh/chart: common-smoke-0.1.0
             app.kubernetes.io/name: features-app
             app.kubernetes.io/component: sync-task
             helm.sh/environment: production
@@ -373,6 +388,7 @@ kind: Ingress
 metadata:
   name: web-public
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
@@ -400,6 +416,7 @@ kind: PodMonitor
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     helm.sh/environment: production

@@ -1,65 +1,25 @@
 ---
 # Source: common-smoke/templates/all.yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: web
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-spec:
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/name: np-egress-app
-      app.kubernetes.io/component: web
-      app.kubernetes.io/instance: smoke
-  policyTypes: 
-    - Ingress
-    - Egress
-  ingress:
-    -
-      from: 
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: gateway
-      ports:
-        - protocol: TCP
-          port: 8080
-  egress:
-    -
-      to: 
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-        - podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ports:
-        - protocol: UDP
-          port: 53
-
----
-# Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: prod
     app.kubernetes.io/instance: smoke
 spec:
   maxUnavailable: 25%
   selector:
     matchLabels:
-      app.kubernetes.io/name: np-egress-app
+      app.kubernetes.io/name: label-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -68,9 +28,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: prod
     app.kubernetes.io/instance: smoke
 automountServiceAccountToken: false
 ---
@@ -81,9 +41,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: prod
     app.kubernetes.io/instance: smoke
 data:
 ---
@@ -94,9 +54,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: prod
     app.kubernetes.io/instance: smoke
 spec:
   type: ClusterIP
@@ -106,7 +66,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
 ---
@@ -117,9 +77,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: np-egress-app
+    app.kubernetes.io/name: label-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: prod
     app.kubernetes.io/instance: smoke
 spec:
   replicas: 1
@@ -131,21 +91,21 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: np-egress-app
+      app.kubernetes.io/name: label-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         helm.sh/chart: common-smoke-0.1.0
-        app.kubernetes.io/name: np-egress-app
+        app.kubernetes.io/name: label-app
         app.kubernetes.io/component: web
-        helm.sh/environment: dev
+        helm.sh/environment: prod
         app.kubernetes.io/instance: smoke
     spec:
       containers:
         - name: web
-          image: ghcr.io/example/api:1.0.0
+          image: ghcr.io/example/web:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: http

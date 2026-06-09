@@ -10,6 +10,7 @@ Usage: {{ include "chart.configmap" (dict "svc" "app-name" "cmp" "component" "Va
 {{- define "config.dict.common" }}{{- end }}
 {{- define "config.dict.default" }}{{- end }}
 {{- define "config.dict.production" }}{{- end }}
+{{- define "config.dict.prod" }}{{- end }}
 {{- define "config.dict.staging" }}{{- end }}
 {{- define "config.dict.review" }}{{- end }}
 {{- define "config.dict.demo" }}{{- end }}

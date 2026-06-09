@@ -5,6 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -23,6 +24,7 @@ kind: ServiceAccount
 metadata:
   name: web-sa
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -35,6 +37,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -49,6 +52,7 @@ kind: ConfigMap
 metadata:
   name: web-files
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -62,6 +66,7 @@ apiVersion: v1
 metadata:
   name: data
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
@@ -79,6 +84,7 @@ kind: Service
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -105,6 +111,7 @@ kind: Service
 metadata:
   name: stateful-headless
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
@@ -130,6 +137,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -149,6 +157,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: web
         helm.sh/environment: staging
@@ -194,6 +203,7 @@ kind: StatefulSet
 metadata:
   name: stateful
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
@@ -213,6 +223,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: stateful
         helm.sh/environment: staging
@@ -258,6 +269,7 @@ spec:
     - metadata:
         name: data
         labels:
+          helm.sh/chart: common-smoke-0.1.0
           app.kubernetes.io/name: internal-platform
           app.kubernetes.io/component: stateful
           helm.sh/environment: staging
@@ -275,6 +287,7 @@ kind: Job
 metadata:
   name: run-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: run-task
     helm.sh/environment: staging
@@ -284,6 +297,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: run-task
         helm.sh/environment: staging
@@ -310,6 +324,7 @@ kind: CronJob
 metadata:
   name: sync-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: sync-task
     helm.sh/environment: staging
@@ -325,6 +340,7 @@ spec:
       template:
         metadata:
           labels:
+            helm.sh/chart: common-smoke-0.1.0
             app.kubernetes.io/name: internal-platform
             app.kubernetes.io/component: sync-task
             helm.sh/environment: staging
@@ -352,6 +368,7 @@ kind: Ingress
 metadata:
   name: web-external-ingress
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -378,6 +395,7 @@ kind: Ingress
 metadata:
   name: web-internal-ingress
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -412,6 +430,7 @@ kind: ExternalSecret
 metadata:
   name: web-secrets
   labels: 
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -442,6 +461,7 @@ kind: PodMonitor
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging
@@ -468,6 +488,7 @@ kind: ScaledObject
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     helm.sh/environment: staging

@@ -5,6 +5,7 @@ kind: ClusterTriggerAuthentication
 metadata:
   name: cluster-iam
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: ta-app
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
@@ -18,6 +19,7 @@ kind: TriggerAuthentication
 metadata:
   name: redis-auth
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: ta-app
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
