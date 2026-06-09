@@ -34,7 +34,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   envfrom-empty \
                   probe-nonmap \
                   priorityclassname-numeric \
-                  daemonset-minready-zero
+                  daemonset-minready-zero \
+                  podmonitor-endpoints
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
