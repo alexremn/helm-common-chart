@@ -73,6 +73,13 @@
 {{ include "chart.statefulset" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters") }}
 {{ include "chart.service.headless" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters") }}
 {{- end }}
+{{- $hasOverride := and (hasKey .Values "override") (kindIs "map" (index .Values "override")) -}}
+{{- if $hasOverride }}
+{{ include "chart.serviceAccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
+{{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
+{{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
+{{ include "chart.pdb" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
+{{- end }}
 {{- if .Values.hexSecret }}
 ---
 apiVersion: v1

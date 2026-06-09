@@ -165,9 +165,11 @@ SECURITY POSTURE
 A standalone axis, independent of the runtime profile. Controls the default
 pod/container securityContext only. Selected via `global.security`:
 
-  minimal  (default)  — vanilla K8s; no container hardening enforced, so
-                        charts that write to disk or run as root work out of
-                        the box. Pod-level seccompProfile stays RuntimeDefault.
+  minimal  (default)  — baseline-hardened: allowPrivilegeEscalation:false +
+                        capabilities.drop:[ALL] (overridable). runAsNonRoot /
+                        readOnlyRootFilesystem stay opt-in so charts that write
+                        to disk or run as root still work out of the box.
+                        Pod-level seccompProfile stays RuntimeDefault.
   generic             — hardened: runAsNonRoot, allowPrivilegeEscalation:false,
                         readOnlyRootFilesystem, drop-ALL capabilities.
 
@@ -202,7 +204,11 @@ each carrying `pod` and `container` securityContext scopes. Consumed by
 minimal:
   pod:
     seccompType: RuntimeDefault
-  container: {}
+  container:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
 generic:
   pod:
     seccompType: RuntimeDefault
