@@ -75,7 +75,7 @@ RBAC: ServiceAccount, Role, RoleBinding
 Storage: PersistentVolumeClaim
 Misc: PriorityClass
 
-Common helper library (`templates/common/`): workload composition, container building, pod spec, profile defaults, affinity/topology helpers, naming.
+Common helper library (`templates/common/`): workload composition, container building, pod spec, profile defaults, affinity/topology helpers, naming. See [Public helpers](./docs/values-reference.md#public-helpers) for the consumer-facing `common.*` utility API.
 
 ## Docs
 

@@ -335,7 +335,9 @@ Usage: {{ include "common.format" (dict "value" .Values.someValue "type" "json")
 {{- end }}
 
 {{/*
-Deep merge maps.
+Merge two maps via Sprig `merge $dest $src` (dest-wins): keys already
+present in `dest` are kept; `src` only fills absent keys. NOT a deep
+override merge — see docs/values-reference.md#public-helpers.
 Usage: {{ include "common.mergeValues" (dict "src" $srcMap "dest" $destMap) }}
 */}}
 {{- define "common.mergeValues" }}
