@@ -123,6 +123,14 @@ data:
 Create a ConfigMap specifically for binary data
 Usage: {{ include "chart.binaryConfigmap" (dict "svc" "app-name" "cmp" "component" "Values" .Values) }}
 */}}
+{{/*
+Lowercase canonical alias (matches chart.configmap casing).
+`chart.binaryConfigmap` (camelCase) is retained as a deprecated alias for one minor.
+*/}}
+{{- define "chart.binaryconfigmap" -}}
+{{- include "chart.binaryConfigmap" . -}}
+{{- end -}}
+
 {{- define "chart.binaryConfigmap" }}
 {{- $svc := include "common.appName" . | trim }}
 {{- $cmp := include "common.componentName" . | trim }}
