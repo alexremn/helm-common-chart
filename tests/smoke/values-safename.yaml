@@ -1,0 +1,14 @@
+name: safename-app
+environment: dev
+
+web:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  ports:
+    http: 8080
+  service:
+    extraServices:
+      grpc_public:
+        ports:
+          grpc: 9090

@@ -66,7 +66,7 @@ spec:
         app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
-        - name: this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters
+        - name: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
           image: ghcr.io/example/web:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:

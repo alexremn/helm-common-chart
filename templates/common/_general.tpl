@@ -61,9 +61,12 @@ Lookup order:
 
 {{/*
 DNS-safe component name for resource metadata (`-` separated).
+Routes through common.safeName so all metadata.name sanitization
+(lowercase, `.`/`_` → `-`, trailing-`-` trim, 63-char truncation) lives
+in a single helper.
 */}}
 {{- define "common.componentName" -}}
-{{- (required "Component name is required" .cmp) | replace "_" "-" -}}
+{{- include "common.safeName" (dict "name" (required "Component name is required" .cmp)) | trim -}}
 {{- end }}
 
 {{/*
