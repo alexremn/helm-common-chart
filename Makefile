@@ -91,10 +91,11 @@ golden-check: render-smoke
 
 # Negative render checks — these fixtures MUST fail (invalid input rejected).
 # Not part of SMOKE_VARIANTS (would break render-smoke / golden-check).
-NEGATIVE_VARIANTS := security-invalid
+NEGATIVE_VARIANTS := security-invalid affinity-scalar hpa-badkind
 
 lint-negative:
 	( cd $(SMOKE_DIR) && \
+	trap 'rm -f Chart.lock charts/common-*.tgz; rmdir charts 2>/dev/null || true' EXIT && \
 	$(HELM) dependency build --skip-refresh >/tmp/common-smoke-deps.log && \
 	for variant in $(NEGATIVE_VARIANTS); do \
 	  if $(HELM) template smoke . -f values-$$variant.yaml >/dev/null 2>&1; then \
