@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   maxUnavailable: 25%
   selector:
@@ -31,6 +32,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -45,6 +47,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 type: Opaque
 stringData:
   RELEASE_REV: "1"
@@ -63,6 +66,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 data:
   OWN_TAG: "1.0.0"
   URL: "https://ghcr.io/example/web.example.org"
@@ -79,6 +83,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   type: ClusterIP
   ports:
@@ -103,6 +108,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   minReadySeconds: 10
   strategy:
@@ -124,6 +130,7 @@ spec:
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: web
@@ -172,6 +179,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   scaleTargetRef:
     name: web

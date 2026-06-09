@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   backoffLimit: 0
   template:
@@ -22,6 +23,7 @@ spec:
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
       annotations:
         checksum/config: abc123
         example.com/job-owner: platform-team
@@ -53,6 +55,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   schedule: "*/5 * * * *"
   concurrencyPolicy: "Forbid"
@@ -70,6 +73,7 @@ spec:
             helm.sh/environment: staging
             app.kubernetes.io/instance: smoke
             app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
           annotations:
             checksum/config: def456
             example.com/cron-owner: platform-team

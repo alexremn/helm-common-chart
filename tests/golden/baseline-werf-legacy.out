@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   maxUnavailable: 25%
   selector:
@@ -31,6 +32,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -45,6 +47,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     werf.io/weight: "-1"
 data:
@@ -61,6 +64,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -79,6 +83,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   type: ClusterIP
   ports:
@@ -103,6 +108,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -130,6 +136,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
@@ -155,6 +162,7 @@ spec:
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: web
@@ -198,6 +206,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
@@ -222,6 +231,7 @@ spec:
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: stateful
@@ -269,6 +279,7 @@ spec:
           helm.sh/environment: production
           app.kubernetes.io/instance: smoke
           app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/version: "7.8.9"
       spec: 
         accessModes: [ReadWriteOnce]
         resources:
@@ -287,6 +298,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
@@ -301,6 +313,7 @@ spec:
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: run-task
@@ -329,6 +342,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
@@ -349,6 +363,7 @@ spec:
             helm.sh/environment: production
             app.kubernetes.io/instance: smoke
             app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
         spec:
           containers:
             - name: sync-task
@@ -378,6 +393,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   
 spec:
   
@@ -406,6 +422,7 @@ metadata:
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations: 
     force-sync: "<NOW>"
     werf.io/weight: "-1"

@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   maxUnavailable: 25%
   selector:
@@ -31,6 +32,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: true
 ---
 # Source: common-smoke/templates/all.yaml
@@ -45,6 +47,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 data:
 ---
 # Source: common-smoke/templates/all.yaml
@@ -59,6 +62,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 rules: 
   - apiGroups:
     - ""
@@ -81,6 +85,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -103,6 +108,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   type: ClusterIP
   ports:
@@ -127,6 +133,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   replicas: 1
   minReadySeconds: 10
@@ -149,6 +156,7 @@ spec:
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: web
