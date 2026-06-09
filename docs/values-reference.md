@@ -357,7 +357,7 @@ runtime profile — any profile can run with any posture. Selected chart-wide vi
 
 | Posture | Container hardening | Use when |
 |---|---|---|
-| `minimal` (**default**) | none enforced; pod-level `seccompProfile: RuntimeDefault` only | charts that write to disk or run as root |
+| `minimal` (**default**) | `allowPrivilegeEscalation: false`, `capabilities.drop: [ALL]`, pod-level `seccompProfile: RuntimeDefault` (`runAsNonRoot`/`readOnlyRootFilesystem` stay opt-in) | charts that write to disk or run as root |
 | `generic` | `runAsNonRoot`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem`, `capabilities.drop: [ALL]` | hardened workloads |
 
 Both postures are overridable per-scope by `global.securityContext.<scope>` and
