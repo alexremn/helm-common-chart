@@ -54,8 +54,8 @@ spec:
   cooldownPeriod: {{ default 180 $scaleConfig.cooldownPeriod }}
   minReplicaCount: {{ dig "min" 1 $scaleConfig }}
   maxReplicaCount: {{ dig "max" 1 $scaleConfig }}
-  {{- with $scaleConfig.idleReplicaCount }}
-  idleReplicaCount: {{ . }}
+  {{- if hasKey $scaleConfig "idleReplicaCount" }}
+  idleReplicaCount: {{ $scaleConfig.idleReplicaCount }}
   {{- end }}
   advanced:
     {{- with $scaleConfig.horizontalPodAutoscalerConfig }}
