@@ -22,6 +22,7 @@ cronjobs:
     image: ghcr.io/example/cron:latest
     command: ["/bin/sh", "-c"]
     args: ["echo cron"]
+    priorityClassName: high-priority
     podAnnotations:
       checksum/config: "def456"
       example.com/cron-owner: "platform-team"

@@ -62,6 +62,7 @@ spec:
             "svc" $svc
             "cmp" $cmp
             "env" $env
+            "includePriorityClassName" true
             "restartPolicy" (default "Never" $componentValues.restartPolicy)
           ) | nindent 10 }}
 {{- end -}}
