@@ -79,6 +79,19 @@ jobs:
                 --username "$ACTOR" \
                 --password-stdin
 
+      # `helm registry login` writes Helm's own OCI config, which cosign does NOT
+      # read. cosign (go-containerregistry) reads ~/.docker/config.json, so log in
+      # to the docker credential store too — otherwise `cosign sign/attest/attach`
+      # fail with "UNAUTHORIZED: unauthenticated".
+      - name: Docker login (GHCR) for Cosign
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" \
+            | docker login ghcr.io \
+                --username "$ACTOR" \
+                --password-stdin
+
       - name: Push chart to GHCR (OCI)
         id: push
         env:
