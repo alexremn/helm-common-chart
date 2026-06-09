@@ -448,3 +448,5 @@ Utility templates a consumer chart may `include` directly. Stable public API (`c
 | Affinity / topology | (inside pod) | `templates/common/_affinities.tpl` |
 | Language profile defaults | (inside container) | `templates/common/_profile.tpl` |
 | Security posture defaults | (pod + container securityContext) | `templates/common/_profile.tpl` (`common.security`) |
+
+> Include-API casing: prefer lowercase `chart.serviceaccount` / `chart.binaryconfigmap` (canonical, matching `chart.service` / `chart.configmap`). The camelCase `chart.serviceAccount` / `chart.binaryConfigmap` names are deprecated aliases retained for one minor.

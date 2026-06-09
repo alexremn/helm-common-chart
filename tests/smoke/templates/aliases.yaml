@@ -1,0 +1,4 @@
+{{- if hasKey .Values "aliasProbe" }}
+{{ include "chart.serviceaccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.binaryconfigmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}

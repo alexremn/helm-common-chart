@@ -5,6 +5,14 @@ This template renders a Kubernetes ServiceAccount with annotations.
 =============================================================================
 */}}
 
+{{/*
+Lowercase canonical alias (matches chart.service / chart.deployment casing).
+`chart.serviceAccount` (camelCase) is retained as a deprecated alias for one minor.
+*/}}
+{{- define "chart.serviceaccount" -}}
+{{- include "chart.serviceAccount" . -}}
+{{- end -}}
+
 {{- define "chart.serviceAccount" }}
 {{- $svc := include "common.appName" . | trim }}
 {{- $cmp := include "common.componentName" . | trim }}
