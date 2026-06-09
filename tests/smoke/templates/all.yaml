@@ -69,6 +69,10 @@
 {{- if hasKey .Values "triggerAuthentications" }}
 {{ include "chart.triggerauth" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
+{{- if hasKey .Values "longStateful" }}
+{{ include "chart.statefulset" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters") }}
+{{ include "chart.service.headless" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters") }}
+{{- end }}
 {{- if .Values.hexSecret }}
 ---
 apiVersion: v1

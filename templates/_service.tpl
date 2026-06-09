@@ -120,7 +120,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s-%s" $cmp $extraName | replace "_" "-" }}
+  name: {{ include "common.safeName" (dict "name" (printf "%s-%s" $cmp $extraName)) | trim }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- with $extra.annotations }}
@@ -152,7 +152,7 @@ Usage: {{ include "chart.service.headless" (dict "svc" "service-name" "cmp" "com
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $serviceConfig := dig "service" "headless" dict $componentValues }}
 {{- $ports := $componentValues.ports | default dict }}
-{{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- $labelCtx := dict "svc" $svc "cmp" (include "common.safeName" (dict "name" $cmp) | trim) "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if not $ports }}
 {{ fail "No ports defined for service. Please define at least one port in the component values." }}
 {{- else }}
@@ -160,7 +160,7 @@ Usage: {{ include "chart.service.headless" (dict "svc" "service-name" "cmp" "com
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $cmp }}-headless
+  name: {{ printf "%s-headless" (include "common.safeName" (dict "name" $cmp "maxLength" 54) | trim) }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
     service.kubernetes.io/headless: "true"

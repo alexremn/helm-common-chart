@@ -4,16 +4,16 @@
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
-{{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- $labelCtx := dict "svc" $svc "cmp" (include "common.safeName" (dict "name" $cmp) | trim) "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ $cmp }}
+  name: {{ include "common.safeName" (dict "name" $cmp) | trim }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
-  serviceName: {{ default (printf "%s-headless" ($cmp)) $componentValues.serviceName | quote }}
+  serviceName: {{ default (printf "%s-headless" (include "common.safeName" (dict "name" $cmp "maxLength" 54) | trim)) $componentValues.serviceName | quote }}
   updateStrategy:
     type: {{ default "RollingUpdate" $componentValues.updateStrategy | quote }}
   podManagementPolicy: {{ default "OrderedReady" $componentValues.podManagementPolicy | quote }}
