@@ -6,24 +6,29 @@ metadata:
   name: logshipper
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: ds-zero-app
+    app.kubernetes.io/name: ds-flat-app
     app.kubernetes.io/component: logshipper
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 spec:
-  minReadySeconds: 30
+  minReadySeconds: 0
+  revisionHistoryLimit: 5
+  updateStrategy: 
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: ds-zero-app
+      app.kubernetes.io/name: ds-flat-app
       app.kubernetes.io/component: logshipper
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         helm.sh/chart: common-smoke-0.1.0
-        app.kubernetes.io/name: ds-zero-app
+        app.kubernetes.io/name: ds-flat-app
         app.kubernetes.io/component: logshipper
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
@@ -32,11 +37,11 @@ spec:
     spec:
       containers:
         - name: logshipper
-          image: ghcr.io/example/log-shipper:1.0.0
+          image: fluentd:1.17
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: metrics
-            containerPort: 9090
+            containerPort: 24231
             protocol: TCP
           readinessProbe:
             httpGet:

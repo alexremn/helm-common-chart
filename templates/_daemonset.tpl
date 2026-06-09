@@ -22,17 +22,15 @@ metadata:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
-  {{- if hasKey $dsConfig "minReadySeconds" }}
-  minReadySeconds: {{ $dsConfig.minReadySeconds }}
-  {{- else if hasKey $componentValues "minReadySeconds" }}
-  minReadySeconds: {{ $componentValues.minReadySeconds }}
-  {{- else }}
-  minReadySeconds: 0
-  {{- end }}
-  {{- with $dsConfig.revisionHistoryLimit }}
+  {{- $minReady := 0 }}
+  {{- if hasKey $componentValues "minReadySeconds" }}{{ $minReady = $componentValues.minReadySeconds }}{{- else if hasKey $dsConfig "minReadySeconds" }}{{ $minReady = $dsConfig.minReadySeconds }}{{- end }}
+  minReadySeconds: {{ $minReady }}
+  {{- $revHist := coalesce $componentValues.revisionHistoryLimit $dsConfig.revisionHistoryLimit }}
+  {{- with $revHist }}
   revisionHistoryLimit: {{ . }}
   {{- end }}
-  {{- with $dsConfig.updateStrategy }}
+  {{- $updStrat := coalesce $componentValues.updateStrategy $dsConfig.updateStrategy }}
+  {{- with $updStrat }}
   updateStrategy: {{ toYaml . | nindent 4 }}
   {{- end }}
   selector:

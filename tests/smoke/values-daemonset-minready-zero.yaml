@@ -9,7 +9,8 @@ global:
 logshipper:
   ports:
     metrics: 9090
-  # Component sets a nonzero value; the daemonSet sub-map overrides it to 0.
+  # Flat key wins (30) per the hasKey-based precedence introduced in P5-8;
+  # the daemonSet sub-map (0) is now the fallback, not the override.
   minReadySeconds: 30
   daemonSet:
     minReadySeconds: 0
