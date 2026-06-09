@@ -1,0 +1,14 @@
+name: labelctx-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  extraLabels:
+    team: platform
+    tier: backend

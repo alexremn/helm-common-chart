@@ -15,6 +15,7 @@ This template renders a Kubernetes ServiceAccount with annotations.
 {{- $create := dig "create" true $saConfig }}
 {{- if and (ne $enabled false) (ne $create false) }}
 ---
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 
 apiVersion: v1

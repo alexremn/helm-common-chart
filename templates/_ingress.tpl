@@ -96,6 +96,7 @@ Main ingress template
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $ingressValues := $componentValues.ingress }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{/*
 Annotations applied to every ingress for this component:

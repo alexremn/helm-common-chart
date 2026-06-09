@@ -12,6 +12,7 @@ Renders a DaemonSet using the same pod spec helpers as Deployment/StatefulSet.
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $dsConfig := dig "daemonSet" dict $componentValues }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 apiVersion: apps/v1
 kind: DaemonSet

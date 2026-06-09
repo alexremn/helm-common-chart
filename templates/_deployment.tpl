@@ -12,6 +12,7 @@ security contexts, probes, etc.
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
 {{/*
