@@ -136,6 +136,11 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
       terminationGracePeriodSeconds: 30
       securityContext:
         seccompProfile:

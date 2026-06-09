@@ -6,9 +6,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -16,20 +16,57 @@ spec:
   maxUnavailable: 25%
   selector:
     matchLabels:
-      app.kubernetes.io/name: rbac-app
+      app.kubernetes.io/name: security-minimal
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: override
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: security-minimal
+    app.kubernetes.io/component: override
+    helm.sh/environment: production
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: security-minimal
+      app.kubernetes.io/component: override
+      app.kubernetes.io/instance: smoke
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: web-sa
+  name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: override
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: security-minimal
+    app.kubernetes.io/component: override
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -42,146 +79,13 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: rbac-app-web
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-rules: 
-  - apiGroups:
-    - ""
-    resources:
-    - nodes
-    verbs:
-    - get
-    - list
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: rbac-app-web
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: rbac-app-web
-subjects:
-  - kind: ServiceAccount
-    name: web-sa
-    namespace: default
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: web
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-rules: 
-  - apiGroups:
-    - ""
-    resources:
-    - configmaps
-    verbs:
-    - get
-    - list
-    - watch
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: custom-readonly
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-rules: 
-  - apiGroups:
-    - ""
-    resources:
-    - pods
-    verbs:
-    - get
-    - list
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: web
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: web
-subjects:
-  - kind: ServiceAccount
-    name: web-sa
-    namespace: default
----
-# Source: common-smoke/templates/all.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: custom-readonly
-  labels:
-    helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
-    app.kubernetes.io/component: web
-    helm.sh/environment: dev
-    app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/version: "7.8.9"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: custom-readonly
-subjects:
-  - kind: ServiceAccount
-    name: read-only
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -190,9 +94,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -204,8 +108,33 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: override
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: security-minimal
+    app.kubernetes.io/component: override
+    helm.sh/environment: production
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: security-minimal
+    app.kubernetes.io/component: override
     app.kubernetes.io/instance: smoke
 ---
 # Source: common-smoke/templates/all.yaml
@@ -215,9 +144,9 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: rbac-app
+    app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: production
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -231,23 +160,23 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: rbac-app
+      app.kubernetes.io/name: security-minimal
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         helm.sh/chart: common-smoke-0.1.0
-        app.kubernetes.io/name: rbac-app
+        app.kubernetes.io/name: security-minimal
         app.kubernetes.io/component: web
-        helm.sh/environment: dev
+        helm.sh/environment: production
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: web
-          image: ghcr.io/example/web:1.0.0
+          image: ghcr.io/example/api:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: http
@@ -278,5 +207,78 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: web-sa
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: override
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: security-minimal
+    app.kubernetes.io/component: override
+    helm.sh/environment: production
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: security-minimal
+      app.kubernetes.io/component: override
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: security-minimal
+        app.kubernetes.io/component: override
+        helm.sh/environment: production
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: override
+          image: ghcr.io/example/api:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       automountServiceAccountToken: false

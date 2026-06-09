@@ -38,7 +38,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   service-appprotocol \
                   persistence-nameless \
                   labels \
-                  long-name
+                  long-name \
+                  security-minimal
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
