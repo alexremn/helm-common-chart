@@ -1,0 +1,23 @@
+name: tpl-envraw
+environment: production
+
+global:
+  security: generic
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  tpl:
+    envValues: false
+
+web:
+  ports:
+    http: 8080
+  env:
+    RAW_GLOBAL: "{{ .Values.web.ports.http }}"
+    LITERAL: "${NOT_A_TEMPLATE}"
+
+nativeSecrets:
+  raw-secret:
+    envRaw: true
+    stringData:
+      RAW_TOKEN: "{{ .Release.Revision }}"
