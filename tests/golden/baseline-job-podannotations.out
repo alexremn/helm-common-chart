@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: run-task
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   backoffLimit: 0
   template:
@@ -20,6 +21,7 @@ spec:
         app.kubernetes.io/component: run-task
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
       annotations:
         checksum/config: abc123
         example.com/job-owner: platform-team
@@ -50,6 +52,7 @@ metadata:
     app.kubernetes.io/component: sync-task
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   schedule: "*/5 * * * *"
   concurrencyPolicy: "Forbid"
@@ -66,6 +69,7 @@ spec:
             app.kubernetes.io/component: sync-task
             helm.sh/environment: staging
             app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
           annotations:
             checksum/config: def456
             example.com/cron-owner: platform-team

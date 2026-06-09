@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: ta-app
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   podIdentity: 
     provider: aws-eks
@@ -23,6 +24,7 @@ metadata:
     app.kubernetes.io/name: ta-app
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   secretTargetRef: 
     - key: password

@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   maxUnavailable: 25%
   selector:
@@ -29,6 +30,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -42,6 +44,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 data:
 ---
 # Source: common-smoke/templates/all.yaml
@@ -55,6 +58,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -82,6 +86,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   minReadySeconds: 10
@@ -103,6 +108,7 @@ spec:
         app.kubernetes.io/component: web
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: web
@@ -148,6 +154,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:

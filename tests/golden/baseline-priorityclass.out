@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: pc-app
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 value: 1e+06
 globalDefault: false
 description: "Critical workloads"

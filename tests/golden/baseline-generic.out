@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   maxUnavailable: 1
   selector:
@@ -29,6 +30,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -42,6 +44,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 data:
   APP_MODE: "internal"
   FEATURE_X: "true"
@@ -57,6 +60,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 binaryData:
   app.bin: "YmluYXJ5"
 ---
@@ -71,6 +75,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -89,6 +94,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -116,6 +122,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -142,6 +149,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   minReadySeconds: 10
   strategy:
@@ -162,6 +170,7 @@ spec:
         app.kubernetes.io/component: web
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: web
@@ -208,6 +217,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -228,6 +238,7 @@ spec:
         app.kubernetes.io/component: stateful
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: stateful
@@ -274,6 +285,7 @@ spec:
           app.kubernetes.io/component: stateful
           helm.sh/environment: staging
           app.kubernetes.io/instance: smoke
+          app.kubernetes.io/managed-by: Helm
       spec: 
         accessModes: [ReadWriteOnce]
         resources:
@@ -292,6 +304,7 @@ metadata:
     app.kubernetes.io/component: run-task
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   backoffLimit: 0
   template:
@@ -302,6 +315,7 @@ spec:
         app.kubernetes.io/component: run-task
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: run-task
@@ -329,6 +343,7 @@ metadata:
     app.kubernetes.io/component: sync-task
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   schedule: "*/5 * * * *"
   concurrencyPolicy: "Forbid"
@@ -345,6 +360,7 @@ spec:
             app.kubernetes.io/component: sync-task
             helm.sh/environment: staging
             app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
         spec:
           containers:
             - name: sync-task
@@ -373,6 +389,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   
 spec:
   
@@ -400,6 +417,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 64m
@@ -435,6 +453,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   annotations: 
     force-sync: "<NOW>"
 spec:
@@ -466,6 +485,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
@@ -493,6 +513,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   scaleTargetRef:
     name: web

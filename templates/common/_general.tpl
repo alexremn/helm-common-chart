@@ -147,6 +147,7 @@ helm.sh/environment: {{ $env }}
 {{- if $instance }}
 app.kubernetes.io/instance: {{ $instance }}
 {{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service | default "Helm" }}
 {{- with .version }}
 app.kubernetes.io/version: {{ . | quote }}
 {{- end }}
