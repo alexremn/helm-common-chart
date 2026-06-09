@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -41,6 +42,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -69,6 +71,7 @@ metadata:
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -89,6 +92,7 @@ spec:
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: stateful

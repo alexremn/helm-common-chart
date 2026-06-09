@@ -11,6 +11,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     example.com/pdb-note: voluntary-disruption-budget
     example.com/pdb-owner: platform-team
@@ -34,6 +35,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/web
     example.com/owner: platform-team
@@ -51,6 +53,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 data:
 ---
 # Source: common-smoke/templates/all.yaml
@@ -65,6 +68,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     example.com/pvc-owner: storage-team
     volume.beta.kubernetes.io/storage-class: standard
@@ -88,6 +92,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   type: ClusterIP
   ports:
@@ -116,6 +121,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -143,6 +149,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   replicas: 2
   minReadySeconds: 10
@@ -165,6 +172,7 @@ spec:
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: web
@@ -212,6 +220,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -233,6 +242,7 @@ spec:
         helm.sh/environment: staging
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
         - name: stateful
@@ -280,6 +290,7 @@ spec:
           helm.sh/environment: staging
           app.kubernetes.io/instance: smoke
           app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/version: "7.8.9"
         annotations: 
           example.com/pvc-owner: storage-team
           volume.beta.kubernetes.io/storage-class: standard
@@ -302,6 +313,7 @@ metadata:
     helm.sh/environment: staging
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
   annotations:
     example.com/scrape-note: default-30s-interval
     example.com/scrape-owner: observability-team
