@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.2.0"
+version: "2.3.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,50 +29,36 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
-    - kind: fixed
-      description: "Default volumeMounts/claimName name for nameless map-form persistence (P1-1)"
-    - kind: fixed
-      description: "Suppress static replicas when a native HPA manages the workload (P1-2)"
-    - kind: fixed
-      description: "Preserve explicit scale-to-zero min/max/idleReplicaCount 0 in KEDA ScaledObject (P1-3)"
-    - kind: fixed
-      description: "Emit a default path for map-form Ingress domains that omit paths (P1-4)"
-    - kind: fixed
-      description: "Fix randHex int64 panic and make config/secrets helper namespace lookups nil-safe (P1-5)"
-    - kind: fixed
-      description: "Quote legacy slice-form nodeAffinity values (P1-6)"
-    - kind: fixed
-      description: "Honor explicit empty envFrom configs/secrets to disable profile phantom defaults (P1-7)"
-    - kind: fixed
-      description: "Fail with a clear message when a component affinity is not a map (P1-8)"
-    - kind: fixed
-      description: "Coerce non-map global.probe/.probes to a dict instead of crashing (P1-9)"
-    - kind: fixed
-      description: "Quote scalar passthrough fields such as priorityClassName (P1-10)"
-    - kind: fixed
-      description: "Honor explicit DaemonSet minReadySeconds 0 (P1-11)"
-    - kind: fixed
-      description: "Emit priorityClassName on CronJob pods (P1-12)"
-    - kind: fixed
-      description: "Apply the profile metricRelabelings fallback per PodMonitor endpoint (P1-13)"
-    - kind: fixed
-      description: "Emit appProtocol on headless and extra Services (P1-14)"
-    - kind: fixed
-      description: "Default containerPort to the port value for map-form port definitions"
-    - kind: security
-      description: "Exclude internal dev paths (docs, tests, CI, Makefile) from the packaged chart (P0-1, P0-2)"
-    - kind: security
-      description: "Generate the SBOM from the packaged artifact and attest+attach it to the OCI ref; add a cosign verify self-check (P0-8, P0-9)"
-    - kind: security
-      description: "Sign the push-emitted digest to close the publish TOCTOU window and scope the cosign certificate identity to the release workflow (P0-10, P0-11)"
-    - kind: security
-      description: "SHA-pin all GitHub Actions and add Dependabot for github-actions (P0-7)"
-    - kind: changed
-      description: "Add kubeconform -verbose, pin the CRDs-catalog schema source, and replace the dead canarybot compat target with a vendored consumer fixture (P0-12, P0-13)"
-    - kind: changed
-      description: "Restore docs/migration-v1-to-v2.md and repoint values-contract to values-reference (P0-3, P0-5, P0-6)"
     - kind: added
-      description: "global.security enum (minimal|generic) validated by values.schema.json and a loud render-time guard; invalid postures are rejected early. Negative render gate added to make lint."
+      description: "Standard recommended labels on all resources: helm.sh/chart, app.kubernetes.io/managed-by, and app.kubernetes.io/version (defaulted from .Chart.AppVersion). Non-selector — matchLabels are unchanged (P2-1, P2-2, P2-3)"
+    - kind: added
+      description: "global.security enum (minimal|generic) validated by values.schema.json + a render-time guard; invalid postures rejected early via a negative render gate in make lint (P3-1)"
+    - kind: added
+      description: "global.tpl.envValues / <cmp>.envRaw opt-out to emit env and Secret stringData verbatim, closing the templating-injection surface for untrusted values (P3-3)"
+    - kind: added
+      description: "global.monitoring.releaseLabel knob to emit the release: selector label on ServiceMonitor/PodMonitor/PrometheusRule (P4-6)"
+    - kind: added
+      description: "Lowercase canonical chart.serviceaccount / chart.binaryconfigmap aliases; camelCase names kept as deprecated aliases for one minor (P5-9)"
+    - kind: security
+      description: "Baseline-harden the minimal posture: allowPrivilegeEscalation:false + capabilities.drop:[ALL] + pod seccompProfile RuntimeDefault, overridable per-scope (P3-2)"
+    - kind: fixed
+      description: "Fail fast on an Ingress domain entry missing host; schema marks host required on map-form domains (P4-5)"
+    - kind: fixed
+      description: "Validate chart.hpa scaleTargetRef.kind (Deployment|StatefulSet|ReplicaSet) and document the non-Deployment contract (P4-12)"
+    - kind: fixed
+      description: "Honor explicit DaemonSet flat-path revisionHistoryLimit/updateStrategy/minReadySeconds with sub-map fallback (P5-8)"
+    - kind: fixed
+      description: "Truncate overflowing resource names and component label values via common.safeName (DNS-1123 safe, opt-out) (P2-4)"
+    - kind: fixed
+      description: "Allow hyphens in component-name schema validation; accept bare-int strings in intOrPercent (P4-7, P4-8)"
+    - kind: changed
+      description: "Model real global.* keys in values.schema.json and correct stale schema/doc descriptions (security posture, profile default, forceSync, securityContext) (P4-1, P4-2, P4-3, P4-4)"
+    - kind: changed
+      description: "Relocate affinity emitters into common/_affinities.tpl and dedup pod-spec toggles and podAnnotations via common.workload.fullToggles / common.podAnnotations (byte-identical render) (P5-4, P5-6, P5-7)"
+    - kind: changed
+      description: "Drop the component label from top-level passthrough resources; route name sanitization and ingress DNS through shared helpers; document the label-context contract and the 10 public utility helpers (P4-11, P5-1, P5-2, P5-3, P5-5)"
+    - kind: changed
+      description: "Document monitor namespaceSelector default + cluster-wide opt-in, and ingress class handling (P4-9, P4-10)"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
