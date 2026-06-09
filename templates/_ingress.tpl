@@ -25,7 +25,7 @@ Define a path for ingress
 {{- define "ingress.path" -}}
 {{- $path := default "/" .path -}}
 {{- $pathType := default "ImplementationSpecific" .pathType -}}
-{{- $svcName := default .defaultSvc .svc | replace "_" "-" -}}
+{{- $svcName := include "common.cmp.dns" (default .defaultSvc .svc) | trim -}}
 {{- $svcPort := default "http" .port -}}
 path: {{ $path }}
 pathType: {{ $pathType }}
@@ -118,7 +118,7 @@ Per-entry annotations override these via mergeOverwrite in `ingress.annotations`
   {{- range $index, $conf := $ingressValues -}}
     {{- if and (ne (dig "enabled" true $conf) false) $conf.domains -}}
       {{- $entryName := default (printf "ingress-%d" $index) $conf.name -}}
-      {{- $name := printf "%s-%s" $cmp $entryName | replace "_" "-" -}}
+      {{- $name := include "common.cmp.dns" (printf "%s-%s" $cmp $entryName) | trim -}}
       {{- $entries = append $entries (dict "name" $name "conf" $conf "baseAnnotations" $globalIngressAnnotations) -}}
     {{- end -}}
   {{- end -}}
@@ -127,7 +127,7 @@ Per-entry annotations override these via mergeOverwrite in `ingress.annotations`
   {{- $mapBaseAnnotations := mergeOverwrite (deepCopy $globalIngressAnnotations) $componentBaseAnnotations -}}
   {{- range $type, $conf := $ingressValues -}}
     {{- if and (ne $type "annotations") (kindIs "map" $conf) (ne (dig "enabled" true $conf) false) $conf.domains -}}
-      {{- $name := printf "%s-%s-ingress" $cmp $type | replace "_" "-" -}}
+      {{- $name := include "common.cmp.dns" (printf "%s-%s-ingress" $cmp $type) | trim -}}
       {{- $entries = append $entries (dict "name" $name "conf" $conf "baseAnnotations" $mapBaseAnnotations) -}}
     {{- end -}}
   {{- end -}}
