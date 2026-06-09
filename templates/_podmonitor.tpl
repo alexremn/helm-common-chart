@@ -106,9 +106,8 @@ spec:
       {{- with $endpoint.honorTimestamps }}
       honorTimestamps: {{ . }}
       {{- end }}
-      {{- with $endpoint.metricRelabelings }}
-      metricRelabelings: {{ toYaml . | nindent 8 }}
-      {{- end }}
+      {{- $epProfileRelabelings := index (include "common.profile.defaults" $ | fromYaml) (include "common.profile" (dict "root" $ "component" $componentValues)) "podMonitor" "metricRelabelings" -}}
+      {{- include "common.prometheus.metricRelabelings" (dict "explicit" $endpoint.metricRelabelings "profile" $epProfileRelabelings) }}
       {{- with $endpoint.relabelings }}
       relabelings: {{ toYaml . | nindent 8 }}
       {{- end }}

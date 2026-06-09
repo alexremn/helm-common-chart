@@ -1,0 +1,22 @@
+name: pm-app
+environment: dev
+
+global:
+  profile: rails
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  # Explicit multi-endpoint form WITHOUT per-endpoint metricRelabelings.
+  # The rails profile default should still be applied per endpoint.
+  podMonitor:
+    enabled: true
+    endpoints:
+      - port: http
+        path: /metrics
+      - port: metrics
+        path: /metrics
