@@ -4,7 +4,7 @@ HELM ?= helm
 SMOKE_DIR ?= tests/smoke
 GOLDEN_DIR ?= tests/golden
 
-.PHONY: lint lint-library lint-smoke render-smoke golden-update golden-check lint-consumer \
+.PHONY: lint lint-library lint-smoke lint-negative render-smoke golden-update golden-check lint-consumer \
         validate validate-kubeconform validate-kube-linter
 
 # Phase C1 — validation tooling.
@@ -12,7 +12,7 @@ KUBECONFORM_VERSION ?= v0.7.0
 KUBE_LINTER_VERSION ?= v0.8.3
 K8S_VERSIONS ?= 1.24.0 1.28.0 1.31.0
 
-lint: lint-library lint-smoke
+lint: lint-library lint-smoke lint-negative
 
 lint-library:
 	$(HELM) lint .
@@ -82,6 +82,22 @@ golden-check: render-smoke
 	  fi; \
 	done; \
 	exit $$rc
+
+# Negative render checks — these fixtures MUST fail (invalid input rejected).
+# Not part of SMOKE_VARIANTS (would break render-smoke / golden-check).
+NEGATIVE_VARIANTS := security-invalid
+
+lint-negative:
+	( cd $(SMOKE_DIR) && \
+	$(HELM) dependency build --skip-refresh >/tmp/common-smoke-deps.log && \
+	for variant in $(NEGATIVE_VARIANTS); do \
+	  if $(HELM) template smoke . -f values-$$variant.yaml >/dev/null 2>&1; then \
+	    echo "FAIL: $$variant rendered successfully but was expected to be rejected." >&2; \
+	    exit 1; \
+	  else \
+	    echo "OK: $$variant correctly rejected."; \
+	  fi; \
+	done )
 
 # Render+lint a minimal synthetic consumer against the local library to catch
 # consumer-facing breakage. Vendored under tests/consumer; runs in CI.

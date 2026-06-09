@@ -71,6 +71,8 @@ annotations:
       description: "Add kubeconform -verbose, pin the CRDs-catalog schema source, and replace the dead canarybot compat target with a vendored consumer fixture (P0-12, P0-13)"
     - kind: changed
       description: "Restore docs/migration-v1-to-v2.md and repoint values-contract to values-reference (P0-3, P0-5, P0-6)"
+    - kind: added
+      description: "global.security enum (minimal|generic) validated by values.schema.json and a loud render-time guard; invalid postures are rejected early. Negative render gate added to make lint."
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
