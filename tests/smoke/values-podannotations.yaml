@@ -1,0 +1,10 @@
+name: podann-app
+environment: dev
+
+web:
+  image: { repository: nginx, tag: "1.27" }
+  ports:
+    http: 8080
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    sidecar.istio.io/inject: "false"

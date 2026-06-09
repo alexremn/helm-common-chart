@@ -42,8 +42,10 @@ spec:
     metadata:
       labels:
         {{- include "common.labels" $labelCtx | nindent 8 }}
-      {{- with $componentValues.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $podAnn := include "common.podAnnotations" $componentValues | trim }}
+      {{- if $podAnn }}
+      annotations:
+        {{- $podAnn | nindent 8 }}
       {{- end }}
     spec:
       {{- include "common.workload.podSpec" (merge (dict
