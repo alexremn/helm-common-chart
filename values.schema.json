@@ -331,7 +331,21 @@
         "revisionHistoryLimit": { "type": "integer", "minimum": 0 },
         "progressDeadlineSeconds": { "type": "integer", "minimum": 0 },
         "paused": { "type": "boolean" },
-        "hpa": { "type": "object", "additionalProperties": true },
+        "hpa": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["Deployment", "StatefulSet", "ReplicaSet"],
+              "description": "scaleTargetRef.kind. Defaults to Deployment. For StatefulSet (or any non-Deployment) workloads you MUST set this explicitly — the library cannot infer the workload kind."
+            },
+            "apiVersion": {
+              "type": "string",
+              "description": "scaleTargetRef.apiVersion. Defaults to apps/v1. Override when targeting a CRD or a non-apps/v1 workload."
+            }
+          }
+        },
         "vpa": { "type": "object", "additionalProperties": true },
         "daemonSet": { "type": "object", "additionalProperties": true },
         "serviceMonitor": { "type": "object", "additionalProperties": true },

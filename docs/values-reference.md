@@ -125,6 +125,20 @@ Keys: `hpa`, `vpa`, `scaledObject`, `pdb`.
 - `scaledObject` — KEDA `ScaledObject` for event-driven autoscaling; pair with `triggerAuthentication` for secret-backed triggers
 - `pdb` — PodDisruptionBudget
 
+**`hpa.kind` / `hpa.apiVersion` — scaleTargetRef contract.**
+`chart.hpa` defaults `scaleTargetRef.kind` to `Deployment` and `scaleTargetRef.apiVersion` to `apps/v1`. For StatefulSet (or any non-Deployment) workloads you **must** set `<component>.hpa.kind` explicitly — the library cannot infer the workload kind. Allowed values: `Deployment`, `StatefulSet`, `ReplicaSet`. Any other value fails fast at render time with a clear message. Override `hpa.apiVersion` only when targeting a CRD or a non-`apps/v1` resource. Example:
+
+```yaml
+stateful:
+  hpa:
+    kind: StatefulSet        # required — library cannot auto-detect
+    minReplicas: 2
+    maxReplicas: 10
+    metrics: [...]
+```
+
+`hpa` and `scaling` (KEDA ScaledObject) are mutually exclusive on the same component — `chart.hpa` fails fast if both are set.
+
 See: [`examples/values.hpa.yaml`](../examples/values.hpa.yaml), [`examples/values.vpa.yaml`](../examples/values.vpa.yaml).
 
 ## Observability
