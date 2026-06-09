@@ -195,6 +195,42 @@ global:
 
 Both `global` and per-component lists are appended to the rendered `envFrom` (not merged), so a custom list at `global.envFrom.configs` replaces the phantom default. Generic / python / go profiles have empty `defaultConfigName` and `defaultSecretName`, so no phantom defaults are emitted under those profiles.
 
+## Monitoring
+
+Keys: `<cmp>.serviceMonitor`, `<cmp>.podMonitor`, `prometheusRules`, `global.monitoring.releaseLabel`.
+
+Per-component `serviceMonitor` / `podMonitor` render a Prometheus Operator
+ServiceMonitor / PodMonitor; they are mutually exclusive per component (the
+render fails fast if both are enabled).
+
+### `namespaceSelector` scope
+
+Both monitors default to scraping only the **release namespace**:
+
+```yaml
+namespaceSelector:
+  matchNames:
+    - <Release.Namespace>
+```
+
+To scrape across **all namespaces**, set an explicit empty selector — this is the
+Prometheus Operator convention for cluster-wide discovery:
+
+```yaml
+web:
+  serviceMonitor:
+    enabled: true
+    portName: metrics
+    namespaceSelector: {}      # cluster-wide; overrides the release-namespace default
+```
+
+The same `namespaceSelector: {}` opt-in applies to `<cmp>.podMonitor`.
+
+### Discovery label
+
+Set `global.monitoring.releaseLabel` so kube-prometheus-stack's default
+`release` selector matches these monitors. See [Global knobs](#global-knobs).
+
 ## RBAC
 
 Keys: `serviceAccount`, `role`, `roleBinding`, `clusterRole`, `clusterRoleBinding`.
