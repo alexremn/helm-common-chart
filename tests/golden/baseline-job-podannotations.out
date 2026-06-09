@@ -5,6 +5,7 @@ kind: Job
 metadata:
   name: run-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: run-task
     helm.sh/environment: staging
@@ -14,6 +15,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: run-task
         helm.sh/environment: staging
@@ -43,6 +45,7 @@ kind: CronJob
 metadata:
   name: sync-task
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: sync-task
     helm.sh/environment: staging
@@ -58,6 +61,7 @@ spec:
       template:
         metadata:
           labels:
+            helm.sh/chart: common-smoke-0.1.0
             app.kubernetes.io/name: internal-platform
             app.kubernetes.io/component: sync-task
             helm.sh/environment: staging

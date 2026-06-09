@@ -5,6 +5,7 @@ kind: DaemonSet
 metadata:
   name: logShipper
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: ds-zero-app
     app.kubernetes.io/component: logShipper
     helm.sh/environment: dev
@@ -19,6 +20,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: ds-zero-app
         app.kubernetes.io/component: logShipper
         helm.sh/environment: dev

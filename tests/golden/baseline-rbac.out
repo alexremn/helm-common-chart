@@ -5,6 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -23,6 +24,7 @@ kind: ServiceAccount
 metadata:
   name: web-sa
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -35,6 +37,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -47,6 +50,7 @@ kind: ClusterRole
 metadata:
   name: rbac-app-web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -66,6 +70,7 @@ kind: ClusterRoleBinding
 metadata:
   name: rbac-app-web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -85,6 +90,7 @@ kind: Role
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -105,6 +111,7 @@ kind: Role
 metadata:
   name: custom-readonly
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -124,6 +131,7 @@ kind: RoleBinding
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -143,6 +151,7 @@ kind: RoleBinding
 metadata:
   name: custom-readonly
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -162,6 +171,7 @@ kind: Service
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -184,6 +194,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -204,6 +215,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: rbac-app
         app.kubernetes.io/component: web
         helm.sh/environment: dev

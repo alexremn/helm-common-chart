@@ -36,7 +36,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   priorityclassname-numeric \
                   daemonset-minready-zero \
                   podmonitor-endpoints \
-                  service-appprotocol
+                  service-appprotocol \
+                  labels
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

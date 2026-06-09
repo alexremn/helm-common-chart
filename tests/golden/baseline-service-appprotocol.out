@@ -5,6 +5,7 @@ kind: PodDisruptionBudget
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -23,6 +24,7 @@ kind: ServiceAccount
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -35,6 +37,7 @@ kind: ConfigMap
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -47,6 +50,7 @@ kind: Service
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -70,6 +74,7 @@ kind: Service
 metadata:
   name: web-grpc
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -93,6 +98,7 @@ kind: Service
 metadata:
   name: stateful-headless
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: stateful
     helm.sh/environment: dev
@@ -123,6 +129,7 @@ kind: Deployment
 metadata:
   name: web
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: web
     helm.sh/environment: dev
@@ -143,6 +150,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: svc-ap-app
         app.kubernetes.io/component: web
         helm.sh/environment: dev
@@ -184,6 +192,7 @@ kind: StatefulSet
 metadata:
   name: stateful
   labels:
+    helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: svc-ap-app
     app.kubernetes.io/component: stateful
     helm.sh/environment: dev
@@ -203,6 +212,7 @@ spec:
   template:
     metadata:
       labels:
+        helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: svc-ap-app
         app.kubernetes.io/component: stateful
         helm.sh/environment: dev
