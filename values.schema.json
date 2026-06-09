@@ -40,7 +40,7 @@
         "security": {
           "type": "string",
           "enum": ["minimal", "generic"],
-          "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): no enforced container hardening (pod seccompProfile RuntimeDefault only). `generic`: runAsNonRoot, allowPrivilegeEscalation:false, readOnlyRootFilesystem, drop-ALL capabilities. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
+          "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): baseline container hardening — allowPrivilegeEscalation:false, capabilities drop-ALL, pod seccompProfile RuntimeDefault (runAsNonRoot and readOnlyRootFilesystem stay opt-in). `generic`: adds runAsNonRoot and readOnlyRootFilesystem on top of the minimal baseline. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
         },
         "image": { "$ref": "#/$defs/imageOrString" },
         "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
