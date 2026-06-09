@@ -5,8 +5,8 @@ global:
   image:
     repository: ghcr.io/example/web
     tag: "1.0.0"
-  # Misconfigured: global.probe is a bool, not a map.
-  probe: true
+  # global.probe omitted (empty/absent) — template coerces missing probe to {}.
+  probe: {}
 
 web:
   ports:

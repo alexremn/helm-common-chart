@@ -71,6 +71,36 @@
             }
           }
         },
+        "probe": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Chart-wide probe field overrides. Slots between the profile default and the per-component value. See docs/values-reference.md#probes."
+        },
+        "envFrom": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "configs": { "type": "array" },
+            "secrets": { "type": "array" }
+          },
+          "description": "Chart-wide envFrom projections appended before per-component entries. configs -> configMapRef, secrets -> secretRef."
+        },
+        "emitEnvironmentLabel": {
+          "type": "boolean",
+          "description": "Emit the non-standard helm.sh/environment label on all rendered resources. Default true; v3.0 will flip to false."
+        },
+        "prometheusEndpoint": {
+          "type": "string",
+          "description": "Default serverAddress for KEDA ScaledObject Prometheus triggers. Required at render time when any trigger has type: prometheus and no explicit serverAddress."
+        },
+        "externalSecrets": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "forceSync": { "type": "boolean" }
+          },
+          "description": "ExternalSecret behavior knobs. forceSync (default true) re-stamps the force-sync annotation per render; false falls back to a stable per-revision value."
+        },
         "hooks": {
           "type": "object",
           "additionalProperties": true,

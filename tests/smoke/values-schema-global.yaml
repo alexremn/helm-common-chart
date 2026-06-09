@@ -1,0 +1,40 @@
+# Locks P4-1: every global.* key consumed by the templates renders cleanly and
+# is now modelled in values.schema.json (additionalProperties:true preserved).
+name: schema-global
+environment: dev
+
+global:
+  profile: generic
+  security: generic
+  emitEnvironmentLabel: false
+  prometheusEndpoint: http://prometheus.monitoring:9090
+  probe:
+    initialDelaySeconds: 7
+  envFrom:
+    configs:
+      - shared-config
+    secrets:
+      - shared-secret
+  externalSecrets:
+    forceSync: false
+
+web:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  ports:
+    http: 8080
+  scaling:
+    min: 1
+    max: 3
+    triggers:
+      - type: prometheus
+        threshold: "1"
+        query: vector(1)
+
+secrets:
+  app-secrets:
+    secretStore: cluster-store
+    secretKey: app
+    properties:
+      - TOKEN
