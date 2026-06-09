@@ -418,6 +418,23 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | `global.compat.legacySelectorLabels` | bool | `false` | Use the pre-v2 selector label scheme for charts migrated from `werf`. |
 | `global.werf.annotations` | bool | unset | Explicitly enable / disable werf-style annotation emission. |
 
+## Public helpers
+
+Utility templates a consumer chart may `include` directly. Stable public API (`common.*`).
+
+| Helper | Signature (dict keys) | Notes / caveats |
+|---|---|---|
+| `common.indent` | `value`, `spaces` (default 2) | Indents every line after the first by `spaces`; first line is not indented. |
+| `common.dbUrl` | `type` (default `postgres`), `host`, `port`, `name`, `user`, `password`, `options` | `user`/`password` are interpolated **verbatim, not URL-encoded** — pre-encode any value containing `@ : / ? #` (e.g. wrap with `urlquery`). Fails if `host`/`name` missing. |
+| `common.formatUrl` | `protocol` (default `https`), `host`, `path` | Defaults to **https**; pass `protocol: "http"` to opt into insecure transport. Emits a leading newline — pipe through `trim`. Fails if `host` missing. |
+| `common.generateName` | `prefix`, `separator` (default `-`), `length` (default 8) | **Non-deterministic** (uses `randAlphaNum`) — re-renders on every `helm upgrade`; do not use for stable resource names. |
+| `common.format` | `value`, `type` (`yaml`\|`json`\|`raw`, default `yaml`) | Renders `value` in the chosen encoding. |
+| `common.renderTemplateOrDefault` | `name`, `context`, `default` | Renders named template; falls back to `default` when the result trims empty. Emits a leading newline — pipe through `trim`. |
+| `common.mergeValues` | `src`, `dest` | Wraps Sprig `merge $dest $src`: **dest-wins** — keys already present in `dest` are NOT overwritten by `src` (shallow-biased, not a true deep override merge). |
+| `common.env.secretRef` | `name`, `secretName`, `key`, `optional` | Emits a single `valueFrom.secretKeyRef` env entry. |
+| `common.env.configMapRef` | `name`, `configMapName`, `key`, `optional` | Emits a single `valueFrom.configMapKeyRef` env entry. |
+| `common.env.fieldRef` | `name`, `fieldPath` | Emits a single `valueFrom.fieldRef` env entry. |
+
 ## Where things live in templates
 
 | Concern | Template | Helper |
