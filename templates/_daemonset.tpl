@@ -21,7 +21,13 @@ metadata:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
 spec:
-  minReadySeconds: {{ default 0 (coalesce $dsConfig.minReadySeconds $componentValues.minReadySeconds) }}
+  {{- if hasKey $dsConfig "minReadySeconds" }}
+  minReadySeconds: {{ $dsConfig.minReadySeconds }}
+  {{- else if hasKey $componentValues "minReadySeconds" }}
+  minReadySeconds: {{ $componentValues.minReadySeconds }}
+  {{- else }}
+  minReadySeconds: 0
+  {{- end }}
   {{- with $dsConfig.revisionHistoryLimit }}
   revisionHistoryLimit: {{ . }}
   {{- end }}

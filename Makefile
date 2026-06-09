@@ -33,7 +33,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   nodeaffinity-legacy \
                   envfrom-empty \
                   probe-nonmap \
-                  priorityclassname-numeric
+                  priorityclassname-numeric \
+                  daemonset-minready-zero
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

@@ -1,0 +1,55 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: logShipper
+  labels:
+    app.kubernetes.io/name: ds-zero-app
+    app.kubernetes.io/component: logShipper
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  minReadySeconds: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ds-zero-app
+      app.kubernetes.io/component: logShipper
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ds-zero-app
+        app.kubernetes.io/component: logShipper
+        helm.sh/environment: dev
+        app.kubernetes.io/instance: smoke
+    spec:
+      containers:
+        - name: logShipper
+          image: ghcr.io/example/log-shipper:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: metrics
+            containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
