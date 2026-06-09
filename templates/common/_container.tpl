@@ -91,8 +91,10 @@ Usage: {{ include "common.probe" .Values.myComponent }}
 {{- $defaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}
 {{- $globalProbe := dig "global" "probe" dict $values -}}
+{{- if not (kindIs "map" $globalProbe) -}}{{- $globalProbe = dict -}}{{- end -}}
 {{- $probeDefaults := $defaults.probe -}}
 {{- $shared := dig "probes" dict . -}}
+{{- if not (kindIs "map" $shared) -}}{{- $shared = dict -}}{{- end -}}
 {{- $perPhase := dict -}}
 {{- if and (ne $phase "") (kindIs "map" $shared) (hasKey $shared $phase) -}}
   {{- $perPhase = index $shared $phase -}}
