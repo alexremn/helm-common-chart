@@ -276,7 +276,7 @@
     "intOrPercent": {
       "oneOf": [
         { "type": "integer", "minimum": 0 },
-        { "type": "string", "pattern": "^[0-9]+%$" }
+        { "type": "string", "pattern": "^[0-9]+%?$" }
       ]
     },
     "imagePullSecrets": {

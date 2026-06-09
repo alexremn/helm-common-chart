@@ -1,0 +1,16 @@
+# Locks P4-8: intOrPercent must accept bare-int strings (e.g. "1") that k8s
+# accepts for maxUnavailable/maxSurge, not only "N%" and integers.
+name: intorpercent
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  pdb:
+    maxUnavailable: "1"          # bare-int STRING — k8s-valid, schema must allow
+  strategyMaxSurge: "2"
