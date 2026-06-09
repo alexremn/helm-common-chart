@@ -1,0 +1,96 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: this-is-a-very-long-stateful-component-name-well-over-headless
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: long-app
+    app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+    helm.sh/environment: prod
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: long-app
+    app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+    app.kubernetes.io/instance: smoke
+  publishNotReadyAddresses: false
+
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: long-app
+    app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+    helm.sh/environment: prod
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  serviceName: "this-is-a-very-long-stateful-component-name-well-over-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: long-app
+      app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: long-app
+        app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
+        helm.sh/environment: prod
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: this-is-a-very-long-stateful-component-name-well-over-sixty-three-characters
+          image: ghcr.io/example/web:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false

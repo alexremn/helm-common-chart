@@ -374,7 +374,7 @@ Generate a DNS-safe name.
 Usage: {{ include "common.safeName" (dict "name" "my.service-name_here" "maxLength" 63) }}
 */}}
 {{- define "common.safeName" }}
-{{- $name := .name | lower | replace "." "-" | replace "_" "-" | trunc (default 63 .maxLength) | regexReplaceAll "-+$" "" }}
+{{- $name := regexReplaceAll "-+$" (.name | lower | replace "." "-" | replace "_" "-" | trunc (default 63 .maxLength)) "" }}
 {{ $name }}
 {{- end }}
 

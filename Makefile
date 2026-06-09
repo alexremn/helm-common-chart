@@ -25,7 +25,6 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   job-podannotations pdb-podmonitor-pvc-sa-annotations \
                   tpl-scoping ingress-no-tls extsecret-namespaced \
                   no-environment-label \
-                  persistence-nameless \
                   hpa-statefulset \
                   scale-to-zero \
                   ingress-map-nopaths \
@@ -37,7 +36,9 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   daemonset-minready-zero \
                   podmonitor-endpoints \
                   service-appprotocol \
-                  labels
+                  persistence-nameless \
+                  labels \
+                  long-name
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
