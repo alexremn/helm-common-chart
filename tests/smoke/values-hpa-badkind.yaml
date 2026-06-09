@@ -1,0 +1,24 @@
+# Locks P4-12: an invalid hpa.kind must fail fast with a clear message instead
+# of silently emitting a scaleTargetRef that points at a non-existent object.
+name: hpa-badkind
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  hpa:
+    kind: Frobnicate        # not a scalable workload kind
+    minReplicas: 2
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
