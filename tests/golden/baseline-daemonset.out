@@ -3,11 +3,11 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: logShipper
+  name: logshipper
   labels:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: ds-app
-    app.kubernetes.io/component: logShipper
+    app.kubernetes.io/component: logshipper
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
@@ -22,21 +22,21 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: ds-app
-      app.kubernetes.io/component: logShipper
+      app.kubernetes.io/component: logshipper
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: ds-app
-        app.kubernetes.io/component: logShipper
+        app.kubernetes.io/component: logshipper
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
     spec:
       containers:
-        - name: logShipper
+        - name: logshipper
           image: ghcr.io/example/log-shipper:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:

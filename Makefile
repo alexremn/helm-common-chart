@@ -43,7 +43,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   security-minimal tpl-envraw \
                   schema-global \
                   hyphen-component \
-                  intorpercent
+                  intorpercent safename
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

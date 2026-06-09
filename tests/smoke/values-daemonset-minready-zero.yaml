@@ -6,7 +6,7 @@ global:
     repository: ghcr.io/example/log-shipper
     tag: "1.0.0"
 
-logShipper:
+logshipper:
   ports:
     metrics: 9090
   # Component sets a nonzero value; the daemonSet sub-map overrides it to 0.
