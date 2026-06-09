@@ -41,8 +41,8 @@ Usage:
       port: {{ $servicePort | int }}
       targetPort: {{ $targetPort }}
       protocol: {{ $protocol }}
-      {{- if and (eq $mode "full") $appProtocol }}
-      appProtocol: {{ $appProtocol }}
+      {{- if $appProtocol }}
+      appProtocol: {{ $appProtocol | quote }}
       {{- end }}
       {{- if and (eq $mode "full") (eq (default "" $serviceConfig.type) "NodePort") $serviceConfig.nodePorts (hasKey $serviceConfig.nodePorts $name) }}
       nodePort: {{ index $serviceConfig.nodePorts $name }}
