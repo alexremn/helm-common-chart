@@ -12,3 +12,11 @@ web:
       grpc_public:
         ports:
           grpc: 9090
+  ingress:
+    - name: public_api
+      domains:
+        - host: api.example.com
+          paths:
+            - path: /
+              svc: web_backend
+              port: http
