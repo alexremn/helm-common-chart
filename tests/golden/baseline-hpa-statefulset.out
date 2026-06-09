@@ -26,6 +26,31 @@ spec:
 
 
     # "Skipping PVC for component 'stateful': no persistence defined"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: stateful
+  labels:
+    app.kubernetes.io/name: hpa-sts-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: dev
+    app.kubernetes.io/instance: smoke
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: stateful
+  minReplicas: 2
+  maxReplicas: 10
+  metrics: 
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
 
 ---
 # Source: common-smoke/templates/all.yaml
