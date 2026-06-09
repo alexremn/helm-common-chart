@@ -60,8 +60,8 @@ spec:
   {{- with $sm.targetLabels }}
   targetLabels: {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $sm.namespaceSelector }}
-  namespaceSelector: {{ toYaml . | nindent 4 }}
+  {{- if hasKey $sm "namespaceSelector" }}
+  namespaceSelector: {{ toYaml $sm.namespaceSelector | nindent 4 }}
   {{- else }}
   namespaceSelector:
     matchNames:
