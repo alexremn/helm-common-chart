@@ -1,0 +1,15 @@
+# P3-1 negative test: an invalid global.security posture must be rejected.
+# NOT golden-locked (render is expected to FAIL); driven by the lint-negative
+# make target, never added to SMOKE_VARIANTS.
+name: security-invalid
+environment: production
+
+global:
+  security: minmal          # typo for "minimal" — must be rejected
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
