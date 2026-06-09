@@ -52,7 +52,7 @@ ports:
 {{- $value := index $portMap $name }}
 {{- if kindIs "map" $value }}
 - name: {{ $name }}
-  containerPort: {{ $value.containerPort | int }}
+  containerPort: {{ default $value.port $value.containerPort | int }}
   protocol: {{ default "TCP" $value.protocol }}
   {{- with $value.hostPort }}
   hostPort: {{ . }}
