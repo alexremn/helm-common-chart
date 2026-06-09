@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   maxUnavailable: 25%
   selector:
@@ -29,6 +30,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -42,6 +44,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 data:
 ---
 # Source: common-smoke/templates/all.yaml
@@ -55,6 +58,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -72,6 +76,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -99,6 +104,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -125,6 +131,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   minReadySeconds: 10
@@ -146,6 +153,7 @@ spec:
         app.kubernetes.io/component: web
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: web
@@ -193,6 +201,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -213,6 +222,7 @@ spec:
         app.kubernetes.io/component: stateful
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: stateful
@@ -262,6 +272,7 @@ spec:
           app.kubernetes.io/component: stateful
           helm.sh/environment: production
           app.kubernetes.io/instance: smoke
+          app.kubernetes.io/managed-by: Helm
       spec: 
         accessModes: [ReadWriteOnce]
         resources:
@@ -279,6 +290,7 @@ metadata:
     app.kubernetes.io/component: run-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   backoffLimit: 0
   template:
@@ -289,6 +301,7 @@ spec:
         app.kubernetes.io/component: run-task
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: run-task
@@ -319,6 +332,7 @@ metadata:
     app.kubernetes.io/component: sync-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   schedule: "0 0 * * *"
   concurrencyPolicy: "Forbid"
@@ -335,6 +349,7 @@ spec:
             app.kubernetes.io/component: sync-task
             helm.sh/environment: production
             app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
         spec:
           containers:
             - name: sync-task
@@ -365,6 +380,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   
 spec:
   ingressClassName: nginx
@@ -393,6 +409,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:

@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: logShipper
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   minReadySeconds: 0
   revisionHistoryLimit: 3
@@ -30,6 +31,7 @@ spec:
         app.kubernetes.io/component: logShipper
         helm.sh/environment: dev
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: logShipper

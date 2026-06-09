@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   minAvailable: 2
   selector:
@@ -29,6 +30,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -42,6 +44,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 data:
   LOG_LEVEL: "info"
 ---
@@ -56,6 +59,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -73,6 +77,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -100,6 +105,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -126,6 +132,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   annotations:
     example.com/initial-replicas: "3"
 spec:
@@ -148,6 +155,7 @@ spec:
         app.kubernetes.io/component: web
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: web
@@ -195,6 +203,7 @@ metadata:
     app.kubernetes.io/component: stateful
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -215,6 +224,7 @@ spec:
         app.kubernetes.io/component: stateful
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: stateful
@@ -263,6 +273,7 @@ spec:
           app.kubernetes.io/component: stateful
           helm.sh/environment: production
           app.kubernetes.io/instance: smoke
+          app.kubernetes.io/managed-by: Helm
       spec: 
         accessModes: [ReadWriteOnce]
         resources:
@@ -280,6 +291,7 @@ metadata:
     app.kubernetes.io/component: run-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   backoffLimit: 0
   template:
@@ -290,6 +302,7 @@ spec:
         app.kubernetes.io/component: run-task
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - name: run-task
@@ -319,6 +332,7 @@ metadata:
     app.kubernetes.io/component: sync-task
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   schedule: "0 0 * * *"
   concurrencyPolicy: "Forbid"
@@ -335,6 +349,7 @@ spec:
             app.kubernetes.io/component: sync-task
             helm.sh/environment: production
             app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
         spec:
           containers:
             - name: sync-task
@@ -365,6 +380,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -401,6 +417,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
   
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -437,6 +454,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   scaleTargetRef:
     name: web

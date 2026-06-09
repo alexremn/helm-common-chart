@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
 spec:
   groups: 
     - name: web
