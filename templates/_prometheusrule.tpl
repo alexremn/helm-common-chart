@@ -22,6 +22,9 @@ metadata:
   name: {{ $name }}
   labels:
     {{ include "common.labels" $labelCtx | nindent 4 }}
+    {{- with (dig "global" "monitoring" "releaseLabel" "" $values) }}
+    release: {{ . }}
+    {{- end }}
     {{- with $val.labels }}
     {{ toYaml . | nindent 4 }}
     {{- end }}

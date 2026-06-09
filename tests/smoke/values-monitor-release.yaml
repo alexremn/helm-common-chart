@@ -1,0 +1,29 @@
+# Locks P4-6: global.monitoring.releaseLabel injects `release: <value>` into
+# ServiceMonitor and PrometheusRule (and PodMonitor via the same knob) so
+# kube-prometheus-stack's default `release` selector discovers them.
+name: monitor-release
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  monitoring:
+    releaseLabel: kube-prometheus-stack
+
+web:
+  ports:
+    http: 8080
+    metrics: 9090
+  serviceMonitor:
+    enabled: true
+    portName: metrics
+
+prometheusRules:
+  app-alerts:
+    groups:
+      - name: web
+        rules:
+          - alert: WebDown
+            expr: up == 0
+            for: 5m

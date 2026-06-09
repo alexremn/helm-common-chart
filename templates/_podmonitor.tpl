@@ -67,6 +67,9 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
+    {{- with (dig "global" "monitoring" "releaseLabel" "" (toYaml .Values | fromYaml)) }}
+    release: {{ . }}
+    {{- end }}
   {{- with $componentValues.podMonitor.labels }}
     {{ toYaml . | nindent 4 }}
   {{- end }}
