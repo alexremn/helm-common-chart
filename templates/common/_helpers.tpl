@@ -262,7 +262,7 @@ Usage:
 {{- if and (kindIs "map" $src) (hasKey $src $key) -}}
 {{- $val := index $src $key }}
 {{- if $scalar }}
-{{ $emitAs }}: {{ $val }}
+{{ $emitAs }}: {{ $val | quote }}
 {{- else }}
 {{ $emitAs }}: {{ toYaml $val | nindent 2 }}
 {{- end -}}
