@@ -4,6 +4,7 @@
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" (include "common.safeName" (dict "name" $cmp) | trim) "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 apiVersion: apps/v1
 kind: StatefulSet

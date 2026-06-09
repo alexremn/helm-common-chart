@@ -99,7 +99,11 @@ Release name resolution helper.
 {{/*
 Build the standard label-context dict shared by every chart helper.
 Returned shape (rendered via `fromYaml`):
-  svc, cmp, env, Values, Release, Chart, version (optional), extraLabels (optional)
+  svc, cmp, env, version (optional), extraLabels (optional)
+
+NOTE: Values, Release, and Chart are NOT preserved — fromYaml round-trip
+drops non-serializable objects. Use common.workload.context.doc (below) for
+the live render context assembled inline by each resource template.
 
 Usage:
   {{- $ctx := include "common.labelCtx" . | fromYaml }}
@@ -119,6 +123,26 @@ version: {{ . | quote }}
 extraLabels: {{ toYaml . | nindent 2 }}
 {{- end }}
 {{- end }}
+
+{{/*
+Canonical label/render context shape consumed DIRECTLY (not via fromYaml) by
+every resource template:
+  svc, cmp, env, Values, Release, Chart   (+ optional version, extraLabels)
+
+Helm `include` can only return a string, so the live Values/Release/Chart
+objects cannot be produced by a builder helper — each resource template
+assembles the dict literal inline:
+
+  {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+
+This define is the single documented source of that shape. NOTE: common.labelCtx
+(above) round-trips through fromYaml and therefore DROPS Values/Release/Chart;
+it is retained only for the legacy scalar-only callers and must NOT be used to
+build a render context.
+*/}}
+{{- define "common.workload.context.doc" -}}
+svc, cmp, env, Values, Release, Chart
+{{- end -}}
 
 {{/*
 =============================================================================

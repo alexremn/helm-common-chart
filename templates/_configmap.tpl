@@ -128,6 +128,7 @@ Usage: {{ include "chart.binaryConfigmap" (dict "svc" "app-name" "cmp" "componen
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValue := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "binaryData") }}
 {{- include "chart._configmap.header" (dict "name" (printf "%s-files" $cmp) "labelCtx" $labelCtx "env" $env "Values" .Values) }}

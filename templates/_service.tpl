@@ -58,6 +58,7 @@ Usage:
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $serviceConfig := dig "service" dict $componentValues }}
 {{- $ports := $componentValues.ports | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if not $ports }}
 {{ fail "No ports defined for service. Please define at least one port in the component values." }}
@@ -152,6 +153,7 @@ Usage: {{ include "chart.service.headless" (dict "svc" "service-name" "cmp" "com
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $serviceConfig := dig "service" "headless" dict $componentValues }}
 {{- $ports := $componentValues.ports | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" (include "common.safeName" (dict "name" $cmp) | trim) "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if not $ports }}
 {{ fail "No ports defined for service. Please define at least one port in the component values." }}

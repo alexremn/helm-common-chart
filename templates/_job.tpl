@@ -11,6 +11,7 @@ This template renders a Kubernetes Job with common configuration.
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values.jobs (include "common.cmp.valuesKey" .cmp) | default dict }}
+{{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 
 apiVersion: batch/v1
