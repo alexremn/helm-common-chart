@@ -1,0 +1,13 @@
+name: aff-app
+environment: dev
+
+web:
+  image: { repository: nginx, tag: "1.27" }
+  ports:
+    http: 8080
+  affinity:
+    nodeAffinity:
+      - key: zone
+        value: 1
+    podAntiAffinity:
+      default: true

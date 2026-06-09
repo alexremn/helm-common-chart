@@ -171,3 +171,71 @@ affinity:
 
   {{- include "common.affinities.podAntiAffinity" (dict "component" .component "context" .context) | nindent 2 }}
 {{- end -}}
+
+{{/*
+Legacy slice-form nodeAffinity emitter (relocated from _pod.tpl).
+Each entry: key, operator (default "In"), value (single string).
+Values are quoted so numeric zone ids stay []string (fixes P1-6).
+Map-form nodeAffinity is passed through by the caller via toYaml.
+*/}}
+{{- define "common.affinities.legacy.nodeSlice" -}}
+nodeAffinity:
+  requiredDuringSchedulingIgnoredDuringExecution:
+    nodeSelectorTerms:
+    {{- range . }}
+      - matchExpressions:
+          - key: {{ .key }}
+            operator: {{ default "In" .operator }}
+            values:
+              - {{ .value | quote }}
+    {{- end }}
+{{- end -}}
+
+{{/*
+Legacy default/custom podAntiAffinity emitter (relocated from _pod.tpl,
+output byte-identical). `.val.default` emits the 100/99 zone+host spread;
+`.val.custom` is appended verbatim.
+*/}}
+{{- define "common.affinities.legacy.podAntiAffinity" }}
+podAntiAffinity:
+{{- if .val.default }}
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 100
+    podAffinityTerm:
+      labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - {{ .svc }}
+        - key: app.kubernetes.io/component
+          operator: In
+          values:
+          - {{ .cmp }}
+        - key: helm.sh/environment
+          operator: In
+          values:
+          - {{ .env }}
+      topologyKey: topology.kubernetes.io/zone
+  - weight: 99
+    podAffinityTerm:
+      labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - {{ .svc }}
+        - key: app.kubernetes.io/component
+          operator: In
+          values:
+          - {{ .cmp }}
+        - key: helm.sh/environment
+          operator: In
+          values:
+          - {{ .env }}
+      topologyKey: kubernetes.io/hostname
+{{- end }}
+{{ with .val.custom }}
+  {{ toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
