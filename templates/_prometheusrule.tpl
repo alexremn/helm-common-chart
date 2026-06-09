@@ -10,9 +10,10 @@ Usage: {{ include "chart.prometheusrule" (dict "Values" .Values "Release" .Relea
 
 {{- define "chart.prometheusrule" }}
 {{- $svc := include "common.appName" . | trim }}
-{{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
-{{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- /* Top-level passthrough: object name is the verbatim consumer key, so do
+       NOT stamp a component label these namespace-shared resources don't own. */ -}}
+{{- $labelCtx := dict "svc" $svc "cmp" "" "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
 {{- range $name, $val := dig "prometheusRules" dict $values }}
 ---

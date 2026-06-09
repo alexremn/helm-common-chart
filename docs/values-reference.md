@@ -371,6 +371,7 @@ global:
 - `priorityClass` — define a `PriorityClass` (cluster-scoped). Map of name → spec.
 - `hooks` — Helm hook weights/annotations for release-time orchestration.
 - `compat.legacySelectorLabels` — opt-in to older selector label scheme for charts migrated from `werf`.
+- **Top-level passthrough resource names.** `prometheusRules`, `networkPolicies`, `configs`, `nativeSecrets`, `priorityClasses`, `triggerAuthentications`, and `rbac` use the consumer map **key verbatim** as `metadata.name` — the chart does NOT prefix the release/app name. Consumers own and namespace these names to avoid collisions when two charts share a namespace. These shared resources are not stamped an `app.kubernetes.io/component` label.
 
 ### Global knobs
 
