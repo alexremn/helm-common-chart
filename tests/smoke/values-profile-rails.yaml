@@ -1,7 +1,8 @@
 # Same component surface as values-profile-generic.yaml but with
 # global.profile: rails to assert that the opt-in rails path renders the
 # Rails-flavored defaults: probe path `/health/live`, podMonitor metric
-# relabelings, envFrom phantom configmap/secret (with optional: true), and
+# relabelings, suppressed phantom envFrom (explicit empty global.envFrom
+# opts out of the rails configmap/secret defaults), and
 # runAsUser 1000 / runAsGroup 3000.
 name: features-app
 environment: production
@@ -20,6 +21,8 @@ global:
   hooks:
     enabled: true
     weight: "-7"
+  # Explicit empty lists disable the rails phantom configmap/secret envFrom
+  # (see P1-7: hasKey opt-out distinguishes present-but-empty from absent).
   envFrom:
     configs: []
     secrets: []
