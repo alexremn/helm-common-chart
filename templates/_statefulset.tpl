@@ -42,20 +42,13 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      {{- include "common.workload.podSpec" (dict
+      {{- include "common.workload.podSpec" (merge (dict
         "root" $
         "component" $componentValues
         "svc" $svc
         "cmp" $cmp
         "env" $env
-        "includePorts" true
-        "includeProbes" true
-        "includeLifecycle" true
-        "includePriorityClassName" true
-        "includeHostAliases" true
-        "includeTopologySpreadConstraints" true
-        "includeTerminationGracePeriod" true
-      ) | nindent 6 }}
+      ) (include "common.workload.fullToggles" . | fromYaml)) | nindent 6 }}
   {{- with $componentValues.persistence }}
   volumeClaimTemplates:
     {{- if kindIs "map" . }}

@@ -168,10 +168,11 @@ Canonical "full" toggle set (Deployment / StatefulSet / DaemonSet):
   includeTerminationGracePeriod: true
 
 NOTE: Defaulting all toggles to false means a new workload kind that
-forgets a flag will silently emit pods without that section. This is a
-known footgun (B3 audit R4/N10). Inverting defaults to true (with Job/
-CronJob opting out) is deferred to Phase C because it would flip golden
-output for Job/CronJob variants.
+forgets a flag will silently emit pods without that section. Long-lived
+workloads avoid this by using the `common.workload.fullToggles` preset
+(single source of the 7-flag "full" set); Job/CronJob still opt in to the
+subset they need. Inverting the underlying defaults to true is deferred
+because it would flip golden output for Job/CronJob variants.
 
 Usage:
 {{ include "common.workload.podSpec" (dict
@@ -189,6 +190,26 @@ Usage:
   "includeTerminationGracePeriod" true
 ) }}
 */}}
+{{/*
+Canonical "full" pod-spec toggle set for long-lived workloads
+(Deployment / StatefulSet / DaemonSet). Centralizes the 7 include* flags
+so they aren't triplicated at each call site. Returns YAML to be merged
+into the podSpec args via `fromYaml`.
+
+Usage:
+  {{- include "common.workload.podSpec" (merge (dict
+      "root" $ "component" $componentValues "svc" $svc "cmp" $cmp "env" $env)
+      (include "common.workload.fullToggles" . | fromYaml)) | nindent 6 }}
+*/}}
+{{- define "common.workload.fullToggles" -}}
+includePorts: true
+includeProbes: true
+includeLifecycle: true
+includePriorityClassName: true
+includeHostAliases: true
+includeTopologySpreadConstraints: true
+includeTerminationGracePeriod: true
+{{- end -}}
 {{- define "common.workload.podSpec" -}}
 {{- $root := .root -}}
 {{- $component := .component -}}
