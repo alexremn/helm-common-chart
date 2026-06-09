@@ -1,0 +1,30 @@
+# Locks P4-5: a map-form domain missing `host` with auto-TLS must fail fast
+# instead of emitting an empty host alongside a real secretName.
+# Negative case (host omitted) is proven in Step 2 of the P4-5 task:
+#   helm template smoke . -f values-ingress-no-host.yaml  (before fix)
+#   → emits tls.hosts: [<empty>] + rules[0].host: <empty>  (invalid Ingress)
+# This golden-locked fixture exercises the POSITIVE path (host present) so
+# that the template renders a valid Ingress. The fail-fast guard
+# (required "ingress: domain entry…requires a non-empty `host`") is verified
+# by removing host: below and re-running the render — it must error out.
+name: ingress-no-host
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  ingress:
+    public:
+      className: nginx
+      tls: true
+      domains:
+        - host: api.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+              port: http

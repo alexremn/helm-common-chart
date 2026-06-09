@@ -48,7 +48,7 @@ Define rules for ingress
 {{- $cmp := .cmp }}
 rules:
 {{- range $conf.domains }}
-  - host: {{ if kindIs "map" . }}{{ .host }}{{ else }}{{ . }}{{ end }}
+  - host: {{ if kindIs "map" . }}{{ required "ingress: domain entry requires a non-empty `host`" .host }}{{ else }}{{ . }}{{ end }}
     http:
       paths:
       {{- if and (kindIs "map" .) .paths }}
@@ -80,7 +80,7 @@ tls:
       {{- end }}
       {{- else }}
       {{- range $conf.domains }}
-      - {{ if kindIs "map" . }}{{ .host }}{{ else }}{{ . }}{{ end }}
+      - {{ if kindIs "map" . }}{{ required "ingress: domain entry with auto-TLS requires a non-empty `host`" .host }}{{ else }}{{ . }}{{ end }}
       {{- end }}
       {{- end }}
     secretName: {{ dig "secretName" $secretName $tlsMap }}
