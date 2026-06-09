@@ -43,9 +43,13 @@ data: {{ toYaml . | nindent 2 }}
 stringData:
 {{- /* F2: scope tpl context to Values/Release/Chart + this secret's
        componentValues ($val) instead of leaking the full chart root via `$`. */ -}}
+{{- /* P3-3: stringData runs through `tpl` by default. Opt out chart-wide via
+       `global.tpl.envValues: false` or per-secret via `envRaw: true`. */ -}}
 {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
+{{- $tplEnabled := dig "global" "tpl" "envValues" true (toYaml $.Values | fromYaml) }}
+{{- if (dig "envRaw" false $val) }}{{- $tplEnabled = false }}{{- end }}
 {{- range $k, $v := . }}
-  {{ $k }}: {{ tpl (toString $v) $tplCtx | quote }}
+  {{ $k }}: {{ if $tplEnabled }}{{ tpl (toString $v) $tplCtx | quote }}{{ else }}{{ toString $v | quote }}{{ end }}
 {{- end }}
 {{- end }}
 {{- end }}

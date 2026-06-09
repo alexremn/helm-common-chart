@@ -144,6 +144,13 @@ Keys: `configMap`, `secret`, `externalSecret`, `envFrom`.
 - `externalSecret` — `ExternalSecret` CRD (requires External Secrets Operator); references a remote backing store
 - `envFrom` — list of ConfigMap/Secret refs projected into container env
 
+**Templating env values & Secret `stringData` (`tpl` opt-out).** By default, `<cmp>.env` values and native Secret `stringData` are rendered through Helm's `tpl` so consumers can interpolate (e.g. `"{{ .Release.Namespace }}"`). In multi-tenant setups where values come from untrusted sources, disable this to emit values verbatim:
+
+- `global.tpl.envValues: false` — chart-wide opt-out.
+- `<cmp>.envRaw: true` — per-component opt-out (also honored on native Secret entries as `<secret>.envRaw: true`).
+
+When disabled, `{{ ... }}` in a value is emitted literally (no evaluation, no injection surface).
+
 ### `envFrom` shape and rails-profile phantom defaults
 
 `envFrom` is **not** a flat list of Kubernetes `envFrom` entries. It is a structured map with two keys:

@@ -295,6 +295,11 @@ Usage (shape b, legacy):
 {{- end }}
 {{- if hasKey $componentValues "env" }}
 {{- $tplCtx := dict "Values" $rootValues "Release" $rootRelease "Chart" $rootChart "componentValues" $componentValues }}
+{{- /* P3-3: env values run through `tpl` by default (consumer templating).
+       Opt out chart-wide via `global.tpl.envValues: false` or per-component
+       via `<cmp>.envRaw: true` to emit values verbatim (no injection). */ -}}
+{{- $tplEnabled := dig "global" "tpl" "envValues" true (toYaml $rootValues | fromYaml) }}
+{{- if (dig "envRaw" false $componentValues) }}{{- $tplEnabled = false }}{{- end }}
 env:
 {{- range $key, $value := $componentValues.env }}
 {{- if kindIs "map" $value }}
@@ -303,11 +308,11 @@ env:
   valueFrom: {{ toYaml $value.valueFrom | nindent 4 }}
 {{- else }}
 - name: {{ $key }}
-  value: {{ tpl (toString $value.value) $tplCtx | quote }}
+  value: {{ if $tplEnabled }}{{ tpl (toString $value.value) $tplCtx | quote }}{{ else }}{{ toString $value.value | quote }}{{ end }}
 {{- end }}
 {{- else }}
 - name: {{ $key }}
-  value: {{ tpl (toString $value) $tplCtx | quote }}
+  value: {{ if $tplEnabled }}{{ tpl (toString $value) $tplCtx | quote }}{{ else }}{{ toString $value | quote }}{{ end }}
 {{- end }}
 {{- end }}
 {{- end }}

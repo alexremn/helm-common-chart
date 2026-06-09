@@ -103,6 +103,16 @@
               "description": "Include `version` and `extraLabels` in `common.labels.matchLabels`. Use only when migrating a chart whose pre-1.3 release stored those labels in selectors -- changing selector contents on existing Deployments/StatefulSets is not allowed by Kubernetes."
             }
           }
+        },
+        "tpl": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "envValues": {
+              "type": "boolean",
+              "description": "Render <cmp>.env values and native Secret stringData through Helm `tpl`. Default true. Set false to emit values verbatim (closes the templating-injection surface for untrusted multi-tenant values). Per-component override: `<cmp>.envRaw: true`."
+            }
+          }
         }
       }
     },
