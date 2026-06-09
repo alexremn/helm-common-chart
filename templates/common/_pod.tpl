@@ -282,89 +282,6 @@ hostIPC: {{ .hostIPC }}
 {{- end }}
 
 {{/*
-Standard pod anti-affinity configuration to spread pods across zones and nodes
-Usage: {{ include "common.podAntiAffinity" (dict "svc" "my-service" "cmp" "web" "env" "prod" "Values" .Values) }}
-*/}}
-{{- define "common.podAntiAffinity" }}
-podAntiAffinity:
-{{- if .val.default }}
-  preferredDuringSchedulingIgnoredDuringExecution:
-  - weight: 100
-    podAffinityTerm:
-      labelSelector:
-        matchExpressions:
-        - key: app.kubernetes.io/name
-          operator: In
-          values:
-          - {{ .svc }}
-        - key: app.kubernetes.io/component
-          operator: In
-          values:
-          - {{ .cmp }}
-        - key: helm.sh/environment
-          operator: In
-          values:
-          - {{ .env }}
-      topologyKey: topology.kubernetes.io/zone
-  - weight: 99
-    podAffinityTerm:
-      labelSelector:
-        matchExpressions:
-        - key: app.kubernetes.io/name
-          operator: In
-          values:
-          - {{ .svc }}
-        - key: app.kubernetes.io/component
-          operator: In
-          values:
-          - {{ .cmp }}
-        - key: helm.sh/environment
-          operator: In
-          values:
-          - {{ .env }}
-      topologyKey: kubernetes.io/hostname
-{{- end }}
-{{ with .val.custom }}
-  {{ toYaml . | nindent 2 }}
-{{- end }}
-{{- end }}
-
-{{/*
-Node affinity helper.
-
-Accepts two input shapes:
-  Map  — passed through verbatim via toYaml; supports any nodeAffinity
-          structure (required/preferred, multiple matchExpressions, multi-
-          value In/NotIn lists, etc.).
-  Slice — legacy convenience form. Each slice entry must have fields:
-          key, operator (default "In"), value (SINGLE string).
-          LIMITATION: the slice form supports only one value per
-          matchExpression entry. To express "key X In [v1, v2]" you must
-          switch to the map form. This limitation is intentional — the
-          slice form is retained for backward compatibility only. New
-          consumers should use the map form.
-          Deprecation to Phase C is tracked in the B3 audit (R3/N7).
-
-Usage: {{ include "common.nodeAffinity" .Values.global.nodeAffinity }}
-*/}}
-{{- define "common.nodeAffinity" -}}
-nodeAffinity:
-{{- if kindIs "map" . }}
-{{- toYaml . | nindent 2 }}
-{{- else }}
-  requiredDuringSchedulingIgnoredDuringExecution:
-    nodeSelectorTerms:
-    {{- range . }}
-      - matchExpressions:
-          - key: {{ .key }}
-            operator: {{ default "In" .operator }}
-            values:
-              - {{ .value | quote }}
-    {{- end }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Combined affinity helper that includes both node and pod affinities
 Usage: {{ include "common.affinity" . }}
 */}}
@@ -388,7 +305,12 @@ affinity:
 {{- else }}
 affinity:
 {{- with $nodeAffinity }}
-{{ include "common.nodeAffinity" . | nindent 2 }}
+{{- if kindIs "slice" . }}
+{{ include "common.affinities.legacy.nodeSlice" . | nindent 2 }}
+{{- else }}
+  nodeAffinity:
+{{- toYaml . | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- if and (hasKey . "podAffinity") (not (empty .podAffinity)) }}
   podAffinity:
@@ -396,7 +318,7 @@ affinity:
 {{- end }}
 {{- with $podAntiAffinity }}
 {{- if $isLegacyPodAntiAffinity }}
-{{ include "common.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" .) | nindent 2 }}
+{{ include "common.affinities.legacy.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" .) | nindent 2 }}
 {{- else }}
   podAntiAffinity:
 {{- toYaml . | nindent 4 }}
