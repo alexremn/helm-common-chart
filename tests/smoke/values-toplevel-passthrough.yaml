@@ -1,0 +1,24 @@
+# Locks P4-11: top-level passthrough resources (prometheusRules, networkPolicies)
+# take the consumer key verbatim as metadata.name and must NOT be stamped a
+# component (`app.kubernetes.io/component`) label they don't belong to.
+name: toplevel-passthrough
+environment: dev
+
+prometheusRules:
+  shared-alerts:
+    groups:
+      - name: shared
+        rules:
+          - alert: SharedDown
+            expr: up == 0
+            for: 5m
+
+networkPolicies:
+  allow-dns:
+    podSelector: {}
+    policyTypes: [Egress]
+    egress:
+      - to: []
+        ports:
+          - protocol: UDP
+            port: 53

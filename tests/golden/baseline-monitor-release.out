@@ -163,7 +163,6 @@ metadata:
     
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: monitor-release
-    app.kubernetes.io/component: web
     helm.sh/environment: dev
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm

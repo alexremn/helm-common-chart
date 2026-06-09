@@ -102,8 +102,11 @@ spec:
   {{- end }}
 {{- end }}
 
-{{- /* Top-level networkPolicies map: freeform spec passthrough. */ -}}
+{{- /* Top-level networkPolicies map: freeform spec passthrough. Object name is
+       the verbatim consumer key; build a component-free label ctx so these
+       shared resources are not stamped with a component they don't own. */ -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $topLabelCtx := dict "svc" $svc "cmp" "" "env" $env "Values" .Values "Release" .Release "Chart" .Chart -}}
 {{- range $name, $spec := dig "networkPolicies" dict $values }}
 ---
 apiVersion: networking.k8s.io/v1
@@ -111,7 +114,7 @@ kind: NetworkPolicy
 metadata:
   name: {{ $name }}
   labels:
-    {{- include "common.labels" $labelCtx | nindent 4 }}
+    {{- include "common.labels" $topLabelCtx | nindent 4 }}
 spec: {{ toYaml $spec | nindent 2 }}
 {{- end }}
 {{- end }}
