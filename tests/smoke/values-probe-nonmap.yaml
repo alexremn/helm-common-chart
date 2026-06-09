@@ -5,9 +5,12 @@ global:
   image:
     repository: ghcr.io/example/web
     tag: "1.0.0"
-  # global.probe omitted (empty/absent) — template coerces missing probe to {}.
-  probe: {}
 
 web:
   ports:
     http: 8080
+  # P1-9 coverage: a non-map per-component `.probes` (here a bool) must be
+  # coerced to {} and fall through to profile defaults instead of crashing.
+  # (global.probe is schema-constrained to object since P4-1, so the reachable
+  # non-map coercion path is the per-component .probes branch.)
+  probes: true
