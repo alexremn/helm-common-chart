@@ -1,0 +1,20 @@
+# Locks P4-7: a hyphenated component key (e.g. `api-gateway`) must validate
+# against the componentLike patternProperty, not fall through to no validation.
+name: hyphen-component
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/api
+    tag: "1.0.0"
+
+# Schema-validation anchor: the hyphenated key must match componentLike regex.
+api-gateway:
+  replicas: 2
+
+# Render anchor: valuesKey("api-gateway") -> "api_gateway", so the template
+# looks up this key for ports/config at render time.
+api_gateway:
+  ports:
+    http: 8080
+  replicas: 2

@@ -41,7 +41,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   labels \
                   long-name \
                   security-minimal tpl-envraw \
-                  schema-global
+                  schema-global \
+                  hyphen-component
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
