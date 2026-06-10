@@ -175,7 +175,13 @@ helm.sh/environment: {{ $env }}
 app.kubernetes.io/instance: {{ $instance }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service | default "Helm" }}
-{{- $version := default (dig "Chart" "AppVersion" "" .) .version }}
+{{- /* .Chart may be a struct (helm 3 / werf render context) or a map
+     (helm 4, or a caller-built dict). `dig` only traverses maps, so use
+     field access via `with`, which works on both. */ -}}
+{{- $version := default "" .version }}
+{{- if not $version }}
+{{- with .Chart }}{{- $version = .AppVersion }}{{- end }}
+{{- end }}
 {{- with $version }}
 app.kubernetes.io/version: {{ . | quote }}
 {{- end }}

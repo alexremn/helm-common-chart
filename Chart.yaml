@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.3.1"
+version: "2.3.2"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -31,6 +31,8 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: "chart.statefulset no longer emits persistence-derived entries under pod volumes; persistence renders only as volumeClaimTemplates (plus container volumeMounts), fixing the duplicate-volume-name admission failure"
+    - kind: fixed
+      description: "common.labels resolves app.kubernetes.io/version via field access instead of dig, fixing 'interface conversion: interface {} is struct' render failures under Helm 3 / werf where .Chart is a struct, not a map"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
