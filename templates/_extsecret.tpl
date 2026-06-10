@@ -71,6 +71,8 @@ template:
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $secrets := .Values.secrets }}
+{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $globalStore := dig "global" "secretStore" "" $values }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 
 {{- if $secrets }}
@@ -88,7 +90,7 @@ metadata:
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
   secretStoreRef:
-    name: {{ required (printf "secrets.%s.secretStore is required for ExternalSecret" $name) (dig "secretStore" "" $val) }}
+    name: {{ required (printf "secrets.%s.secretStore (or global.secretStore) is required for ExternalSecret" $name) (coalesce (dig "secretStore" "" $val) $globalStore) }}
     {{- $kind := dig "secretStoreKind" "ClusterSecretStore" $val }}
     {{- if not (has $kind (list "ClusterSecretStore" "SecretStore")) }}
     {{ fail (printf "invalid secretStoreKind %q for component %s (secret %s); must be ClusterSecretStore or SecretStore" $kind $cmp $name) }}

@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.3.2"
+version: "2.3.3"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,6 +29,8 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: added
+      description: "global.secretStore fallback for ExternalSecret secretStoreRef name; per-secret secrets.<name>.secretStore still wins, and the render-time failure message now mentions both knobs"
     - kind: fixed
       description: "chart.statefulset no longer emits persistence-derived entries under pod volumes; persistence renders only as volumeClaimTemplates (plus container volumeMounts), fixing the duplicate-volume-name admission failure"
     - kind: fixed

@@ -42,6 +42,10 @@
           "enum": ["minimal", "generic"],
           "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): baseline container hardening — allowPrivilegeEscalation:false, capabilities drop-ALL, pod seccompProfile RuntimeDefault (runAsNonRoot and readOnlyRootFilesystem stay opt-in). `generic`: adds runAsNonRoot and readOnlyRootFilesystem on top of the minimal baseline. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
         },
+        "secretStore": {
+          "type": "string",
+          "description": "Default secretStoreRef name for all ExternalSecrets rendered by chart.extsecret. Overridable per secret via secrets.<name>.secretStore. No default — when unset, every secret must declare its own store."
+        },
         "image": { "$ref": "#/$defs/imageOrString" },
         "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
         "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },
