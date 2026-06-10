@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.3.0"
+version: "2.3.1"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,36 +29,8 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
-    - kind: added
-      description: "Standard recommended labels on all resources: helm.sh/chart, app.kubernetes.io/managed-by, and app.kubernetes.io/version (defaulted from .Chart.AppVersion). Non-selector — matchLabels are unchanged (P2-1, P2-2, P2-3)"
-    - kind: added
-      description: "global.security enum (minimal|generic) validated by values.schema.json + a render-time guard; invalid postures rejected early via a negative render gate in make lint (P3-1)"
-    - kind: added
-      description: "global.tpl.envValues / <cmp>.envRaw opt-out to emit env and Secret stringData verbatim, closing the templating-injection surface for untrusted values (P3-3)"
-    - kind: added
-      description: "global.monitoring.releaseLabel knob to emit the release: selector label on ServiceMonitor/PodMonitor/PrometheusRule (P4-6)"
-    - kind: added
-      description: "Lowercase canonical chart.serviceaccount / chart.binaryconfigmap aliases; camelCase names kept as deprecated aliases for one minor (P5-9)"
-    - kind: security
-      description: "Baseline-harden the minimal posture: allowPrivilegeEscalation:false + capabilities.drop:[ALL] + pod seccompProfile RuntimeDefault, overridable per-scope (P3-2)"
     - kind: fixed
-      description: "Fail fast on an Ingress domain entry missing host; schema marks host required on map-form domains (P4-5)"
-    - kind: fixed
-      description: "Validate chart.hpa scaleTargetRef.kind (Deployment|StatefulSet|ReplicaSet) and document the non-Deployment contract (P4-12)"
-    - kind: fixed
-      description: "Honor explicit DaemonSet flat-path revisionHistoryLimit/updateStrategy/minReadySeconds with sub-map fallback (P5-8)"
-    - kind: fixed
-      description: "Truncate overflowing resource names and component label values via common.safeName (DNS-1123 safe, opt-out) (P2-4)"
-    - kind: fixed
-      description: "Allow hyphens in component-name schema validation; accept bare-int strings in intOrPercent (P4-7, P4-8)"
-    - kind: changed
-      description: "Model real global.* keys in values.schema.json and correct stale schema/doc descriptions (security posture, profile default, forceSync, securityContext) (P4-1, P4-2, P4-3, P4-4)"
-    - kind: changed
-      description: "Relocate affinity emitters into common/_affinities.tpl and dedup pod-spec toggles and podAnnotations via common.workload.fullToggles / common.podAnnotations (byte-identical render) (P5-4, P5-6, P5-7)"
-    - kind: changed
-      description: "Drop the component label from top-level passthrough resources; route name sanitization and ingress DNS through shared helpers; document the label-context contract and the 10 public utility helpers (P4-11, P5-1, P5-2, P5-3, P5-5)"
-    - kind: changed
-      description: "Document monitor namespaceSelector default + cluster-wide opt-in, and ingress class handling (P4-9, P4-10)"
+      description: "chart.statefulset no longer emits persistence-derived entries under pod volumes; persistence renders only as volumeClaimTemplates (plus container volumeMounts), fixing the duplicate-volume-name admission failure"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification

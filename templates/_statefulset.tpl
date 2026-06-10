@@ -50,6 +50,7 @@ spec:
         "svc" $svc
         "cmp" $cmp
         "env" $env
+        "persistenceAsClaimTemplate" true
       ) (include "common.workload.fullToggles" . | fromYaml)) | nindent 6 }}
   {{- with $componentValues.persistence }}
   volumeClaimTemplates:

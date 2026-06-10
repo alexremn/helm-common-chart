@@ -277,10 +277,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: stateful
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: data
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false

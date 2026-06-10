@@ -223,6 +223,11 @@ includeTerminationGracePeriod: true
 {{- $includeHostAliases := default false .includeHostAliases -}}
 {{- $includeTopologySpreadConstraints := default false .includeTopologySpreadConstraints -}}
 {{- $includeTerminationGracePeriod := default false .includeTerminationGracePeriod -}}
+{{- /* StatefulSet renders `persistence` as volumeClaimTemplates; emitting the
+       same entries under pod `volumes:` would collide on volume name at
+       admission. The flag drops persistence from the volumes section only —
+       volumeMounts still pick it up so containers mount the claimed PVCs. */ -}}
+{{- $volumesComponent := ternary (omit $component "persistence") $component (default false .persistenceAsClaimTemplate) -}}
 {{- if $includePriorityClassName -}}
   {{- $pc := include "common.priorityClassName" $component | trim -}}
   {{- if $pc -}}
@@ -313,7 +318,7 @@ terminationGracePeriodSeconds: {{ default 30 $component.terminationGracePeriod }
     (include "common.tolerations" (dict "component" $component "root" $root) | trim)
     (include "common.affinity" (dict "val" $component "svc" $svc "cmp" $cmp "env" $env) | trim)
     (include "common.serviceAccount" (dict "component" $component "root" $root "cmp" $cmp) | trim)
-    (include "common.volumes" $component | trim)
+    (include "common.volumes" $volumesComponent | trim)
     (include "common.nodeSelector" $component | trim)
     (include "common.imagePullSecrets" (dict "component" $component "root" $root) | trim)
 -}}

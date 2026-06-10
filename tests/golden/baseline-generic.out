@@ -292,10 +292,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: data
       automountServiceAccountToken: false
   volumeClaimTemplates:
     - metadata:

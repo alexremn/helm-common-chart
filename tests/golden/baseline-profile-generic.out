@@ -303,10 +303,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: data
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
