@@ -148,6 +148,7 @@ spec:
               - ALL
       terminationGracePeriodSeconds: 30
       securityContext:
+        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: web

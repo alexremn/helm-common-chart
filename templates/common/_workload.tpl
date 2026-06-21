@@ -228,6 +228,13 @@ includeTerminationGracePeriod: true
        admission. The flag drops persistence from the volumes section only —
        volumeMounts still pick it up so containers mount the claimed PVCs. */ -}}
 {{- $volumesComponent := ternary (omit $component "persistence") $component (default false .persistenceAsClaimTemplate) -}}
+{{- /* `extraPodConfig.containers` would emit a second `containers:` key as a
+       sibling of the one below; YAML last-key-wins then silently drops the main
+       container, deploying a pod with no app container. Reject it loudly and
+       point at the supported `sidecars:` map. */ -}}
+{{- if and (kindIs "map" $component) (kindIs "map" $component.extraPodConfig) (hasKey $component.extraPodConfig "containers") -}}
+  {{- fail (printf "component %q: extraPodConfig.containers collides with the pod's own containers list (last-key-wins silently drops the main container). Add long-running containers via `sidecars:` instead." $cmp) -}}
+{{- end -}}
 {{- if $includePriorityClassName -}}
   {{- $pc := include "common.priorityClassName" $component | trim -}}
   {{- if $pc -}}
@@ -299,7 +306,13 @@ containers:
     {{- with $component.extraContainerConfig }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-{{- $ic := include "common.initContainers" $component | trim }}
+{{- /* Sidecars are appended to THIS containers list, after the main container,
+       so the app container is always present. */ -}}
+{{- $sidecars := include "common.extraContainers" (dict "component" $component "root" $root) | trim }}
+{{- if $sidecars }}
+{{ $sidecars | indent 2 }}
+{{- end }}
+{{- $ic := include "common.initContainers" (dict "component" $component "root" $root) | trim }}
 {{- if $ic }}
 {{ $ic }}
 {{- end }}

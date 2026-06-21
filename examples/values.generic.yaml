@@ -51,6 +51,10 @@ configs:
 
 secrets:
   app:
+    # Required for the ExternalSecret (v2): the SecretStore/ClusterSecretStore
+    # backing this secret. Set per-secret here, or chart-wide via
+    # `global.secretStore`. See docs/migration-v1-to-v2.md.
+    secretStore: my-cluster-store
     secretKey: "internal/app/staging"
     properties:
       - API_KEY

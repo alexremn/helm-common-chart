@@ -73,12 +73,20 @@ template:
 {{- $secrets := .Values.secrets }}
 {{- $values := include "common._values" . | fromYaml | default dict }}
 {{- $globalStore := dig "global" "secretStore" "" $values }}
+{{- /* ExternalSecret apiVersion. `external-secrets.io/v1` is the default (ESO
+       >= 0.14.0). Clusters running ESO 0.9.x-0.13.x only serve `v1beta1`;
+       set `global.externalSecrets.apiVersion: external-secrets.io/v1beta1`
+       there. Validated so a typo fails loudly instead of at admission. */ -}}
+{{- $esoApiVersion := dig "global" "externalSecrets" "apiVersion" "external-secrets.io/v1" $values }}
+{{- if not (has $esoApiVersion (list "external-secrets.io/v1" "external-secrets.io/v1beta1")) }}
+{{- fail (printf "invalid global.externalSecrets.apiVersion %q; must be external-secrets.io/v1 or external-secrets.io/v1beta1" $esoApiVersion) }}
+{{- end }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 
 {{- if $secrets }}
 {{- range $name, $val := $secrets }}
 ---
-apiVersion: external-secrets.io/v1
+apiVersion: {{ $esoApiVersion }}
 kind: ExternalSecret
 metadata:
   name: {{ $name }}

@@ -211,6 +211,10 @@ minimal:
         - ALL
 generic:
   pod:
+    # Pod-level runAsNonRoot is inherited by every container (init + sidecars
+    # included) unless a container overrides it — defense in depth on top of
+    # the container-scope setting below.
+    runAsNonRoot: true
     seccompType: RuntimeDefault
   container:
     runAsNonRoot: true

@@ -9,10 +9,11 @@ global:
 web:
   ports:
     http: 8080
-  # Scale-to-zero: explicit min 0 must survive (KEDA idles the workload).
+  # Scale-to-zero: KEDA idles to 0 replicas via idleReplicaCount, which MUST be
+  # strictly less than minReplicaCount (KEDA admission rejects idle >= min).
   scaling:
-    min: 0
-    max: 0
+    min: 1
+    max: 3
     idleReplicaCount: 0
     triggers:
       - type: cron

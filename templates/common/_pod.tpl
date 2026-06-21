@@ -114,24 +114,106 @@ Usage:
 {{- end -}}
 
 {{/*
-Configure init containers
-Usage: {{ include "common.initContainers" .Values.myComponent }}
+Render a list of container specs (init containers or sidecars), injecting the
+posture-derived container securityContext into each, with the container's own
+`securityContext` winning (deep-merged). Accepts the map form (name -> spec) or
+the slice form (list of specs carrying their own `name`). Emits list items at
+column 0 with bodies at +2; the caller positions them.
+
+Parameters: containers (map|slice), sec (merged posture container secCtx map)
 */}}
-{{- define "common.initContainers" }}
-{{- if kindIs "map" . }}
-{{- if hasKey . "initContainers" }}
-initContainers:
-  {{- if kindIs "slice" .initContainers }}
-  {{ toYaml .initContainers | nindent 2 }}
-  {{- else }}
-  {{- if kindIs "map" .initContainers }}
-  {{- range $name, $container := .initContainers }}
-  - name: {{ $name }}
-    {{ toYaml $container | nindent 4 }}
+{{- define "common.renderContainers" -}}
+{{- $containers := .containers -}}
+{{- $sec := default dict .sec -}}
+{{- if kindIs "map" $containers }}
+{{- range $name, $c := $containers }}
+- name: {{ $name }}
+  {{- $merged := mergeOverwrite (deepCopy $sec) (dig "securityContext" dict $c) }}
+  {{- with omit $c "securityContext" }}
+  {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- end }}
+  {{- if gt (len $merged) 0 }}
+  securityContext:
+    {{- toYaml $merged | nindent 4 }}
   {{- end }}
 {{- end }}
+{{- else if kindIs "slice" $containers }}
+{{- range $c := $containers }}
+- name: {{ required "container entry requires a name" $c.name }}
+  {{- $merged := mergeOverwrite (deepCopy $sec) (dig "securityContext" dict $c) }}
+  {{- with omit $c "name" "securityContext" }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- if gt (len $merged) 0 }}
+  securityContext:
+    {{- toYaml $merged | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Resolve the posture-derived container securityContext for a component, to be
+applied to its init containers / sidecars. Empty when no root context is
+available (legacy bare-map callers get no injection — backward compatible).
+*/}}
+{{- define "common.auxContainers.secCtx" -}}
+{{- $root := default dict .root -}}
+{{- $component := default dict .component -}}
+{{- if $root -}}
+{{- include "common._securityContext.merge" (dict "scope" "container" "root" $root "component" $component "input" dict "wrapped" true) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Configure init containers.
+
+Each init container inherits the active security posture's container
+securityContext (so they are hardened like the main container), while keeping
+the init container's own `securityContext` as the override — set
+`securityContext: {runAsNonRoot: false, readOnlyRootFilesystem: false}` on an
+init container that legitimately needs root / a writable rootfs (volume chown,
+migrations).
+
+Usage:
+  {{ include "common.initContainers" (dict "component" .Values.web "root" $) }}
+  {{ include "common.initContainers" .Values.web }}   {{/* legacy: no hardening */}}
+*/}}
+{{- define "common.initContainers" }}
+{{- $component := . }}
+{{- $root := dict }}
+{{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") }}
+  {{- $component = default dict .component }}
+  {{- $root = default dict .root }}
+{{- end }}
+{{- if and (kindIs "map" $component) (hasKey $component "initContainers") }}
+{{- $sec := include "common.auxContainers.secCtx" (dict "root" $root "component" $component) | fromYaml | default dict }}
+initContainers:
+{{ include "common.renderContainers" (dict "containers" $component.initContainers "sec" $sec) | trim | indent 2 }}
+{{- end }}
+{{- end }}
+
+{{/*
+Configure long-running sidecar containers, appended to the pod's `containers`
+list after the main container. Same securityContext inheritance + per-container
+override as init containers; shares the pod's volumes surface.
+
+Map form (name -> spec) or slice form (list with `name`). The main container is
+always emitted first by common.workload.podSpec, so the app container is never
+dropped — unlike a raw `extraPodConfig.containers`, which is rejected.
+
+Usage: {{ include "common.extraContainers" (dict "component" .Values.web "root" $) }}
+*/}}
+{{- define "common.extraContainers" }}
+{{- $component := . }}
+{{- $root := dict }}
+{{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") }}
+  {{- $component = default dict .component }}
+  {{- $root = default dict .root }}
+{{- end }}
+{{- if and (kindIs "map" $component) (hasKey $component "sidecars") }}
+{{- $sec := include "common.auxContainers.secCtx" (dict "root" $root "component" $component) | fromYaml | default dict }}
+{{- include "common.renderContainers" (dict "containers" $component.sidecars "sec" $sec) }}
 {{- end }}
 {{- end }}
 
@@ -352,9 +434,12 @@ Usage:
     "component" $component
     "input" $input
     "wrapped" $wrapped
-    "overrideKeys" (list "runAsUser" "runAsGroup" "fsGroup" "seccompType" "seccompProfile" "fsGroupChangePolicy" "supplementalGroups" "sysctls")) | fromYaml | default dict -}}
+    "overrideKeys" (list "runAsUser" "runAsGroup" "runAsNonRoot" "fsGroup" "seccompType" "seccompProfile" "fsGroupChangePolicy" "supplementalGroups" "sysctls")) | fromYaml | default dict -}}
 {{- if gt (len $secCtx) 0 }}
 securityContext:
+  {{- if hasKey $secCtx "runAsNonRoot" }}
+  runAsNonRoot: {{ $secCtx.runAsNonRoot }}
+  {{- end }}
   {{- if hasKey $secCtx "runAsUser" }}
   runAsUser: {{ $secCtx.runAsUser }}
   {{- end }}
