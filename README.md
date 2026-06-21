@@ -60,14 +60,14 @@ And in your chart's `templates/all.yaml`:
 {{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 ```
 
-Each per-resource template is invoked the same way — pass a `dict` carrying the root `Values`/`Release`/`Chart` plus a `cmp` key naming the component subtree to render (here, `web`). Available entrypoints include `chart.deployment`, `chart.statefulset`, `chart.daemonset`, `chart.job`, `chart.cronjob`, `chart.service`, `chart.service.headless`, `chart.ingress`, `chart.networkpolicy`, `chart.configmap`, `chart.binaryconfigmap`, `chart.secret`, `chart.extsecret`, `chart.serviceaccount`, `chart.rbac`, `chart.hpa`, `chart.vpa`, `chart.scaledobject`, `chart.triggerauth`, `chart.pdb`, `chart.pvc`, `chart.podmonitor`, `chart.servicemonitor`, `chart.prometheusrule`, `chart.priorityclass`.
+Each per-resource template is invoked the same way — pass a `dict` carrying the root `Values`/`Release`/`Chart` plus a `cmp` key naming the component subtree to render (here, `web`). Available entrypoints include `chart.deployment`, `chart.statefulset`, `chart.daemonset`, `chart.job`, `chart.cronjob`, `chart.service`, `chart.service.headless`, `chart.ingress`, `chart.httproute`, `chart.networkpolicy`, `chart.configmap`, `chart.binaryconfigmap`, `chart.secret`, `chart.extsecret`, `chart.serviceaccount`, `chart.rbac`, `chart.hpa`, `chart.vpa`, `chart.scaledobject`, `chart.triggerauth`, `chart.pdb`, `chart.pvc`, `chart.podmonitor`, `chart.servicemonitor`, `chart.prometheusrule`, `chart.priorityclass`.
 
 See [`tests/smoke/templates/all.yaml`](./tests/smoke/templates/all.yaml) for a complete consumer-side template wiring multiple resources, and [`examples/`](./examples/) for richer fixtures (HPA, VPA, NetworkPolicy, ServiceMonitor, profiles, etc.).
 
 ## What's inside
 
 Workloads: Deployment, StatefulSet, DaemonSet, Job, CronJob
-Networking: Service, Ingress, NetworkPolicy
+Networking: Service, Ingress, HTTPRoute (Gateway API), NetworkPolicy
 Scaling: HPA, VPA, KEDA ScaledObject + TriggerAuthentication, PodDisruptionBudget
 Observability: ServiceMonitor, PodMonitor, PrometheusRule
 Config & Secrets: ConfigMap, Secret, ExternalSecret
