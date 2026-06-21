@@ -1,0 +1,17 @@
+# NEGATIVE: an hpa block without maxReplicas must be rejected by the schema
+# (maxReplicas is render-required; the schema now requires it so the typo class
+# `maxReplica:` is caught at lint instead of failing deep in helm template).
+name: hpa-no-max
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  hpa:
+    minReplicas: 2
+    # maxReplicas intentionally omitted

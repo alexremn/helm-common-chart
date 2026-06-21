@@ -62,6 +62,7 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
+            "minAvailable": { "$ref": "#/$defs/intOrPercent" },
             "maxUnavailable": { "$ref": "#/$defs/intOrPercent" }
           }
         },
@@ -96,6 +97,14 @@
         "prometheusEndpoint": {
           "type": "string",
           "description": "Default serverAddress for KEDA ScaledObject Prometheus triggers. Required at render time when any trigger has type: prometheus and no explicit serverAddress."
+        },
+        "monitoring": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "releaseLabel": { "type": "string" }
+          },
+          "description": "Observability knobs. releaseLabel injects release: <value> onto every ServiceMonitor / PodMonitor / PrometheusRule for kube-prometheus-stack discovery."
         },
         "externalSecrets": {
           "type": "object",
@@ -325,6 +334,7 @@
         "hpa": {
           "type": "object",
           "additionalProperties": true,
+          "required": ["maxReplicas"],
           "properties": {
             "kind": {
               "type": "string",
@@ -334,7 +344,13 @@
             "apiVersion": {
               "type": "string",
               "description": "scaleTargetRef.apiVersion. Defaults to apps/v1. Override when targeting a CRD or a non-apps/v1 workload."
-            }
+            },
+            "minReplicas": { "type": "integer", "minimum": 0 },
+            "maxReplicas": { "type": "integer", "minimum": 1, "description": "Required. Upper replica bound — the chart fails to render without it." },
+            "targetName": { "type": "string", "description": "scaleTargetRef.name override (defaults to the component name)." },
+            "metrics": { "type": "array", "description": "Raw autoscaling/v2 metrics list." },
+            "behavior": { "type": "object", "additionalProperties": true, "description": "autoscaling/v2 scaleUp/scaleDown behavior." },
+            "annotations": { "$ref": "#/$defs/annotations" }
           }
         },
         "vpa": { "type": "object", "additionalProperties": true },
@@ -438,7 +454,39 @@
           }
         },
         "annotations": { "$ref": "#/$defs/annotations" },
-        "podAnnotations": { "$ref": "#/$defs/annotations" }
+        "podAnnotations": { "$ref": "#/$defs/annotations" },
+        "resources": { "type": "object", "additionalProperties": true },
+        "env": { "type": ["object", "array"] },
+        "envFrom": { "type": ["object", "array"] },
+        "envRaw": { "type": "boolean" },
+        "volumes": { "type": "array" },
+        "volumeMounts": { "type": "array" },
+        "lifecycle": { "type": "object", "additionalProperties": true },
+        "probe": { "type": "object", "additionalProperties": true },
+        "probes": { "type": "object", "additionalProperties": true },
+        "nodeSelector": { "type": "object", "additionalProperties": true },
+        "affinity": { "type": "object", "additionalProperties": true },
+        "tolerations": { "type": "array" },
+        "topologySpreadConstraints": { "type": "array" },
+        "hostAliases": { "type": "array" },
+        "initContainers": { "type": ["object", "array"] },
+        "sidecars": { "type": ["object", "array"] },
+        "securityContext": { "type": "object", "additionalProperties": true },
+        "priorityClassName": { "type": ["string", "integer"] },
+        "terminationGracePeriod": { "type": "integer", "minimum": 0 },
+        "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
+        "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },
+        "extraContainerConfig": { "type": "object", "additionalProperties": true },
+        "extraPodConfig": { "type": "object", "additionalProperties": true },
+        "dnsPolicy": { "type": "string" },
+        "dnsConfig": { "type": "object", "additionalProperties": true },
+        "runtimeClassName": { "type": "string" },
+        "schedulerName": { "type": "string" },
+        "hostNetwork": { "type": "boolean" },
+        "hostPID": { "type": "boolean" },
+        "hostIPC": { "type": "boolean" },
+        "enableServiceLinks": { "type": "boolean" },
+        "shareProcessNamespace": { "type": "boolean" }
       }
     },
     "securityContext": {

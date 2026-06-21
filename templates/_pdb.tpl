@@ -28,10 +28,17 @@ metadata:
     {{- $ann | nindent 4 }}
   {{- end }}
 spec:
+  {{- /* Precedence: component minAvailable > component maxUnavailable >
+         global.pdb.minAvailable > global.pdb.maxUnavailable > 25%.
+         minAvailable/maxUnavailable are mutually exclusive in the PDB spec. */ -}}
   {{- if hasKey $pdbConfig "minAvailable" }}
   minAvailable: {{ $pdbConfig.minAvailable }}
+  {{- else if hasKey $pdbConfig "maxUnavailable" }}
+  maxUnavailable: {{ $pdbConfig.maxUnavailable }}
+  {{- else if ne (dig "global" "pdb" "minAvailable" nil $values) nil }}
+  minAvailable: {{ dig "global" "pdb" "minAvailable" nil $values }}
   {{- else }}
-  maxUnavailable: {{ coalesce $pdbConfig.maxUnavailable (dig "global" "pdb" "maxUnavailable" nil $values) "25%" }}
+  maxUnavailable: {{ coalesce (dig "global" "pdb" "maxUnavailable" nil $values) "25%" }}
   {{- end }}
   selector:
     matchLabels:
