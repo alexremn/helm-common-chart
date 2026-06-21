@@ -408,6 +408,7 @@
           ]
         },
         "service": { "type": "object" },
+        "httpRoute": { "type": "object", "additionalProperties": true, "description": "Gateway API HTTPRoute (chart.httproute): parentRefs, hostnames, rules, port. backendRefs default to the component's Service." },
         "scaling": {
           "type": "object",
           "additionalProperties": true,

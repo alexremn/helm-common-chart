@@ -1,0 +1,35 @@
+# Exercises the Gateway API HTTPRoute emitter (#33): parentRefs, hostnames, a
+# rule whose backend defaults to the component Service (port resolved from
+# ports.http), and a rule with explicit backendRefs.
+name: gateway-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: external-gateway
+        namespace: gateway-system
+        sectionName: https
+    hostnames:
+      - app.example.com
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /api
+        # backendRefs omitted -> defaults to Service "web" on port 8080
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - name: web
+            port: 8080
+            weight: 100

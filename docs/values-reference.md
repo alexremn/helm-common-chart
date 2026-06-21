@@ -99,9 +99,30 @@ See: PVC behavior is exercised in profile and statefulset variants.
 
 ## Networking
 
-Keys: `service`, `ingress`, `networkPolicy`.
+Keys: `service`, `ingress`, `httpRoute`, `networkPolicy`.
 
 `service.type`, `service.ports` (named map matching container ports); `ingress.hosts[]`, `ingress.tls[]`, `ingress.annotations`; `networkPolicy.ingress[]` / `egress[]` with shorthand for common patterns.
+
+**`httpRoute` — Gateway API (`chart.httproute`).** The forward-looking complement to `ingress` for clusters running Gateway API (GA since k8s 1.31). Renders a `gateway.networking.k8s.io/v1` HTTPRoute. Shape:
+
+```yaml
+<cmp>:
+  httpRoute:
+    parentRefs:                 # required — the Gateway(s) to attach to
+      - name: external-gateway
+        namespace: gateway-system
+        sectionName: https
+    hostnames: [app.example.com]
+    port: 8080                  # optional default backend port (else <cmp>.ports.http, else 80)
+    rules:
+      - matches:
+          - path: { type: PathPrefix, value: /api }
+        # backendRefs omitted -> defaults to the component's own Service + port
+      - backendRefs:            # or specify explicitly (weights, cross-service, ...)
+          - { name: web, port: 8080, weight: 100 }
+```
+
+Gated on the `httpRoute` key, so existing consumers are unaffected. With no `rules`, a single catch-all rule routes to the component Service.
 
 See: [`examples/values.networkpolicy.yaml`](../examples/values.networkpolicy.yaml).
 
