@@ -47,7 +47,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   lowercase-aliases \
                   sidecars \
                   schema-reserved-keys \
-                  global-pdb-minavailable
+                  global-pdb-minavailable \
+                  extsecret-datafrom
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:

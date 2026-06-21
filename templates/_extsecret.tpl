@@ -119,6 +119,9 @@ spec:
   {{- with $val.dataFrom }}
   dataFrom: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- /* Only emit `data:` when there is per-key material; a dataFrom-only
+         ExternalSecret would otherwise render a bare `data:` (data: null). */ -}}
+  {{- if or $val.secretKey $val.properties $val.includes }}
   data:
     {{- include "secrets.generate" (dict "key" $val.secretKey "values" $val.properties) | trimPrefix "\n" | nindent 4}}
     {{- range $inc := $val.includes }}
@@ -133,6 +136,7 @@ spec:
     {{- end }}
     {{- end }}
     {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

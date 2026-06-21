@@ -425,18 +425,14 @@ Usage: {{ include "common.safeName" (dict "name" "my.service-name_here" "maxLeng
 Indent multiline strings with a specified number of spaces.
 Usage: {{ include "common.indent" (dict "value" $multilineString "spaces" 2) }}
 */}}
-{{- define "common.indent" }}
-{{- $lines := splitList "\n" .value }}
-{{- $spaces := default 2 .spaces | int }}
-{{- $indent := "" }}
-{{- range $i, $_ := until $spaces }}
-  {{- $indent = printf "%s " $indent }}
-{{- end }}
-{{- range $i, $line := $lines }}
-  {{- if $i }}
-    {{ printf "\n%s%s" $indent $line }}
-  {{- else }}
-    {{ $line }}
-  {{- end }}
-{{- end }}
-{{- end }}
+{{- define "common.indent" -}}
+{{- $lines := splitList "\n" .value -}}
+{{- $indent := repeat (default 2 .spaces | int) " " -}}
+{{- range $i, $line := $lines -}}
+{{- if $i }}
+{{ $indent }}{{ $line }}
+{{- else -}}
+{{ $line }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -30,6 +30,8 @@ Selects the kind of workload (`Deployment` | `StatefulSet` | `DaemonSet` | `Job`
 
 **Deployment default `minReadySeconds: 10`** — overrides the Kubernetes default `0`. Adds a 10-second readiness debounce to rollouts. StatefulSet and DaemonSet keep the Kubernetes default of `0`.
 
+**Kubernetes version floor for opt-in batch fields.** On clusters older than a field's support floor the apiserver silently drops it (the chart declares `kubeVersion: ">=1.24-0"`, so it does not enforce these): CronJob `timeZone` needs **k8s ≥1.27** (GA; alpha 1.25 — UTC is used below that), and Job/CronJob `podFailurePolicy` needs **k8s ≥1.26** (beta). Set these only on clusters at or above those versions.
+
 See: [`examples/values.generic.yaml`](../examples/values.generic.yaml), [`examples/values.daemonset.yaml`](../examples/values.daemonset.yaml).
 
 ## Container
@@ -140,6 +142,8 @@ stateful:
 ```
 
 `hpa` and `scaling` (KEDA ScaledObject) are mutually exclusive on the same component — `chart.hpa` fails fast if both are set.
+
+**`pdb.unhealthyPodEvictionPolicy` requires k8s ≥1.27.** The field is alpha (off) in 1.26 and absent in 1.24/1.25; on the chart's declared `>=1.24-0` floor the apiserver silently prunes it below 1.27, so the requested eviction policy is not enforced. Set it only on clusters at or above 1.27.
 
 See: [`examples/values.hpa.yaml`](../examples/values.hpa.yaml), [`examples/values.vpa.yaml`](../examples/values.vpa.yaml).
 
@@ -433,6 +437,7 @@ Utility templates a consumer chart may `include` directly. Stable public API (`c
 | `common.dbUrl` | `type` (default `postgres`), `host`, `port`, `name`, `user`, `password`, `options` | `user`/`password` are interpolated **verbatim, not URL-encoded** — pre-encode any value containing `@ : / ? #` (e.g. wrap with `urlquery`). Fails if `host`/`name` missing. |
 | `common.formatUrl` | `protocol` (default `https`), `host`, `path` | Defaults to **https**; pass `protocol: "http"` to opt into insecure transport. Emits a leading newline — pipe through `trim`. Fails if `host` missing. |
 | `common.generateName` | `prefix`, `separator` (default `-`), `length` (default 8) | **Non-deterministic** (uses `randAlphaNum`) — re-renders on every `helm upgrade`; do not use for stable resource names. |
+| `generateName` | `name`, `suffix` (required) | **Deterministic** `<name>-<suffix>`, stable across renders — pass `.Release.Revision` for a per-revision name. Prefer this (not `common.generateName`) for Job/CronJob names that must not churn. |
 | `common.format` | `value`, `type` (`yaml`\|`json`\|`raw`, default `yaml`) | Renders `value` in the chosen encoding. |
 | `common.renderTemplateOrDefault` | `name`, `context`, `default` | Renders named template; falls back to `default` when the result trims empty. Emits a leading newline — pipe through `trim`. |
 | `common.mergeValues` | `src`, `dest` | Wraps Sprig `merge $dest $src`: **dest-wins** — keys already present in `dest` are NOT overwritten by `src` (shallow-biased, not a true deep override merge). |
