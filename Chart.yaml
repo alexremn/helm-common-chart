@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.3.3"
+version: "2.4.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -30,11 +30,17 @@ annotations:
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
     - kind: added
-      description: "global.secretStore fallback for ExternalSecret secretStoreRef name; per-secret secrets.<name>.secretStore still wins, and the render-time failure message now mentions both knobs"
+      description: "common.extraContainers helper renders long-running sidecars from <component>.sidecars, appended to the pod containers list after the main container"
+    - kind: added
+      description: "global.externalSecrets.apiVersion makes the ExternalSecret apiVersion configurable (default external-secrets.io/v1, validated) for clusters running ESO < 0.14.0"
+    - kind: security
+      description: "init containers and sidecars now inherit the active security posture's container securityContext (per-container securityContext overrides win); generic posture also sets pod-level runAsNonRoot"
     - kind: fixed
-      description: "chart.statefulset no longer emits persistence-derived entries under pod volumes; persistence renders only as volumeClaimTemplates (plus container volumeMounts), fixing the duplicate-volume-name admission failure"
+      description: "extraPodConfig.containers is now rejected at render time — it emitted a duplicate containers key that silently dropped the main application container; use sidecars instead"
     - kind: fixed
-      description: "common.labels resolves app.kubernetes.io/version via field access instead of dig, fixing 'interface conversion: interface {} is struct' render failures under Helm 3 / werf where .Chart is a struct, not a map"
+      description: "chart.scaledobject fails at render unless minReplicaCount > idleReplicaCount, matching KEDA admission (idle < min)"
+    - kind: fixed
+      description: "common.dbUrl coerces the port with toString and omits the :port segment when absent, fixing %!s(int=...) / %!s(<nil>) corruption on integer or omitted ports"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
