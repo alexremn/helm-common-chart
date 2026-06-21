@@ -114,6 +114,37 @@ Usage:
 {{- end -}}
 
 {{/*
+checksum/config rollout annotation.
+
+Returns a sha256 of the component's rendered config sources (ConfigMap, binary
+ConfigMap, and native Secret) so a `helm upgrade` that changes config content
+also changes the pod template, triggering a rollout — without this, an updated
+ConfigMap/Secret leaves running pods on stale config until something else rolls
+them. Opt-in only: returns empty unless `<cmp>.rollOnConfigChange: true` or
+`global.checksumAnnotations: true`, so default golden output is unchanged.
+
+The hash is computed over in-chart rendered manifests (deterministic, offline).
+
+Usage:
+  {{ include "common.configChecksum" (dict "root" $ "component" $componentValues "cmp" $cmp) }}
+*/}}
+{{- define "common.configChecksum" -}}
+{{- $root := .root -}}
+{{- $component := default dict .component -}}
+{{- $cmp := .cmp -}}
+{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $optIn := or (dig "rollOnConfigChange" false $component) (dig "global" "checksumAnnotations" false $values) -}}
+{{- if $optIn -}}
+{{- $ctx := dict "Values" $root.Values "Release" $root.Release "Chart" $root.Chart "cmp" $cmp -}}
+{{- $cm := include "chart.configmap" $ctx -}}
+{{- $bcm := include "chart.binaryconfigmap" $ctx -}}
+{{- $sec := "" -}}
+{{- if hasKey $values "nativeSecrets" -}}{{- $sec = include "chart.secret" $ctx -}}{{- end -}}
+{{- printf "%s\n%s\n%s" $cm $bcm $sec | sha256sum -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Render a list of container specs (init containers or sidecars), injecting the
 posture-derived container securityContext into each, with the container's own
 `securityContext` winning (deep-merged). Accepts the map form (name -> spec) or

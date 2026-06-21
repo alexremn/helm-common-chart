@@ -1,0 +1,21 @@
+# Exercises the opt-in checksum/config rollout annotation (#32). web opts in via
+# rollOnConfigChange, so the Deployment pod template carries a deterministic
+# sha256 of the component's rendered ConfigMap — changing configs.app.data would
+# change the hash and roll the pods on the next upgrade.
+name: checksum-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  rollOnConfigChange: true
+
+configs:
+  app:
+    data:
+      APP_MODE: "production"

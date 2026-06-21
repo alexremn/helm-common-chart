@@ -171,6 +171,13 @@ Keys: `configMap`, `secret`, `externalSecret`, `envFrom`.
 
 When disabled, `{{ ... }}` in a value is emitted literally (no evaluation, no injection surface).
 
+**Roll pods on config change (`checksum/config`).** Kubernetes does not restart pods when a mounted ConfigMap/Secret changes — the pod template is byte-identical across the upgrade. Opt in to a `checksum/config` pod annotation (a sha256 of the component's rendered ConfigMap / binary ConfigMap / native Secret) so config changes roll Deployment/StatefulSet/DaemonSet pods automatically:
+
+- `global.checksumAnnotations: true` — chart-wide.
+- `<cmp>.rollOnConfigChange: true` — per-component.
+
+Off by default (rendered output is unchanged unless opted in). The hash is computed from in-chart rendered manifests, so it is deterministic and offline.
+
 ### `envFrom` shape and rails-profile phantom defaults
 
 `envFrom` is **not** a flat list of Kubernetes `envFrom` entries. It is a structured map with two keys:

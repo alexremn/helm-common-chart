@@ -94,6 +94,10 @@
           "type": "boolean",
           "description": "Emit the non-standard helm.sh/environment label on all rendered resources. Default true; v3.0 will flip to false."
         },
+        "checksumAnnotations": {
+          "type": "boolean",
+          "description": "Chart-wide opt-in: emit a checksum/config pod annotation on Deployment/StatefulSet/DaemonSet so ConfigMap/Secret content changes trigger a rollout. Default false. Per-component override: <cmp>.rollOnConfigChange."
+        },
         "prometheusEndpoint": {
           "type": "string",
           "description": "Default serverAddress for KEDA ScaledObject Prometheus triggers. Required at render time when any trigger has type: prometheus and no explicit serverAddress."
@@ -486,7 +490,8 @@
         "hostPID": { "type": "boolean" },
         "hostIPC": { "type": "boolean" },
         "enableServiceLinks": { "type": "boolean" },
-        "shareProcessNamespace": { "type": "boolean" }
+        "shareProcessNamespace": { "type": "boolean" },
+        "rollOnConfigChange": { "type": "boolean", "description": "Emit a checksum/config pod annotation so ConfigMap/Secret changes roll this workload. Default false." }
       }
     },
     "securityContext": {
