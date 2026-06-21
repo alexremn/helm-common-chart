@@ -181,10 +181,6 @@ Usage: {{ include "secrets.retrieve.external" (dict "key" "KEY_NAME" "base" (dic
 {{- end -}}
 
 {{/*
-Generate a deterministic name for resources like jobs
-Usage: {{ include "generateName" (dict "name" "job-name" "suffix" .Release.Revision) }}
-*/}}
-{{/*
 Build a merged securityContext map for the requested scope ("pod" or
 "container"). Used by `common.pod.securityContext` and
 `common.container.securityContext`; both share the merge logic and
@@ -291,6 +287,13 @@ Resolution order:
 {{- dig "serviceAccount" "name" $fallback $component -}}
 {{- end -}}
 
+{{/*
+Deterministic resource name "<name>-<suffix>". Unlike `common.generateName`
+(which is RANDOM), this is STABLE across renders and REQUIRES an explicit
+`suffix` — pass `.Release.Revision` for a per-revision name. Use for Job /
+CronJob names that must not churn on every `helm upgrade`.
+Usage: {{ include "generateName" (dict "name" "migrate" "suffix" .Release.Revision) }}
+*/}}
 {{- define "generateName" -}}
   {{- $name := required "Name is required" .name }}
   {{- $suffix := .suffix }}

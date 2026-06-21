@@ -499,9 +499,6 @@ spec:
   maxReplicaCount: 10
   advanced:
     restoreToOriginalReplicaCount: false
-  fallback:
-    failureThreshold: 3
-    replicas: 1
   triggers:
     - type: cpu
       metadata:

@@ -72,9 +72,18 @@ spec:
     {{- with $scaleConfig.scalingModifiers }}
     scalingModifiers: {{ toYaml . | nindent 6 }}
     {{- end }}
+  {{- /* KEDA's CheckFallbackValid rejects a fallback block when EVERY trigger is
+         cpu/memory (those scalers have no fallback semantics). Emit fallback only
+         when at least one trigger is not cpu/memory. */ -}}
+  {{- $nonResourceTrigger := false }}
+  {{- range $scaleConfig.triggers }}
+  {{- if not (or (eq .type "cpu") (eq .type "memory")) }}{{- $nonResourceTrigger = true }}{{- end }}
+  {{- end }}
+  {{- if $nonResourceTrigger }}
   fallback:
     failureThreshold: {{ default 3 $scaleConfig.failureThreshold }}
     replicas: {{ default 1 $scaleConfig.fallback }}
+  {{- end }}
   triggers:
   {{- range $scaleConfig.triggers }}
   {{- if eq .type "cron" }}
