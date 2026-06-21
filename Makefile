@@ -10,7 +10,7 @@ GOLDEN_DIR ?= tests/golden
 # Phase C1 — validation tooling.
 KUBECONFORM_VERSION ?= v0.7.0
 KUBE_LINTER_VERSION ?= v0.8.3
-K8S_VERSIONS ?= 1.24.0 1.28.0 1.31.0
+K8S_VERSIONS ?= 1.24.0 1.28.0 1.31.0 1.33.0
 
 lint: lint-library lint-smoke lint-negative
 
