@@ -83,9 +83,9 @@ Profile defaults (probe `type`, `path`, `port`, thresholds) live in `templates/c
 
 ## Pod
 
-Keys: `securityContext.pod`, `nodeSelector`, `affinity`, `tolerations`, `topologySpreadConstraints`, `priorityClassName`, `serviceAccountName`, `hostNetwork`, `dnsPolicy`, `terminationGracePeriodSeconds`.
+Keys: `securityContext.pod`, `nodeSelector`, `affinity`, `tolerations`, `topologySpreadConstraints`, `priorityClassName`, `serviceAccountName`, `hostNetwork`, `hostPID`, `hostIPC`, `dnsPolicy`, `dnsConfig`, `runtimeClassName`, `schedulerName`, `terminationGracePeriodSeconds`.
 
-Pod-level scheduling and isolation. The pod `securityContext` is layered over the chart-wide `global.security` posture (see [Security posture](#security-posture)), not applied by the runtime profile. Affinity helpers in `templates/common/_affinities.tpl` provide presets for common topologies.
+Pod-level scheduling and isolation. The pod `securityContext` is layered over the chart-wide `global.security` posture (see [Security posture](#security-posture)), not applied by the runtime profile. Affinity helpers in `templates/common/_affinities.tpl` provide presets for common topologies. `hostNetwork`, `hostPID`, and `hostIPC` share the host's namespaces and are a privilege-escalation surface — they are off unless explicitly set, and only emitted when the key is present.
 
 ## Volumes & Storage
 
@@ -384,7 +384,7 @@ global:
 
 ## Misc
 
-- `priorityClass` — define a `PriorityClass` (cluster-scoped). Map of name → spec.
+- `priorityClasses` — define `PriorityClass` objects (cluster-scoped). Map of name → spec. Rendered by `chart.priorityclass`.
 - `hooks` — Helm hook weights/annotations for release-time orchestration.
 - `compat.legacySelectorLabels` — opt-in to older selector label scheme for charts migrated from `werf`.
 - **Top-level passthrough resource names.** `prometheusRules`, `networkPolicies`, `configs`, `nativeSecrets`, `priorityClasses`, `triggerAuthentications`, and `rbac` use the consumer map **key verbatim** as `metadata.name` — the chart does NOT prefix the release/app name. Consumers own and namespace these names to avoid collisions when two charts share a namespace. These shared resources are not stamped an `app.kubernetes.io/component` label.
@@ -414,6 +414,8 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | `global.prometheusEndpoint` | string | unset | Default `serverAddress` for KEDA `ScaledObject` Prometheus triggers. Required when any trigger has `type: prometheus` and no explicit `serverAddress`. |
 | `global.monitoring.releaseLabel` | string | unset | When set, injects `release: <value>` onto every ServiceMonitor / PodMonitor / PrometheusRule so kube-prometheus-stack's default `release` selector discovers them (e.g. `kube-prometheus-stack`). |
 | `global.pdb.maxUnavailable` | int\|string | `25%` | Fallback `maxUnavailable` for PodDisruptionBudgets when neither `<cmp>.pdb.maxUnavailable` nor `<cmp>.pdb.minAvailable` is set. |
+| `global.secretStore` | string | unset | Chart-wide default `secretStoreRef.name` for ExternalSecrets. Per-secret `secrets.<name>.secretStore` overrides it. Required (here or per-secret) whenever `secrets` are defined, else the render fails. |
+| `global.externalSecrets.apiVersion` | string | `external-secrets.io/v1` | ExternalSecret apiVersion. Set `external-secrets.io/v1beta1` for clusters running ESO < 0.14.0 (which do not serve `v1`). Validated against those two values. |
 | `global.externalSecrets.forceSync` | bool | `true` | When `true` (default), stamps `force-sync: <now>` on every rendered `ExternalSecret`, so ESO re-reconciles on each `helm upgrade` — but this rewrites the annotation every render (GitOps diff noise). Set `false` for a stable per-revision value (`force-sync: <Release.Revision>`): noise-free diffs, reconcile only when the revision changes. |
 | `global.deployment.replicasOnCreationAnnotation` | string | unset (`""`) | Annotation key for the "replicas at first install" hint. When `werf` annotations are enabled this falls back to `werf.io/replicas-on-creation`. Set to a non-empty string to opt in outside of werf. |
 | `global.emitEnvironmentLabel` | bool | `true` | Emit `helm.sh/environment: <env>` label on all rendered resources. Set to `false` to opt out of this non-standard label. v3.0 will flip the default to `false`. |
