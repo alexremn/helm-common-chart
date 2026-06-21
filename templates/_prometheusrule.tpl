@@ -22,12 +22,12 @@ kind: PrometheusRule
 metadata:
   name: {{ $name }}
   labels:
-    {{ include "common.labels" $labelCtx | nindent 4 }}
+    {{- include "common.labels" $labelCtx | nindent 4 }}
     {{- with (dig "global" "monitoring" "releaseLabel" "" $values) }}
     release: {{ . }}
     {{- end }}
     {{- with $val.labels }}
-    {{ toYaml . | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- with $val.annotations }}
   annotations: {{ toYaml . | nindent 4 }}

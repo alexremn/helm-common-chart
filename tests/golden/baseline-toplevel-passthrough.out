@@ -27,7 +27,6 @@ kind: PrometheusRule
 metadata:
   name: shared-alerts
   labels:
-    
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: toplevel-passthrough
     helm.sh/environment: dev
