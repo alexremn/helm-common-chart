@@ -1,0 +1,30 @@
+# Exercises sidecars (appended to the pod's containers list, after the main
+# container) and initContainers. Both inherit the active security posture's
+# container securityContext (minimal here: allowPrivilegeEscalation:false +
+# capabilities.drop:[ALL]); a container's own securityContext overrides it
+# (deep-merged, container wins). The migrate init container opts back into a
+# writable rootfs to prove the override path.
+name: sidecar-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  initContainers:
+    migrate:
+      image: ghcr.io/example/migrate:1.0.0
+      command: ["/bin/migrate"]
+      # Migrations need a writable rootfs — override the hardened default.
+      securityContext:
+        readOnlyRootFilesystem: false
+  sidecars:
+    log-shipper:
+      image: ghcr.io/example/fluentbit:2.0.0
+      ports:
+        - containerPort: 2020
+          name: metrics

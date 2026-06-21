@@ -6,7 +6,7 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
@@ -16,7 +16,7 @@ spec:
   maxUnavailable: 25%
   selector:
     matchLabels:
-      app.kubernetes.io/name: securitycontext-app
+      app.kubernetes.io/name: sidecar-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
 
@@ -30,7 +30,7 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
@@ -45,7 +45,7 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
@@ -60,7 +60,7 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
@@ -74,7 +74,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
 ---
@@ -85,7 +85,7 @@ metadata:
   name: web
   labels:
     helm.sh/chart: common-smoke-0.1.0
-    app.kubernetes.io/name: securitycontext-app
+    app.kubernetes.io/name: sidecar-app
     app.kubernetes.io/component: web
     helm.sh/environment: production
     app.kubernetes.io/instance: smoke
@@ -101,14 +101,14 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: securitycontext-app
+      app.kubernetes.io/name: sidecar-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
   template:
     metadata:
       labels:
         helm.sh/chart: common-smoke-0.1.0
-        app.kubernetes.io/name: securitycontext-app
+        app.kubernetes.io/name: sidecar-app
         app.kubernetes.io/component: web
         helm.sh/environment: production
         app.kubernetes.io/instance: smoke
@@ -117,7 +117,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/example/api:1.0.0
+          image: ghcr.io/example/app:1.0.0
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: http
@@ -141,14 +141,32 @@ spec:
             timeoutSeconds: 1
           securityContext:
             allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
             capabilities:
               drop:
               - ALL
+        - name: log-shipper
+          image: ghcr.io/example/fluentbit:2.0.0
+          ports:
+          - containerPort: 2020
+            name: metrics
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      initContainers:
+        - name: migrate
+          command:
+          - /bin/migrate
+          image: ghcr.io/example/migrate:1.0.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
       terminationGracePeriodSeconds: 30
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false

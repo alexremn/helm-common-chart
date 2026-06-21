@@ -394,10 +394,15 @@ Usage: {{ include "common.dbUrl" (dict "type" "postgres" "host" "db.example.com"
 {{- $password := .password }}
 {{- $options := default "" .options }}
 {{- if and $host $name }}
+{{- /* Build the host[:port] authority. Coerce the port with `toString` so an
+       integer port (the natural YAML form) doesn't render as `%!s(int=5432)`,
+       and omit the `:port` segment entirely when no port is supplied. */ -}}
+{{- $authority := $host }}
+{{- if $port }}{{- $authority = printf "%s:%s" $host ($port | toString) }}{{- end }}
 {{- if and $user $password }}
-{{ printf "%s://%s:%s@%s:%s/%s%s" $type $user $password $host $port $name $options }}
+{{ printf "%s://%s:%s@%s/%s%s" $type $user $password $authority $name $options }}
 {{- else }}
-{{ printf "%s://%s:%s/%s%s" $type $host $port $name $options }}
+{{ printf "%s://%s/%s%s" $type $authority $name $options }}
 {{- end }}
 {{- else }}
 {{ fail "Host and database name are required for DB URL formatting" }}

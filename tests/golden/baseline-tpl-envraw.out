@@ -168,6 +168,7 @@ spec:
               - ALL
       terminationGracePeriodSeconds: 30
       securityContext:
+        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false

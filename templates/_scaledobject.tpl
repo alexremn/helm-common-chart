@@ -55,6 +55,13 @@ spec:
   minReplicaCount: {{ dig "min" 1 $scaleConfig }}
   maxReplicaCount: {{ dig "max" 1 $scaleConfig }}
   {{- if hasKey $scaleConfig "idleReplicaCount" }}
+  {{- /* KEDA's webhook (CheckReplicaCountBoundsAreValid) requires
+         idleReplicaCount < minReplicaCount, else the ScaledObject is rejected
+         at admission. Fail at render so a clear message points at the input. */ -}}
+  {{- $min := int (dig "min" 1 $scaleConfig) }}
+  {{- if not (gt $min (int $scaleConfig.idleReplicaCount)) }}
+  {{- fail (printf "component '%s': scaling.min (%d) must be strictly greater than scaling.idleReplicaCount (%v) — KEDA requires idle < min for scale-to-zero" .cmp $min $scaleConfig.idleReplicaCount) }}
+  {{- end }}
   idleReplicaCount: {{ $scaleConfig.idleReplicaCount }}
   {{- end }}
   advanced:
