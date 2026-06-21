@@ -247,9 +247,7 @@
       "additionalProperties": true
     }
   },
-  "patternProperties": {
-    "^[A-Za-z][A-Za-z0-9_-]*$": { "$ref": "#/$defs/componentLike" }
-  },
+  "$comment": "Component keys (web, worker, ...) are consumer-named and intentionally not schema-validated here. A patternProperties over all keys also matched reserved structural keys (global, app, werf, images, configs, secrets, ...) and spuriously forced them through the component schema (e.g. rejecting global.replicas). jobs/cronjobs entries are validated via $ref:#/$defs/component where the shape is known.",
   "$defs": {
     "imagePullPolicy": {
       "type": "string",
@@ -304,17 +302,6 @@
           "required": ["name"],
           "properties": { "name": { "type": "string" } }
         }
-      ]
-    },
-    "componentLike": {
-      "description": "Shape a consumer chart uses for component-keyed values (e.g. web, worker). Loose by design -- many chart helpers tolerate missing keys.",
-      "oneOf": [
-        { "type": "null" },
-        { "type": "boolean" },
-        { "type": "string" },
-        { "type": "number" },
-        { "type": "array" },
-        { "$ref": "#/$defs/component" }
       ]
     },
     "component": {

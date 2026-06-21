@@ -7,13 +7,13 @@
 {{- $hasStateful := and (hasKey .Values "stateful") (kindIs "map" (index .Values "stateful")) -}}
 {{- if or $hasWeb (hasKey .Values "configs") }}
 {{ include "chart.configmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
-{{ include "chart.binaryConfigmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.binaryconfigmap" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
 {{- if or $hasWeb (hasKey .Values "secrets") }}
 {{ include "chart.extsecret" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
 {{- if $hasWeb }}
-{{ include "chart.serviceAccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{ include "chart.serviceaccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{ include "chart.ingress" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
@@ -75,7 +75,7 @@
 {{- end }}
 {{- $hasOverride := and (hasKey .Values "override") (kindIs "map" (index .Values "override")) -}}
 {{- if $hasOverride }}
-{{ include "chart.serviceAccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
+{{ include "chart.serviceaccount" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
 {{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
 {{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}
 {{ include "chart.pdb" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "override") }}

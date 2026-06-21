@@ -349,7 +349,10 @@ Usage: {{ include "common.mergeValues" (dict "src" $srcMap "dest" $destMap) }}
 {{- define "common.mergeValues" }}
 {{- $src := .src }}
 {{- $dest := .dest }}
-{{ toYaml (merge $dest $src) }}
+{{/* deepCopy $dest so Sprig `merge` (which mutates its first arg) does not
+     write $src's keys back into the caller's map — matches every other merge
+     in the tree and honors the chart's immutability contract. */}}
+{{ toYaml (merge (deepCopy $dest) $src) }}
 {{- end }}
 
 {{/*

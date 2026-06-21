@@ -45,7 +45,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   hyphen-component \
                   intorpercent safename labelctx affinity-legacy affinity-map podannotations daemonset-flat \
                   lowercase-aliases \
-                  sidecars
+                  sidecars \
+                  schema-reserved-keys
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
