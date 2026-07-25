@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.4.0"
+version: "2.4.1"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,6 +29,8 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: added
+      description: "configs.<name>.annotations and secrets.<name>.annotations are now rendered, merged after the chart defaults (same order as workload annotations); previously these keys were accepted by the schema but silently ignored"
     - kind: added
       description: "common.extraContainers helper renders long-running sidecars from <component>.sidecars, appended to the pod containers list after the main container"
     - kind: added

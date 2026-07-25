@@ -39,11 +39,16 @@ werf.io/weight: {{ dig "werf" "configWeight" "-1" $values | quote }}
 Render the shared ConfigMap header (separator, apiVersion, kind,
 metadata.name, labels, annotations).
 
+`annotations` is optional: a dict of user-supplied annotations merged AFTER the defaults, so a
+caller can override a default key or add its own (e.g. argocd.argoproj.io/sync-wave). Mirrors the
+merge order of `common.workload.annotations`.
+
 Usage:
   {{- include "chart._configmap.header" (dict
         "name" $name
         "labelCtx" $labelCtx
         "env" $env
+        "annotations" (dig "annotations" dict $val)
         "Values" .Values) }}
 */}}
 {{- define "chart._configmap.header" -}}
@@ -55,9 +60,15 @@ metadata:
   labels:
     {{- include "common.labels" .labelCtx | nindent 4 }}
   {{- $ann := include "config.annotations.default" (dict "env" .env "Values" .Values) | trim }}
-  {{- if $ann }}
+  {{- $userAnn := default dict .annotations }}
+  {{- if or $ann (gt (len $userAnn) 0) }}
   annotations:
+    {{- if $ann }}
     {{- $ann | nindent 4 }}
+    {{- end }}
+    {{- with $userAnn }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -70,7 +81,7 @@ metadata:
 
 {{- if hasKey .Values "configs" }}
 {{- range $name, $val := .Values.configs }}
-{{ include "chart._configmap.header" (dict "name" $name "labelCtx" $labelCtx "env" $env "Values" $.Values) }}
+{{ include "chart._configmap.header" (dict "name" $name "labelCtx" $labelCtx "env" $env "annotations" (dig "annotations" dict $val) "Values" $.Values) }}
 {{- if $val.immutable }}
 immutable: true
 {{- end }}
@@ -97,7 +108,7 @@ binaryData:
 {{- end }}
 {{- end }}
 {{- else }}
-{{- include "chart._configmap.header" (dict "name" $cmp "labelCtx" $labelCtx "env" $env "Values" .Values) }}
+{{- include "chart._configmap.header" (dict "name" $cmp "labelCtx" $labelCtx "env" $env "annotations" (dig "configmap" "annotations" dict $componentValue) "Values" .Values) }}
 data:
 {{- $commonConfig := include "config.dict.common" . | default "" | trim }}
 {{- if ne $commonConfig "" }}
@@ -139,7 +150,7 @@ Lowercase canonical alias (matches chart.configmap casing).
 {{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{- if and (hasKey $componentValue "configmap") (hasKey $componentValue.configmap "binaryData") }}
-{{- include "chart._configmap.header" (dict "name" (printf "%s-files" $cmp) "labelCtx" $labelCtx "env" $env "Values" .Values) }}
+{{- include "chart._configmap.header" (dict "name" (printf "%s-files" $cmp) "labelCtx" $labelCtx "env" $env "annotations" (dig "configmap" "annotations" dict $componentValue) "Values" .Values) }}
 binaryData:
   {{- range $key, $value := $componentValue.configmap.binaryData }}
   {{ $key }}: {{ $value | quote }}

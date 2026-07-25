@@ -22,48 +22,80 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "name": { "type": "string" }
+        "name": {
+          "type": "string"
+        }
       }
     },
     "global": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "name": { "type": "string" },
-        "environment": { "type": "string" },
-        "env": { "type": "string" },
+        "name": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
         "profile": {
           "type": "string",
-          "enum": ["rails", "generic", "python", "go"],
-          "description": "Selects a set of library defaults (probe paths, podMonitor metricRelabelings, envFrom phantom names). Default `generic`. Set `rails` to preserve v1.3.1 behavior. Security context is a separate axis — see `security`."
+          "enum": [
+            "rails",
+            "generic",
+            "python",
+            "go"
+          ],
+          "description": "Selects a set of library defaults (probe paths, podMonitor metricRelabelings, envFrom phantom names). Default `generic`. Set `rails` to preserve v1.3.1 behavior. Security context is a separate axis \u2014 see `security`."
         },
         "security": {
           "type": "string",
-          "enum": ["minimal", "generic"],
-          "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): baseline container hardening — allowPrivilegeEscalation:false, capabilities drop-ALL, pod seccompProfile RuntimeDefault (runAsNonRoot and readOnlyRootFilesystem stay opt-in). `generic`: adds runAsNonRoot and readOnlyRootFilesystem on top of the minimal baseline. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
+          "enum": [
+            "minimal",
+            "generic"
+          ],
+          "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): baseline container hardening \u2014 allowPrivilegeEscalation:false, capabilities drop-ALL, pod seccompProfile RuntimeDefault (runAsNonRoot and readOnlyRootFilesystem stay opt-in). `generic`: adds runAsNonRoot and readOnlyRootFilesystem on top of the minimal baseline. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
         },
         "secretStore": {
           "type": "string",
-          "description": "Default secretStoreRef name for all ExternalSecrets rendered by chart.extsecret. Overridable per secret via secrets.<name>.secretStore. No default — when unset, every secret must declare its own store."
+          "description": "Default secretStoreRef name for all ExternalSecrets rendered by chart.extsecret. Overridable per secret via secrets.<name>.secretStore. No default \u2014 when unset, every secret must declare its own store."
         },
-        "image": { "$ref": "#/$defs/imageOrString" },
-        "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
-        "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },
-        "securityContext": { "$ref": "#/$defs/securityContext" },
+        "image": {
+          "$ref": "#/$defs/imageOrString"
+        },
+        "imagePullPolicy": {
+          "$ref": "#/$defs/imagePullPolicy"
+        },
+        "imagePullSecrets": {
+          "$ref": "#/$defs/imagePullSecrets"
+        },
+        "securityContext": {
+          "$ref": "#/$defs/securityContext"
+        },
         "ingress": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "className": { "type": "string" },
-            "annotations": { "$ref": "#/$defs/annotations" }
+            "className": {
+              "type": "string"
+            },
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            }
           }
         },
         "pdb": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "minAvailable": { "$ref": "#/$defs/intOrPercent" },
-            "maxUnavailable": { "$ref": "#/$defs/intOrPercent" }
+            "minAvailable": {
+              "$ref": "#/$defs/intOrPercent"
+            },
+            "maxUnavailable": {
+              "$ref": "#/$defs/intOrPercent"
+            }
           }
         },
         "deployment": {
@@ -85,8 +117,12 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "configs": { "type": "array" },
-            "secrets": { "type": "array" }
+            "configs": {
+              "type": "array"
+            },
+            "secrets": {
+              "type": "array"
+            }
           },
           "description": "Chart-wide envFrom projections appended before per-component entries. configs -> configMapRef, secrets -> secretRef."
         },
@@ -106,7 +142,9 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "releaseLabel": { "type": "string" }
+            "releaseLabel": {
+              "type": "string"
+            }
           },
           "description": "Observability knobs. releaseLabel injects release: <value> onto every ServiceMonitor / PodMonitor / PrometheusRule for kube-prometheus-stack discovery."
         },
@@ -114,7 +152,9 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "forceSync": { "type": "boolean" }
+            "forceSync": {
+              "type": "boolean"
+            }
           },
           "description": "ExternalSecret behavior knobs. forceSync (default true) re-stamps the force-sync annotation per render; false falls back to a stable per-revision value."
         },
@@ -122,13 +162,22 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "enabled": { "type": "boolean" },
+            "enabled": {
+              "type": "boolean"
+            },
             "preInstallEnvironments": {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "description": "Environments where ConfigMaps/ExternalSecrets are emitted as pre-install,pre-upgrade hooks. Default: [review, demo]."
             },
-            "weight": { "type": ["string", "integer"] }
+            "weight": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
           }
         },
         "werf": {
@@ -168,15 +217,25 @@
       "description": "Legacy werf-style values. Supported as fallback for name/env/image but no longer required.",
       "additionalProperties": true,
       "properties": {
-        "name": { "type": "string" },
-        "env": { "type": "string" },
-        "enabled": { "type": "boolean" },
+        "name": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
         "image": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "app": { "type": "string" },
-            "pullPolicy": { "$ref": "#/$defs/imagePullPolicy" }
+            "app": {
+              "type": "string"
+            },
+            "pullPolicy": {
+              "$ref": "#/$defs/imagePullPolicy"
+            }
           }
         }
       }
@@ -184,7 +243,9 @@
     "images": {
       "type": "object",
       "description": "Per-component image overrides keyed by component name (DNS or values-key form).",
-      "additionalProperties": { "$ref": "#/$defs/imageOrString" }
+      "additionalProperties": {
+        "$ref": "#/$defs/imageOrString"
+      }
     },
     "configs": {
       "type": "object",
@@ -192,29 +253,57 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "data": { "type": "object" }
+          "data": {
+            "type": "object"
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Extra annotations merged after the chart defaults (e.g. argocd.argoproj.io/sync-wave).",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
         }
       }
     },
     "secrets": {
       "type": "object",
       "description": "ExternalSecret entries.",
-      "additionalProperties": true
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "description": "Extra annotations merged after the chart defaults (e.g. argocd.argoproj.io/sync-wave).",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
     },
     "jobs": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/component" }
+      "additionalProperties": {
+        "$ref": "#/$defs/component"
+      }
     },
     "cronjobs": {
       "type": "object",
       "additionalProperties": {
         "allOf": [
-          { "$ref": "#/$defs/component" },
+          {
+            "$ref": "#/$defs/component"
+          },
           {
             "type": "object",
-            "required": ["schedule"],
+            "required": [
+              "schedule"
+            ],
             "properties": {
-              "schedule": { "type": "string" }
+              "schedule": {
+                "type": "string"
+              }
             }
           }
         ]
@@ -227,10 +316,18 @@
         "type": "object",
         "additionalProperties": true,
         "properties": {
-          "type": { "type": "string" },
-          "immutable": { "type": "boolean" },
-          "data": { "type": "object" },
-          "stringData": { "type": "object" }
+          "type": {
+            "type": "string"
+          },
+          "immutable": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object"
+          },
+          "stringData": {
+            "type": "object"
+          }
         }
       }
     },
@@ -264,56 +361,107 @@
   "$defs": {
     "imagePullPolicy": {
       "type": "string",
-      "enum": ["Always", "IfNotPresent", "Never"]
+      "enum": [
+        "Always",
+        "IfNotPresent",
+        "Never"
+      ]
     },
     "imageOrString": {
       "oneOf": [
-        { "type": "string" },
+        {
+          "type": "string"
+        },
         {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "image": { "type": "string" },
-            "registry": { "type": "string" },
-            "repository": { "type": "string" },
-            "name": { "type": "string" },
-            "tag": { "type": ["string", "number"] },
-            "digest": { "type": "string" },
-            "pullPolicy": { "$ref": "#/$defs/imagePullPolicy" }
+            "image": {
+              "type": "string"
+            },
+            "registry": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "tag": {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            "digest": {
+              "type": "string"
+            },
+            "pullPolicy": {
+              "$ref": "#/$defs/imagePullPolicy"
+            }
           }
         }
       ]
     },
     "annotations": {
       "type": "object",
-      "additionalProperties": { "type": ["string", "number", "boolean"] }
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean"
+        ]
+      }
     },
     "intOrPercent": {
       "oneOf": [
-        { "type": "integer", "minimum": 0 },
-        { "type": "string", "pattern": "^[0-9]+%?$" }
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]+%?$"
+        }
       ]
     },
     "imagePullSecrets": {
       "oneOf": [
-        { "type": "string" },
+        {
+          "type": "string"
+        },
         {
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string" },
+              {
+                "type": "string"
+              },
               {
                 "type": "object",
-                "required": ["name"],
-                "properties": { "name": { "type": "string" } }
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
               }
             ]
           }
         },
         {
           "type": "object",
-          "required": ["name"],
-          "properties": { "name": { "type": "string" } }
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
         }
       ]
     },
@@ -323,73 +471,185 @@
       "properties": {
         "profile": {
           "type": "string",
-          "enum": ["rails", "generic", "python", "go"],
+          "enum": [
+            "rails",
+            "generic",
+            "python",
+            "go"
+          ],
           "description": "Per-component profile override (v2.1+). Resolution chain: <cmp>.profile -> global.profile -> 'generic'. Lets mixed-tech charts pick a different profile per workload."
         },
-        "image": { "$ref": "#/$defs/imageOrString" },
-        "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
-        "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },
-        "securityContext": { "$ref": "#/$defs/securityContext" },
-        "replicas": { "type": "integer", "minimum": 0 },
-        "minReadySeconds": { "type": "integer", "minimum": 0 },
-        "revisionHistoryLimit": { "type": "integer", "minimum": 0 },
-        "progressDeadlineSeconds": { "type": "integer", "minimum": 0 },
-        "paused": { "type": "boolean" },
+        "image": {
+          "$ref": "#/$defs/imageOrString"
+        },
+        "imagePullPolicy": {
+          "$ref": "#/$defs/imagePullPolicy"
+        },
+        "imagePullSecrets": {
+          "$ref": "#/$defs/imagePullSecrets"
+        },
+        "securityContext": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "replicas": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minReadySeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revisionHistoryLimit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "progressDeadlineSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "paused": {
+          "type": "boolean"
+        },
         "hpa": {
           "type": "object",
           "additionalProperties": true,
-          "required": ["maxReplicas"],
+          "required": [
+            "maxReplicas"
+          ],
           "properties": {
             "kind": {
               "type": "string",
-              "enum": ["Deployment", "StatefulSet", "ReplicaSet"],
-              "description": "scaleTargetRef.kind. Defaults to Deployment. For StatefulSet (or any non-Deployment) workloads you MUST set this explicitly — the library cannot infer the workload kind."
+              "enum": [
+                "Deployment",
+                "StatefulSet",
+                "ReplicaSet"
+              ],
+              "description": "scaleTargetRef.kind. Defaults to Deployment. For StatefulSet (or any non-Deployment) workloads you MUST set this explicitly \u2014 the library cannot infer the workload kind."
             },
             "apiVersion": {
               "type": "string",
               "description": "scaleTargetRef.apiVersion. Defaults to apps/v1. Override when targeting a CRD or a non-apps/v1 workload."
             },
-            "minReplicas": { "type": "integer", "minimum": 0 },
-            "maxReplicas": { "type": "integer", "minimum": 1, "description": "Required. Upper replica bound — the chart fails to render without it." },
-            "targetName": { "type": "string", "description": "scaleTargetRef.name override (defaults to the component name)." },
-            "metrics": { "type": "array", "description": "Raw autoscaling/v2 metrics list." },
-            "behavior": { "type": "object", "additionalProperties": true, "description": "autoscaling/v2 scaleUp/scaleDown behavior." },
-            "annotations": { "$ref": "#/$defs/annotations" }
+            "minReplicas": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxReplicas": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Required. Upper replica bound \u2014 the chart fails to render without it."
+            },
+            "targetName": {
+              "type": "string",
+              "description": "scaleTargetRef.name override (defaults to the component name)."
+            },
+            "metrics": {
+              "type": "array",
+              "description": "Raw autoscaling/v2 metrics list."
+            },
+            "behavior": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "autoscaling/v2 scaleUp/scaleDown behavior."
+            },
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            }
           }
         },
-        "vpa": { "type": "object", "additionalProperties": true },
-        "daemonSet": { "type": "object", "additionalProperties": true },
-        "serviceMonitor": { "type": "object", "additionalProperties": true },
-        "networkPolicy": { "type": "object", "additionalProperties": true },
-        "rbac": { "type": "object", "additionalProperties": true },
-        "rbacCluster": { "type": "object", "additionalProperties": true },
-        "strategyType": { "type": "string", "enum": ["RollingUpdate", "Recreate"] },
-        "strategyMaxUnavailable": { "$ref": "#/$defs/intOrPercent" },
-        "strategyMaxSurge": { "$ref": "#/$defs/intOrPercent" },
+        "vpa": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "daemonSet": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "serviceMonitor": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "networkPolicy": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "rbac": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "rbacCluster": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "strategyType": {
+          "type": "string",
+          "enum": [
+            "RollingUpdate",
+            "Recreate"
+          ]
+        },
+        "strategyMaxUnavailable": {
+          "$ref": "#/$defs/intOrPercent"
+        },
+        "strategyMaxSurge": {
+          "$ref": "#/$defs/intOrPercent"
+        },
         "command": {
           "oneOf": [
-            { "type": "string" },
-            { "type": "array", "items": { "type": "string" } }
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           ]
         },
         "args": {
           "oneOf": [
-            { "type": "string" },
-            { "type": "array", "items": { "type": "string" } }
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           ]
         },
         "ports": {
           "type": "object",
           "additionalProperties": {
             "oneOf": [
-              { "type": "integer", "minimum": 1, "maximum": 65535 },
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
               {
                 "type": "object",
-                "required": ["containerPort"],
+                "required": [
+                  "containerPort"
+                ],
                 "properties": {
-                  "containerPort": { "type": "integer" },
-                  "protocol": { "type": "string", "enum": ["TCP", "UDP", "SCTP"] },
-                  "hostPort": { "type": "integer" }
+                  "containerPort": {
+                    "type": "integer"
+                  },
+                  "protocol": {
+                    "type": "string",
+                    "enum": [
+                      "TCP",
+                      "UDP",
+                      "SCTP"
+                    ]
+                  },
+                  "hostPort": {
+                    "type": "integer"
+                  }
                 }
               }
             ]
@@ -397,132 +657,289 @@
         },
         "ingress": {
           "oneOf": [
-            { "type": "array", "items": { "$ref": "#/$defs/ingressEntry" } },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ingressEntry"
+              }
+            },
             {
               "type": "object",
               "additionalProperties": true,
               "properties": {
-                "annotations": { "$ref": "#/$defs/annotations" }
+                "annotations": {
+                  "$ref": "#/$defs/annotations"
+                }
               }
             }
           ]
         },
-        "service": { "type": "object" },
-        "httpRoute": { "type": "object", "additionalProperties": true, "description": "Gateway API HTTPRoute (chart.httproute): parentRefs, hostnames, rules, port. backendRefs default to the component's Service." },
+        "service": {
+          "type": "object"
+        },
+        "httpRoute": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Gateway API HTTPRoute (chart.httproute): parentRefs, hostnames, rules, port. backendRefs default to the component's Service."
+        },
         "scaling": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "min": { "type": "integer", "minimum": 0 },
-            "max": { "type": "integer", "minimum": 0 },
-            "triggers": { "type": "array" }
+            "min": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "triggers": {
+              "type": "array"
+            }
           }
         },
         "pdb": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "minAvailable": { "$ref": "#/$defs/intOrPercent" },
-            "maxUnavailable": { "$ref": "#/$defs/intOrPercent" }
+            "minAvailable": {
+              "$ref": "#/$defs/intOrPercent"
+            },
+            "maxUnavailable": {
+              "$ref": "#/$defs/intOrPercent"
+            }
           }
         },
         "podMonitor": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "enabled": { "type": "boolean" },
-            "portName": { "type": "string" },
-            "path": { "type": "string" }
+            "enabled": {
+              "type": "boolean"
+            },
+            "portName": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
           }
         },
         "serviceAccount": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "enabled": { "type": "boolean" },
-            "name": { "type": "string" },
-            "automount": { "type": "boolean" }
+            "enabled": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            },
+            "automount": {
+              "type": "boolean"
+            }
           }
         },
         "persistence": {
           "oneOf": [
-            { "type": "object" },
-            { "type": "array", "items": { "type": "object" } }
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           ]
         },
         "configmap": {
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "data": { "type": "object" },
-            "binaryData": { "type": "object" }
+            "data": {
+              "type": "object"
+            },
+            "binaryData": {
+              "type": "object"
+            }
           }
         },
-        "annotations": { "$ref": "#/$defs/annotations" },
-        "podAnnotations": { "$ref": "#/$defs/annotations" },
-        "resources": { "type": "object", "additionalProperties": true },
-        "env": { "type": ["object", "array"] },
-        "envFrom": { "type": ["object", "array"] },
-        "envRaw": { "type": "boolean" },
-        "volumes": { "type": "array" },
-        "volumeMounts": { "type": "array" },
-        "lifecycle": { "type": "object", "additionalProperties": true },
-        "probe": { "type": "object", "additionalProperties": true },
-        "probes": { "type": "object", "additionalProperties": true },
-        "nodeSelector": { "type": "object", "additionalProperties": true },
-        "affinity": { "type": "object", "additionalProperties": true },
-        "tolerations": { "type": "array" },
-        "topologySpreadConstraints": { "type": "array" },
-        "hostAliases": { "type": "array" },
-        "initContainers": { "type": ["object", "array"] },
-        "sidecars": { "type": ["object", "array"] },
-        "securityContext": { "type": "object", "additionalProperties": true },
-        "priorityClassName": { "type": ["string", "integer"] },
-        "terminationGracePeriod": { "type": "integer", "minimum": 0 },
-        "imagePullPolicy": { "$ref": "#/$defs/imagePullPolicy" },
-        "imagePullSecrets": { "$ref": "#/$defs/imagePullSecrets" },
-        "extraContainerConfig": { "type": "object", "additionalProperties": true },
-        "extraPodConfig": { "type": "object", "additionalProperties": true },
-        "dnsPolicy": { "type": "string" },
-        "dnsConfig": { "type": "object", "additionalProperties": true },
-        "runtimeClassName": { "type": "string" },
-        "schedulerName": { "type": "string" },
-        "hostNetwork": { "type": "boolean" },
-        "hostPID": { "type": "boolean" },
-        "hostIPC": { "type": "boolean" },
-        "enableServiceLinks": { "type": "boolean" },
-        "shareProcessNamespace": { "type": "boolean" },
-        "rollOnConfigChange": { "type": "boolean", "description": "Emit a checksum/config pod annotation so ConfigMap/Secret changes roll this workload. Default false." }
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
+        "podAnnotations": {
+          "$ref": "#/$defs/annotations"
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "env": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "envFrom": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "envRaw": {
+          "type": "boolean"
+        },
+        "volumes": {
+          "type": "array"
+        },
+        "volumeMounts": {
+          "type": "array"
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "probe": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "probes": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "nodeSelector": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "affinity": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "tolerations": {
+          "type": "array"
+        },
+        "topologySpreadConstraints": {
+          "type": "array"
+        },
+        "hostAliases": {
+          "type": "array"
+        },
+        "initContainers": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "sidecars": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "priorityClassName": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "terminationGracePeriod": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "extraContainerConfig": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "extraPodConfig": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "dnsPolicy": {
+          "type": "string"
+        },
+        "dnsConfig": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "runtimeClassName": {
+          "type": "string"
+        },
+        "schedulerName": {
+          "type": "string"
+        },
+        "hostNetwork": {
+          "type": "boolean"
+        },
+        "hostPID": {
+          "type": "boolean"
+        },
+        "hostIPC": {
+          "type": "boolean"
+        },
+        "enableServiceLinks": {
+          "type": "boolean"
+        },
+        "shareProcessNamespace": {
+          "type": "boolean"
+        },
+        "rollOnConfigChange": {
+          "type": "boolean",
+          "description": "Emit a checksum/config pod annotation so ConfigMap/Secret changes roll this workload. Default false."
+        }
       }
     },
     "securityContext": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "pod": { "type": "object", "additionalProperties": true },
-        "container": { "type": "object", "additionalProperties": true }
+        "pod": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "container": {
+          "type": "object",
+          "additionalProperties": true
+        }
       }
     },
     "ingressEntry": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "name": { "type": "string" },
-        "enabled": { "type": "boolean" },
-        "className": { "type": "string" },
-        "annotations": { "$ref": "#/$defs/annotations" },
+        "name": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "domains": {
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string" },
+              {
+                "type": "string"
+              },
               {
                 "type": "object",
                 "additionalProperties": true,
-                "required": ["host"],
+                "required": [
+                  "host"
+                ],
                 "properties": {
-                  "host": { "type": "string" },
-                  "paths": { "type": "array" }
+                  "host": {
+                    "type": "string"
+                  },
+                  "paths": {
+                    "type": "array"
+                  }
                 }
               }
             ]
@@ -530,11 +947,17 @@
         },
         "tls": {
           "oneOf": [
-            { "type": "boolean" },
+            {
+              "type": "boolean"
+            },
             {
               "type": "object",
               "additionalProperties": true,
-              "properties": { "secretName": { "type": "string" } }
+              "properties": {
+                "secretName": {
+                  "type": "string"
+                }
+              }
             }
           ]
         }

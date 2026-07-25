@@ -92,8 +92,17 @@ metadata:
   name: {{ $name }}
   labels: {{ include "common.labels" $labelCtx | nindent 4 }}
   {{- $ann := include "secrets.annotations.default" (dict "env" $env "Values" $.Values "Release" $.Release) | trim }}
-  {{- if $ann }}
-  annotations: {{ $ann | nindent 4 }}
+  {{- /* user annotations merge AFTER the defaults, so a consumer can override a default key or
+         add its own (e.g. argocd.argoproj.io/sync-wave). Same order as workload annotations. */ -}}
+  {{- $userAnn := dig "annotations" dict $val }}
+  {{- if or $ann (gt (len $userAnn) 0) }}
+  annotations:
+    {{- if $ann }}
+    {{- $ann | nindent 4 }}
+    {{- end }}
+    {{- with $userAnn }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}
