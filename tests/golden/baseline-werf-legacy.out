@@ -439,7 +439,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  annotations: 
+  annotations:
     force-sync: "<NOW>"
     werf.io/weight: "-1"
 spec:
