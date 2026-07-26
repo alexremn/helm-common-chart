@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
 spec:
   maxUnavailable: 25%
@@ -31,7 +31,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
 ---
@@ -46,7 +46,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
     argocd.argoproj.io/sync-wave: "-5"
@@ -66,7 +66,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
     argocd.argoproj.io/sync-wave: "-5"
@@ -84,7 +84,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
 spec:
   type: ClusterIP
@@ -109,7 +109,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
 spec:
   replicas: 1
@@ -132,8 +132,10 @@ spec:
         app.kubernetes.io/component: web
         helm.sh/environment: review
         app.kubernetes.io/instance: smoke
-        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
+      annotations:
+        checksum/config: 67c9e84c8bf23ad51073668c930b9ed6d6084d423c606cc8471f9d669e33f0d6
     spec:
       containers:
         - name: web
@@ -181,7 +183,7 @@ metadata:
     app.kubernetes.io/component: web
     helm.sh/environment: review
     app.kubernetes.io/instance: smoke
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
     argocd.argoproj.io/sync-wave: "-5"
