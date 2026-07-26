@@ -63,11 +63,13 @@ force-sync: {{ now | quote }}
 {{- end }}
 {{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values }}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values }}
-{{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
-helm.sh/hook: pre-install,pre-upgrade
-helm.sh/hook-weight: {{ dig "global" "hooks" "weight" "-5" $values | quote }}
-{{- else }}
+{{- $hookWanted := and (ne $hooksEnabled false) (has $env $hookEnvs) }}
 {{- $weight := dig "global" "ordering" "secretWeight" (dig "werf" "secretWeight" "-1" $values) $values }}
+{{- if $hookWanted }}{{- $weight = dig "global" "hooks" "weight" "-5" $values }}{{- end }}
+{{- if and $hookWanted (ne $tool "argocd") }}
+helm.sh/hook: pre-install,pre-upgrade
+helm.sh/hook-weight: {{ $weight | quote }}
+{{- else }}
 {{- $ordering := include "common.annotations.ordering" (dict "root" . "weight" $weight) | trim }}
 {{- if $ordering }}
 {{ $ordering }}

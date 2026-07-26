@@ -1,0 +1,34 @@
+# The Helm-hook path under the DEFAULT dialect. Sibling of values-argocd-hooks.yaml:
+# same hook activation, no deployTool, so helm.sh/hook must still be emitted. Locks the
+# arm that seven fixtures configure but none previously exercised.
+name: hooks-generic
+environment: review
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  secretStore: my-cluster-store
+  hooks:
+    preInstallEnvironments:
+      - review
+    weight: "-5"
+
+web:
+  ports:
+    http: 8080
+  configmap:
+    data:
+      APP_MODE: "review"
+
+nativeSecrets:
+  bootstrap:
+    type: Opaque
+    stringData:
+      HELLO: world
+
+secrets:
+  app-secrets:
+    secretKey: "internal/app/review"
+    properties:
+      - API_KEY

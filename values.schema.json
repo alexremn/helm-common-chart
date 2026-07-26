@@ -200,7 +200,7 @@
               "items": {
                 "type": "string"
               },
-              "description": "Environments where ConfigMaps/ExternalSecrets are emitted as pre-install,pre-upgrade hooks. Default: [review, demo]."
+              "description": "Environments where ConfigMaps/ExternalSecrets are emitted as pre-install,pre-upgrade Helm hooks. Default: [] (no hooks). Ignored under deployTool: argocd, where the ordering intent is emitted as argocd.argoproj.io/sync-wave instead — ArgoCD converts Helm hooks to PreSync hooks, which removes the object from the Application's desired state and recreates it on every sync."
             },
             "weight": {
               "type": [
