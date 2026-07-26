@@ -284,7 +284,9 @@ Usage:
 {{- if kindIs "map" . -}}
 {{- if hasKey . "annotations" -}}
 {{- with .annotations }}
-{{- . | toYaml }}
+{{- $coerced := dict }}
+{{- range $k, $v := . }}{{- $_ := set $coerced $k ($v | toString) }}{{- end }}
+{{- toYaml $coerced }}
 {{- end }}
 {{- end }}
 {{- end }}

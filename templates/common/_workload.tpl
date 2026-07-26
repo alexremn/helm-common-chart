@@ -90,7 +90,9 @@ Usage:
 {{- if $werfAnn -}}
   {{- $annotations = fromYaml $werfAnn -}}
 {{- end -}}
-{{- $annotations = mergeOverwrite $annotations (deepCopy $userAnn) -}}
+{{- range $key, $val := $userAnn -}}
+  {{- $_ := set $annotations $key ($val | toString) -}}
+{{- end -}}
 {{- range $key, $val := $extra -}}
   {{- $_ := set $annotations $key ($val | toString) -}}
 {{- end -}}
