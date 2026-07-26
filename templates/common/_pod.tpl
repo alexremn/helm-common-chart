@@ -133,7 +133,10 @@ Usage:
 {{- $component := default dict .component -}}
 {{- $cmp := .cmp -}}
 {{- $values := include "common._values" $root | fromYaml | default dict -}}
-{{- $optIn := or (dig "rollOnConfigChange" false $component) (dig "global" "checksumAnnotations" false $values) -}}
+{{- /* Under ArgoCD there is no `helm upgrade` event, so this hash is the only
+       config-driven rollout mechanism — default it on there. */ -}}
+{{- $checksumDefault := eq (include "common.deployTool" $root) "argocd" -}}
+{{- $optIn := or (dig "rollOnConfigChange" false $component) (dig "global" "checksumAnnotations" $checksumDefault $values) -}}
 {{- if $optIn -}}
 {{- $ctx := dict "Values" $root.Values "Release" $root.Release "Chart" $root.Chart "cmp" $cmp -}}
 {{- $cm := include "chart.configmap" $ctx -}}

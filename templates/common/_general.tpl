@@ -176,7 +176,10 @@ helm.sh/environment: {{ $env }}
 {{- if $instance }}
 app.kubernetes.io/instance: {{ $instance }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service | default "Helm" }}
+{{- /* Under ArgoCD there is no Helm release behind the manifest — no release
+       Secret, no `helm history`, no `helm rollback` — so claiming Helm here
+       misleads operators and cleanup tooling. */}}
+app.kubernetes.io/managed-by: {{ ternary "argocd" (.Release.Service | default "Helm") (eq (include "common.deployTool" .) "argocd") }}
 {{- /* .Chart may be a struct (helm 3 / werf render context) or a map
      (helm 4, or a caller-built dict). `dig` only traverses maps, so use
      field access via `with`, which works on both. */ -}}

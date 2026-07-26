@@ -162,7 +162,7 @@
         },
         "checksumAnnotations": {
           "type": "boolean",
-          "description": "Chart-wide opt-in: emit a checksum/config pod annotation on Deployment/StatefulSet/DaemonSet so ConfigMap/Secret content changes trigger a rollout. Default false. Per-component override: <cmp>.rollOnConfigChange."
+          "description": "Emit a checksum/config pod annotation on Deployment/StatefulSet/DaemonSet so ConfigMap/Secret content changes trigger a rollout. Default false under deployTool generic/werf, true under deployTool argocd, where no helm upgrade event exists and this hash is the only rollout trigger. Per-component override: <cmp>.rollOnConfigChange. Deliberately excludes ExternalSecret-delivered material, so ESO rotation does not roll pods."
         },
         "prometheusEndpoint": {
           "type": "string",
