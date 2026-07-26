@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.4.2"
+version: "2.4.3"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,6 +29,8 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "secrets.<name>.properties accepts a map of <secretKey>: <remoteProperty> again, for stores whose field names differ from the keys the workload expects; a map was previously iterated by value, silently dropping the intended Secret key (CA_CERT: ca-certificate rendered secretKey: ca-certificate). The list form is unchanged"
     - kind: fixed
       description: "chart.scaledobject emitted scaling.triggers[].name, .metricType, .authenticationRef and .extraConfig at the wrong indentation, outside the trigger list item, so any consumer setting one of them rendered an unparseable manifest"
     - kind: fixed
