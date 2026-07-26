@@ -24,6 +24,11 @@ jobs:
   run_task:
     command: ["/bin/sh", "-c"]
     args: ["echo legacy job"]
+    # Overrides a werf default the chart also emits; both must collapse into a
+    # single annotations map rather than repeating the key.
+    annotations:
+      werf.io/failures-allowed-per-replica: "0"
+      werf.io/fail-mode: FailWholeDeployProcessImmediately
 
 cronjobs:
   sync_task:

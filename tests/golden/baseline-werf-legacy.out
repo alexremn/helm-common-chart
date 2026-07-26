@@ -138,8 +138,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
+    werf.io/no-activity-timeout: 6m
 spec:
   replicas: 1
   minReadySeconds: 10
@@ -213,8 +213,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
+    werf.io/no-activity-timeout: 6m
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -306,8 +306,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    werf.io/no-activity-timeout: "6m"
-    werf.io/failures-allowed-per-replica: "3"
+    werf.io/fail-mode: FailWholeDeployProcessImmediately
+    werf.io/failures-allowed-per-replica: "0"
+    werf.io/no-activity-timeout: 6m
 spec:
   backoffLimit: 0
   template:
@@ -355,8 +356,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    werf.io/no-activity-timeout: "6m"
     werf.io/failures-allowed-per-replica: "3"
+    werf.io/no-activity-timeout: 6m
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: "Forbid"
