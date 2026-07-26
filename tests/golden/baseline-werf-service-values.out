@@ -93,6 +93,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    werf.io/failures-allowed-per-replica: "3"
+    werf.io/no-activity-timeout: 6m
 spec:
   replicas: 1
   minReadySeconds: 10

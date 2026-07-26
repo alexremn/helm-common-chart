@@ -77,7 +77,7 @@ Usage:
 {{- $root := default dict .root -}}
 {{- $component := default dict .component -}}
 {{- $extra := default dict .extra -}}
-{{- $werfAnn := include "common.annotations.werf" $root | trim -}}
+{{- $werfAnn := include "common.annotations.lifecycle" $root | trim -}}
 {{- $userAnn := dig "annotations" dict $component -}}
 {{- /* Collapse the three sources into one map before emitting. Rendering them
        as three separate blocks wrote a key twice whenever a component

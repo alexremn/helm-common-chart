@@ -18,13 +18,15 @@ security contexts, probes, etc.
 {{/*
 Resolve the annotation key used for "replicas at first install".
 - Explicit override:   .Values.global.deployment.replicasOnCreationAnnotation
-- Werf compatibility:  emits werf.io/replicas-on-creation when werf annotations
-                       are enabled (see common.werf.annotationsEnabled)
-- Otherwise:           empty (annotation skipped)
+- deployTool: werf     werf.io/replicas-on-creation
+- deployTool: argocd   empty — ArgoCD has no equivalent; seeding the initial
+                       replica count requires Application.spec.ignoreDifferences
+                       on /spec/replicas instead
+- deployTool: generic  empty
 */}}
 {{- $replicasOnCreationAnnotation := dig "global" "deployment" "replicasOnCreationAnnotation" "" $values }}
 {{- if eq $replicasOnCreationAnnotation "" }}
-  {{- if eq (include "common.werf.annotationsEnabled" .) "true" }}
+  {{- if eq (include "common.deployTool" .) "werf" }}
     {{- $replicasOnCreationAnnotation = "werf.io/replicas-on-creation" }}
   {{- end }}
 {{- end }}
