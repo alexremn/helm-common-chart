@@ -860,6 +860,10 @@
         "podAnnotations": {
           "$ref": "#/$defs/annotations"
         },
+        "jobAnnotations": {
+          "$ref": "#/$defs/annotations",
+          "description": "For cronjobs.<name>: annotations applied to spec.jobTemplate.metadata, i.e. to each spawned Job rather than to the CronJob itself."
+        },
         "resources": {
           "type": "object",
           "additionalProperties": true

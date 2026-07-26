@@ -410,6 +410,61 @@ spec:
       automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-task
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: sync-task
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      annotations:
+        argocd.argoproj.io/compare-options: IgnoreExtraneous
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: argocd-app
+            app.kubernetes.io/component: sync-task
+            helm.sh/environment: staging
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: argocd
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: sync-task
+              image: ghcr.io/example/app:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              command: 
+                - /bin/sh
+                - -c
+              args: 
+                - echo sync
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
