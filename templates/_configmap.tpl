@@ -30,8 +30,12 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 {{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
 helm.sh/hook: pre-install,pre-upgrade
 helm.sh/hook-weight: {{ dig "global" "hooks" "weight" "-5" $values | quote }}
-{{- else if hasKey $values "werf" }}
-werf.io/weight: {{ dig "werf" "configWeight" "-1" $values | quote }}
+{{- else }}
+{{- $weight := dig "global" "ordering" "configWeight" (dig "werf" "configWeight" "-1" $values) $values }}
+{{- $ordering := include "common.annotations.ordering" (dict "root" . "weight" $weight) | trim }}
+{{- if $ordering }}
+{{ $ordering }}
+{{- end }}
 {{- end }}
 {{- end -}}
 

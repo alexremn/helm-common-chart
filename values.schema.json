@@ -71,6 +71,27 @@
           "type": "string",
           "description": "Default secretStoreRef name for all ExternalSecrets rendered by chart.extsecret. Overridable per secret via secrets.<name>.secretStore. No default \u2014 when unset, every secret must declare its own store."
         },
+        "ordering": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "configWeight": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Ordering weight for ConfigMaps and native Secrets. Emitted as werf.io/weight under deployTool: werf and argocd.argoproj.io/sync-wave under deployTool: argocd. Default -1. Falls back to the legacy werf.configWeight."
+            },
+            "secretWeight": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Ordering weight for ExternalSecrets. Emitted as werf.io/weight under deployTool: werf and argocd.argoproj.io/sync-wave under deployTool: argocd. Default -1. Falls back to the legacy werf.secretWeight."
+            }
+          },
+          "description": "Tool-neutral deploy-ordering weights. See docs/values-reference.md#deploy-tool-dialect."
+        },
         "image": {
           "$ref": "#/$defs/imageOrString"
         },
