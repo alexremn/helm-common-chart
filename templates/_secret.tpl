@@ -28,9 +28,15 @@ metadata:
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- $ann := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
-  {{- if $ann }}
+  {{- $userAnn := include "common.annotations" $val | trim }}
+  {{- if or $ann $userAnn }}
   annotations:
+    {{- if $ann }}
     {{- $ann | nindent 4 }}
+    {{- end }}
+    {{- if $userAnn }}
+    {{- $userAnn | nindent 4 }}
+    {{- end }}
   {{- end }}
 type: {{ default "Opaque" $val.type }}
 {{- if $val.immutable }}

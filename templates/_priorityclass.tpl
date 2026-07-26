@@ -20,6 +20,11 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
+  {{- $ann := include "common.annotations" $val | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
 value: {{ required (printf "priorityClasses entry %q must set value" $name) $val.value }}
 globalDefault: {{ default false $val.globalDefault }}
 {{- with $val.description }}
