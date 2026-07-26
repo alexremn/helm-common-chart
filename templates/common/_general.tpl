@@ -190,6 +190,9 @@ app.kubernetes.io/managed-by: {{ ternary "argocd" (.Release.Service | default "H
 {{- with $version }}
 app.kubernetes.io/version: {{ . | quote }}
 {{- end }}
+{{- with dig "global" "selectorLabels" dict $values }}
+{{- toYaml . | nindent 0 }}
+{{- end }}
 {{- /* Chart-wide labels merge first; a caller-supplied extraLabels wins. */ -}}
 {{- $extra := dig "global" "extraLabels" dict $values }}
 {{- with .extraLabels }}{{- $extra = mergeOverwrite (deepCopy $extra) . }}{{- end }}
@@ -220,8 +223,18 @@ app.kubernetes.io/name: {{ $svc }}
 {{- if $cmp }}
 app.kubernetes.io/component: {{ $cmp }}
 {{- end }}
-{{- if $instance }}
+{{- /* ArgoCD rewrites app.kubernetes.io/instance in metadata and pod-template
+       labels but never in spec.selector, so when the ArgoCD instance name and
+       the Helm release name diverge the selector stops matching. Opting out is
+       NEW-INSTALL ONLY: selectors are immutable, and removing this key from a
+       live workload requires delete/recreate. Supply global.selectorLabels as
+       a replacement discriminator when you do. */ -}}
+{{- $instanceInSelector := dig "global" "compat" "instanceInSelector" true $values }}
+{{- if and $instance $instanceInSelector }}
 app.kubernetes.io/instance: {{ $instance }}
+{{- end }}
+{{- with dig "global" "selectorLabels" dict $values }}
+{{- toYaml . | nindent 0 }}
 {{- end }}
 {{- if $legacy }}
 {{- with .version }}

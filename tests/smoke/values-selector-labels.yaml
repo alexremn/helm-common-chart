@@ -1,0 +1,22 @@
+# Opt out of the instance label in selectors and supply a stable discriminator
+# instead. NEW INSTALLS ONLY — selectors are immutable.
+name: selector-app
+environment: staging
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  compat:
+    instanceInSelector: false
+  selectorLabels:
+    app.example.com/tenant: blue
+
+web:
+  ports:
+    http: 8080
+  service:
+    type: ClusterIP
+  pdb:
+    maxUnavailable: 1

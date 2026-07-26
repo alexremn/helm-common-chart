@@ -1,0 +1,161 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: blue
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: selector-app
+      app.kubernetes.io/component: web
+      app.example.com/tenant: blue
+
+
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: blue
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: blue
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: blue
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    app.example.com/tenant: blue
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: selector-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: blue
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: selector-app
+      app.kubernetes.io/component: web
+      app.example.com/tenant: blue
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: selector-app
+        app.kubernetes.io/component: web
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/version: "7.8.9"
+        app.example.com/tenant: blue
+      annotations:
+        checksum/config: 1ff01fd404eed50a39ae13d871bf3db6dacf0267785e68a43f2c12c5ee2c3c76
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
