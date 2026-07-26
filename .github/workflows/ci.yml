@@ -49,6 +49,9 @@ jobs:
       - name: Golden render check
         run: make golden-check
 
+      - name: Determinism check
+        run: make determinism-check
+
       - name: Consumer compatibility lint
         run: make lint-consumer
 
