@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.4.3"
+version: "2.5.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,26 +29,28 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
-    - kind: fixed
-      description: "secrets.<name>.properties accepts a map of <secretKey>: <remoteProperty> again, for stores whose field names differ from the keys the workload expects; a map was previously iterated by value, silently dropping the intended Secret key (CA_CERT: ca-certificate rendered secretKey: ca-certificate). The list form is unchanged"
-    - kind: fixed
-      description: "chart.scaledobject emitted scaling.triggers[].name, .metricType, .authenticationRef and .extraConfig at the wrong indentation, outside the trigger list item, so any consumer setting one of them rendered an unparseable manifest"
-    - kind: fixed
-      description: "workload annotations are merged into a single map before rendering; a component overriding a werf default (e.g. werf.io/failures-allowed-per-replica on a Job) previously emitted the key twice, which strict YAML decoders reject"
     - kind: added
-      description: "configs.<name>.annotations and secrets.<name>.annotations are now rendered, merged after the chart defaults (same order as workload annotations); previously these keys were accepted by the schema but silently ignored"
+      description: "global.deployTool (generic|werf|argocd) selects the dialect of ordering and lifecycle metadata the chart emits; werf is auto-detected from its injected service values, ArgoCD must be set explicitly"
     - kind: added
-      description: "common.extraContainers helper renders long-running sidecars from <component>.sidecars, appended to the pod containers list after the main container"
+      description: "chart-wide global.annotations and global.extraLabels, plus global.selectorLabels as a stable selector discriminator"
     - kind: added
-      description: "global.externalSecrets.apiVersion makes the ExternalSecret apiVersion configurable (default external-secrets.io/v1, validated) for clusters running ESO < 0.14.0"
-    - kind: security
-      description: "init containers and sidecars now inherit the active security posture's container securityContext (per-container securityContext overrides win); generic posture also sets pod-level runAsNonRoot"
+      description: "annotation passthrough on native Secret, RBAC, PriorityClass and TriggerAuthentication, which previously discarded a consumer-supplied annotations key"
+    - kind: added
+      description: "jobs.<name>.hook emits ArgoCD hook annotations so a Job re-runs each sync instead of failing on spec immutability; cronjobs.<name>.jobAnnotations reaches spec.jobTemplate.metadata"
+    - kind: added
+      description: "global.persistence.retain (default false) protects standalone PVCs with both helm.sh/resource-policy: keep and argocd.argoproj.io/sync-options: Prune=false"
     - kind: fixed
-      description: "extraPodConfig.containers is now rejected at render time — it emitted a duplicate containers key that silently dropped the main application container; use sidecars instead"
+      description: "annotation values are coerced to strings; a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
     - kind: fixed
-      description: "chart.scaledobject fails at render unless minReplicaCount > idleReplicaCount, matching KEDA admission (idle < min)"
+      description: "top-level networkPolicies.<name> treats annotations and labels as metadata instead of dumping them into spec, which the API server rejected"
     - kind: fixed
-      description: "common.dbUrl coerces the port with toString and omits the :port segment when absent, fixing %!s(int=...) / %!s(<nil>) corruption on integer or omitted ports"
+      description: "name and environment now resolve from werf's own global.werf.name / global.werf.env service values, not only the hand-written werf.name / werf.env"
+    - kind: fixed
+      description: "werf.io/weight is gated by the resolved deploy tool instead of the bare presence of a werf key, so global.werf.annotations: false now suppresses it"
+    - kind: fixed
+      description: "under deployTool: argocd the ExternalSecret force-sync annotation is omitted (a per-render timestamp is permanent drift), Helm hooks become sync-waves, checksum/config defaults on, and cluster-lookup or random helpers fail loudly instead of blanking live Secret data"
+    - kind: changed
+      description: "global.werf.annotations is deprecated in favour of global.deployTool and will be removed in 3.0"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification

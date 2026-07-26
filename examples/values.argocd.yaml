@@ -1,0 +1,76 @@
+# ArgoCD dialect. ArgoCD cannot be auto-detected from inside a Helm render
+# (Helm exposes no `env` function, and nothing in .Release or .Capabilities
+# distinguishes ArgoCD's repo-server from a plain `helm template`), so
+# global.deployTool must be set explicitly. Set it once in your Application or
+# ApplicationSet template rather than per app:
+#
+#   spec:
+#     source:
+#       helm:
+#         valuesObject:
+#           global:
+#             deployTool: argocd
+#
+# What the chart cannot do for you — these belong in the Application spec:
+#
+#   spec:
+#     syncPolicy:
+#       automated: { prune: true, selfHeal: true }
+#       retry: { limit: 5, backoff: { duration: 5s, factor: 2 } }
+#       syncOptions: [ServerSideApply=true, RespectIgnoreDifferences=true]
+#     ignoreDifferences:
+#       # only needed if you want scaling.min seeded at creation
+#       - group: apps
+#         kind: Deployment
+#         jsonPointers: ["/spec/replicas"]
+#
+# Also make sure the Application name matches the Helm release name baked into
+# your existing selectors, or set global.compat.instanceInSelector: false on
+# NEW installs only.
+
+name: internal-app
+environment: staging
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/internal-app
+    tag: "1.0.0"
+  secretStore: my-cluster-store
+  # Ordering: emitted as argocd.argoproj.io/sync-wave under this dialect.
+  ordering:
+    configWeight: "-2"
+    secretWeight: "-1"
+  # Protect the PVC from an auto-sync prune.
+  persistence:
+    retain: true
+  # Applied to every resource that supports annotations.
+  annotations:
+    example.com/owner: platform-team
+
+app:
+  replicas: 2
+  ports:
+    http: 8080
+  persistence:
+    name: data
+    size: 10Gi
+
+configs:
+  app:
+    data:
+      APP_MODE: "internal"
+
+secrets:
+  app:
+    secretKey: "internal/app/staging"
+    properties:
+      - API_KEY
+
+jobs:
+  migrate:
+    # Re-runs on every sync; without this the Job is applied once and its
+    # immutable spec blocks every later change.
+    hook: PreSync
+    command: ["/bin/sh", "-c"]
+    args: ["echo migrate"]

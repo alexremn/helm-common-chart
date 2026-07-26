@@ -62,7 +62,7 @@ And in your chart's `templates/all.yaml`:
 
 Each per-resource template is invoked the same way — pass a `dict` carrying the root `Values`/`Release`/`Chart` plus a `cmp` key naming the component subtree to render (here, `web`). Available entrypoints include `chart.deployment`, `chart.statefulset`, `chart.daemonset`, `chart.job`, `chart.cronjob`, `chart.service`, `chart.service.headless`, `chart.ingress`, `chart.httproute`, `chart.networkpolicy`, `chart.configmap`, `chart.binaryconfigmap`, `chart.secret`, `chart.extsecret`, `chart.serviceaccount`, `chart.rbac`, `chart.hpa`, `chart.vpa`, `chart.scaledobject`, `chart.triggerauth`, `chart.pdb`, `chart.pvc`, `chart.podmonitor`, `chart.servicemonitor`, `chart.prometheusrule`, `chart.priorityclass`.
 
-See [`tests/smoke/templates/all.yaml`](./tests/smoke/templates/all.yaml) for a complete consumer-side template wiring multiple resources, and [`examples/`](./examples/) for richer fixtures (HPA, VPA, NetworkPolicy, ServiceMonitor, profiles, etc.).
+See [`tests/smoke/templates/all.yaml`](./tests/smoke/templates/all.yaml) for a complete consumer-side template wiring multiple resources, and [`examples/`](./examples/) for richer fixtures (HPA, VPA, NetworkPolicy, ServiceMonitor, profiles, the [ArgoCD dialect](./examples/values.argocd.yaml), etc.).
 
 ## What's inside
 

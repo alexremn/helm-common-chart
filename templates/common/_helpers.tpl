@@ -324,7 +324,7 @@ re-running. Prefer an image tag or digest, or the sha256 from
 common.configChecksum. Under `deployTool: argocd`, prefer `jobs.<name>.hook`
 over name suffixing entirely. Use for Job /
 CronJob names that must not churn on every `helm upgrade`.
-Usage: {{ include "generateName" (dict "name" "migrate" "suffix" .Release.Revision) }}
+Usage: {{ include "generateName" (dict "name" "migrate" "suffix" .Values.image.tag) }}
 */}}
 {{- define "generateName" -}}
   {{- $name := required "Name is required" .name }}
