@@ -69,3 +69,11 @@ jobs:
     hook: PreSync
     command: ["/bin/sh", "-c"]
     args: ["echo migrate"]
+
+cronjobs:
+  sync_task:
+    schedule: "0 * * * *"
+    command: ["/bin/sh", "-c"]
+    args: ["echo sync"]
+    jobAnnotations:
+      argocd.argoproj.io/compare-options: IgnoreExtraneous

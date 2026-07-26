@@ -36,6 +36,12 @@ spec:
   timeZone: {{ . | quote }}
   {{- end }}
   jobTemplate:
+    {{- $jobAnn := include "common.annotations" (dict "annotations" (dig "jobAnnotations" dict $componentValues)) | trim }}
+    {{- if $jobAnn }}
+    metadata:
+      annotations:
+        {{- $jobAnn | nindent 8 }}
+    {{- end }}
     spec:
       {{- with $componentValues.activeDeadlineSeconds }}
       activeDeadlineSeconds: {{ . }}
