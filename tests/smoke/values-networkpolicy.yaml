@@ -33,3 +33,15 @@ networkPolicies:
   deny-all:
     podSelector: {}
     policyTypes: [Ingress, Egress]
+  allow-dns:
+    annotations:
+      argocd.argoproj.io/sync-wave: "-1"
+    podSelector: {}
+    policyTypes:
+      - Egress
+    egress:
+      - to:
+          - namespaceSelector: {}
+        ports:
+          - protocol: UDP
+            port: 53
