@@ -197,7 +197,11 @@ When disabled, `{{ ... }}` in a value is emitted literally (no evaluation, no in
 - `global.checksumAnnotations: true` — chart-wide.
 - `<cmp>.rollOnConfigChange: true` — per-component.
 
-Off by default (rendered output is unchanged unless opted in). The hash is computed from in-chart rendered manifests, so it is deterministic and offline.
+Default is dialect-dependent: `false` under `generic`/`werf` (rendered output
+is unchanged unless opted in), `true` under `deployTool: argocd` — there is
+no `helm upgrade` event under ArgoCD, so this hash is the only config-driven
+rollout trigger. See [Deploy-tool dialect](#deploy-tool-dialect). The hash is
+computed from in-chart rendered manifests, so it is deterministic and offline.
 
 ### ExternalSecret `properties`: list or map
 
@@ -447,6 +451,148 @@ global:
 > to restore hardening; set `runAsUser`/`runAsGroup` explicitly under
 > `securityContext.pod` if you relied on the old rails uid/gid.
 
+## Deploy-tool dialect
+
+Key: `global.deployTool`.
+
+A third chart-wide axis, independent of [Profiles](#profiles) and
+[Security posture](#security-posture): which tool consumes the rendered
+manifests. Selects the dialect of ordering and lifecycle metadata the chart
+emits — plain Helm (`generic`), werf (`werf`), or ArgoCD (`argocd`).
+
+Allowed values: `generic`, `werf`, `argocd`. Invalid values fail loudly at
+render time (also schema-rejected before any template runs, since `global.*`
+is propagated into this library chart too).
+
+### Resolution order
+
+```
+global.deployTool  ->  global.werf.annotations (deprecated)  ->  werf service values present  ->  "generic"
+```
+
+1. `global.deployTool` — explicit, validated against the enum.
+2. `global.werf.annotations` (deprecated boolean) — an explicit `true`/`false`
+   override of the werf branch, kept for one minor in favour of
+   `global.deployTool`.
+3. werf service values present (`global.werf.version`, `global.werf.name`, or
+   a hand-written `werf.name`) → `werf`.
+4. otherwise → `generic`.
+
+**werf is auto-detected** — it injects `global.werf.version` and
+`global.werf.name` on every deploy, so a werf consumer needs no
+`deployTool` configuration at all.
+
+**ArgoCD cannot be auto-detected.** Helm exposes no `env` function
+(`helm template` → `function "env" not defined`, verified on Helm v4.2.3),
+and nothing in `.Release` or `.Capabilities` distinguishes ArgoCD's
+repo-server from a plain `helm template` run. (`.Capabilities.APIVersions.Has
+"argoproj.io/v1alpha1"` was considered and rejected: it false-positives for
+any plain-Helm consumer whose target cluster happens to run ArgoCD for
+something else, silently changing emitted metadata.) ArgoCD consumers must
+set `global.deployTool: argocd` explicitly — once, in the Application or
+ApplicationSet template, rather than per app:
+
+```yaml
+spec:
+  source:
+    helm:
+      valuesObject:
+        global:
+          deployTool: argocd
+```
+
+### Behaviour matrix
+
+| Concern | `werf` | `argocd` | `generic` |
+|---|---|---|---|
+| ConfigMap / native Secret / ExternalSecret ordering | `werf.io/weight: "-1"` | `argocd.argoproj.io/sync-wave: "-1"` | nothing |
+| Workload lifecycle metadata | `werf.io/no-activity-timeout`, `werf.io/failures-allowed-per-replica` | nothing (`Application.spec.syncPolicy.retry` owns this) | nothing |
+| `replicasOnCreationAnnotation` fallback | `werf.io/replicas-on-creation` | empty (`""`) — `spec.replicas` stays omitted; seed it via `Application.spec.ignoreDifferences` instead | empty (`""`) |
+| ExternalSecret `force-sync` | `force-sync: <now>` (per-render, default on) | omitted entirely by default — a per-render timestamp is permanent drift; `global.externalSecrets.forceSync: true` opts back in to a stable per-revision value instead | `force-sync: <now>` |
+| `global.checksumAnnotations` default | `false` | `true` — there is no `helm upgrade` event, so this hash is the only config-driven rollout trigger | `false` |
+| `helm.sh/hook` on ConfigMap/ExternalSecret | Helm hook phases (`global.hooks.*`) | never emitted — the `global.hooks.*` intent is translated to a `argocd.argoproj.io/sync-wave` instead | Helm hook phases |
+| `lookup`/random helpers (`secrets.define`, `secrets.retrieve`, `secrets.retrieve.external`, `config.define`, `common.generateName`) | work | `fail` at render, unless `global.argocd.allowClusterlessLookups: true` | work |
+| `app.kubernetes.io/managed-by` | `Helm` | `argocd` | `Helm` |
+
+Why `helm.sh/hook` must never reach ArgoCD: ArgoCD maps `pre-install,pre-upgrade`
+to a PreSync hook, which removes the object from the Application's tracked
+desired state (no OutOfSync reporting, no selfHeal, no prune if the values
+key is later dropped) and applies the default `BeforeHookCreation` policy —
+deleting and recreating the object on every sync. For an `ExternalSecret`
+with `creationPolicy: Owner` that delete cascades to the generated target
+Secret.
+
+### The dialect governs only chart-emitted metadata
+
+`global.deployTool` only changes what the chart itself decides to emit. A
+component's own hand-written `annotations:` are passed through verbatim in
+**every** dialect — switching the dialect does not scrub them. Verified:
+`tests/smoke/values-werf-legacy.yaml` hand-sets
+`jobs.run_task.annotations` to `werf.io/failures-allowed-per-replica: "0"`
+and `werf.io/fail-mode: FailWholeDeployProcessImmediately`, and both survive
+a `--set global.deployTool=argocd` render unchanged. A consumer migrating
+off werf must remove such keys from their own values themselves — the
+dialect switch is not a filter.
+
+### Escape hatches
+
+- **`global.argocd.allowClusterlessLookups`** (default `false`) restores the
+  pre-dialect behaviour of `secrets.define`, `secrets.retrieve`,
+  `secrets.retrieve.external`, `config.define` and `common.generateName`
+  under `deployTool: argocd`, instead of failing at render. This is a
+  **mitigation, not a guarantee**: the guard only fires when the caller
+  threads `"root" $` through to the helper, as every in-chart call site and
+  each helper's documented `Usage:` line does. A consumer invoking one of
+  these helpers the old way — without a `root` key — keeps today's unsafe
+  behaviour (blanking or regenerating live cluster data) under ArgoCD
+  regardless of this setting, because the guard then has no context to
+  resolve the dialect against.
+- **`global.compat.instanceInSelector: false`** drops
+  `app.kubernetes.io/instance` from generated selectors (`matchLabels`
+  only — metadata and pod-template labels are unaffected). **New installs
+  only**: selectors are immutable, so flipping this on a live workload is
+  rejected by the API server; recovery is delete/recreate
+  (`kubectl delete sts --cascade=orphan` for StatefulSets). The instance
+  label is otherwise the only per-release discriminator in selectors, so
+  pair this with `global.selectorLabels` — merged into both `common.labels`
+  and every selector — or two releases of the same app in one namespace will
+  cross-select each other's pods.
+
+### `jobs`/`cronjobs` dialect knobs
+
+| Path | Type | Default | Notes |
+|---|---|---|---|
+| `jobs.<name>.hook` | string (`PreSync`\|`Sync`\|`PostSync`\|`Skip`) | unset | Under `deployTool: argocd`, emits `argocd.argoproj.io/hook: <phase>` plus `hook-delete-policy: BeforeHookCreation`, so the Job re-runs each sync instead of failing on Job spec immutability. Ignored under other dialects. |
+| `jobs.<name>.hookDeletePolicy` | string | `BeforeHookCreation` | Override for `argocd.argoproj.io/hook-delete-policy`. |
+| `cronjobs.<name>.jobAnnotations` | map | unset | Annotations applied to `spec.jobTemplate.metadata` — the spawned Job, not the CronJob itself. |
+
+### What the chart cannot do
+
+These decisions live in the ArgoCD `Application` manifest, not in values —
+the chart can emit resource-level hints but cannot make them:
+
+- `spec.ignoreDifferences` for `/spec/replicas` on HPA/KEDA-scaled
+  Deployments — only needed if you want `scaling.min` seeded at creation;
+  the chart already omits `spec.replicas` when `scaling`/`hpa` is set.
+- `spec.syncPolicy.retry` — the only ArgoCD equivalent of the patience
+  intent behind werf's `no-activity-timeout` / `failures-allowed-per-replica`.
+- `spec.syncPolicy.automated` (`prune`, `selfHeal`) — decides the severity of
+  every drift finding the chart's metadata surfaces. The chart can mitigate
+  (e.g. `global.persistence.retain`), never decide.
+- The cluster's tracking method (`application.instanceLabelKey`, label vs
+  `argocd.argoproj.io/tracking-id`) — an `argocd-cm` cluster setting,
+  unknowable from a render.
+- Release/app name alignment (`spec.source.helm.releaseName`, Application
+  name) — must match the release name already baked into existing immutable
+  selectors, or see `global.compat.instanceInSelector` above.
+- App-of-apps CRD ordering (installing ESO / KEDA / Prometheus-Operator /
+  Gateway-API CRDs before this chart's CRD-backed kinds), and the
+  `ServerSideApply=true` / `RespectIgnoreDifferences=true` /
+  `CreateNamespace=true` sync options.
+
+> The heading anchor `#deploy-tool-dialect` is referenced from
+> `values.schema.json` — do not rename this heading.
+
 ## Misc
 
 - `priorityClasses` — define `PriorityClass` objects (cluster-scoped). Map of name → spec. Rendered by `chart.priorityclass`.
@@ -482,11 +628,21 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | `global.pdb.maxUnavailable` | int\|string | `25%` | Fallback `maxUnavailable` for PodDisruptionBudgets. PDB bound precedence: `<cmp>.pdb.minAvailable` > `<cmp>.pdb.maxUnavailable` > `global.pdb.minAvailable` > `global.pdb.maxUnavailable` > `25%`. |
 | `global.secretStore` | string | unset | Chart-wide default `secretStoreRef.name` for ExternalSecrets. Per-secret `secrets.<name>.secretStore` overrides it. Required (here or per-secret) whenever `secrets` are defined, else the render fails. |
 | `global.externalSecrets.apiVersion` | string | `external-secrets.io/v1` | ExternalSecret apiVersion. Set `external-secrets.io/v1beta1` for clusters running ESO < 0.14.0 (which do not serve `v1`). Validated against those two values. |
-| `global.externalSecrets.forceSync` | bool | `true` | When `true` (default), stamps `force-sync: <now>` on every rendered `ExternalSecret`, so ESO re-reconciles on each `helm upgrade` — but this rewrites the annotation every render (GitOps diff noise). Set `false` for a stable per-revision value (`force-sync: <Release.Revision>`): noise-free diffs, reconcile only when the revision changes. |
-| `global.deployment.replicasOnCreationAnnotation` | string | unset (`""`) | Annotation key for the "replicas at first install" hint. When `werf` annotations are enabled this falls back to `werf.io/replicas-on-creation`. Set to a non-empty string to opt in outside of werf. |
+| `global.externalSecrets.forceSync` | bool | dialect-dependent: `true` under `generic`/`werf`, `false` under `argocd` | Stamps `force-sync: <now>` on every rendered `ExternalSecret` so ESO re-reconciles on each `helm upgrade` — but this rewrites the annotation every render (GitOps diff noise), which under `deployTool: argocd` is permanent drift, so the default flips to omitted there. Set `false` under `generic`/`werf` for a stable per-revision value (`force-sync: <Release.Revision>`) instead of the timestamp; set `true` under `argocd` to opt back into a stamped annotation — still the stable per-revision value there, never a timestamp. See [Deploy-tool dialect](#deploy-tool-dialect). |
+| `global.deployment.replicasOnCreationAnnotation` | string | unset (`""`) | Annotation key for the "replicas at first install" hint. Falls back to `werf.io/replicas-on-creation` under `deployTool: werf`; stays empty under `argocd` (seed `scaling.min` via `Application.spec.ignoreDifferences` instead) and `generic`. Set to a non-empty string to opt in outside of werf. |
 | `global.emitEnvironmentLabel` | bool | `true` | Emit `helm.sh/environment: <env>` label on all rendered resources. Set to `false` to opt out of this non-standard label. v3.0 will flip the default to `false`. |
+| `global.checksumAnnotations` | bool | dialect-dependent: `false` under `generic`/`werf`, `true` under `argocd` | Chart-wide opt-in to the `checksum/config` pod annotation (see "Roll pods on config change" under [Config & Secrets](#config--secrets)). |
 | `global.compat.legacySelectorLabels` | bool | `false` | Use the pre-v2 selector label scheme for charts migrated from `werf`. |
-| `global.werf.annotations` | bool | unset | Explicitly enable / disable werf-style annotation emission. |
+| `global.compat.instanceInSelector` | bool | `true` | Include `app.kubernetes.io/instance` in every generated selector. **New installs only** — selectors are immutable, so flipping this on a live workload requires delete/recreate (`--cascade=orphan` for StatefulSets). Set `false` under ArgoCD when the Application name may diverge from the Helm release name, and pair with `global.selectorLabels`. See [Deploy-tool dialect](#deploy-tool-dialect). |
+| `global.selectorLabels` | map | unset | Labels added to both `common.labels` and every generated selector. Use as a stable discriminator when `global.compat.instanceInSelector` is `false`. Immutable in practice — changing these on a live workload also requires delete/recreate. |
+| `global.extraLabels` | map | unset | Labels merged into `common.labels` on every resource. NOT added to selectors — see `global.selectorLabels` for that. |
+| `global.annotations` | map | unset | Annotations merged into workloads (Deployment/StatefulSet/DaemonSet/Job/CronJob), ConfigMap, Secret, ExternalSecret, Service, ServiceAccount, PDB, PVC, PodMonitor, NetworkPolicy, RBAC, PriorityClass, ScaledObject and TriggerAuthentication. A resource's own `annotations` wins on key conflict. **Not** applied to HPA, VPA, HTTPRoute, PrometheusRule or ServiceMonitor (set those per-resource), nor to Ingress (use `global.ingress.annotations`). |
+| `global.deployTool` | string | `werf` when werf service values are present, else `generic` | Selects the dialect of ordering/lifecycle metadata the chart emits (`generic`\|`werf`\|`argocd`). ArgoCD cannot be auto-detected and must be set explicitly. See [Deploy-tool dialect](#deploy-tool-dialect). |
+| `global.ordering.configWeight` | string\|int | `-1` | Ordering weight for ConfigMaps and native Secrets. Emitted as `werf.io/weight` under `werf` and `argocd.argoproj.io/sync-wave` under `argocd`. Falls back to the legacy top-level `werf.configWeight`. |
+| `global.ordering.secretWeight` | string\|int | `-1` | Ordering weight for ExternalSecrets. Same emission rule as `configWeight`. Falls back to the legacy top-level `werf.secretWeight`. |
+| `global.persistence.retain` | bool | `false` | Protect standalone PVCs from deletion: emits `helm.sh/resource-policy: keep`, plus `argocd.argoproj.io/sync-options: Prune=false` under `deployTool: argocd` (where `resource-policy` alone is inert, since ArgoCD never runs `helm install`/`upgrade`). |
+| `global.argocd.allowClusterlessLookups` | bool | `false` | Allow `secrets.define`, `secrets.retrieve`, `secrets.retrieve.external`, `config.define` and `common.generateName` to render under `deployTool: argocd` instead of failing. Mitigation only — see [Escape hatches](#escape-hatches). |
+| `global.werf.annotations` | bool | unset | **Deprecated**, removed in 3.0 — explicit override for emitting werf-style annotations. Superseded by `global.deployTool`. |
 
 ## Public helpers
 

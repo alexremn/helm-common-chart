@@ -129,7 +129,9 @@ lint-consumer:
 	trap 'rm -f Chart.lock charts/common-*.tgz; rmdir charts 2>/dev/null || true' EXIT && \
 	$(HELM) dependency build --skip-refresh >/tmp/consumer-deps.log && \
 	$(HELM) lint . -f values.yaml && \
-	$(HELM) template consumer-compat . -f values.yaml >/tmp/consumer-render.out )
+	$(HELM) template consumer-compat . -f values.yaml >/tmp/consumer-render.out && \
+	$(HELM) lint . -f values-argocd.yaml && \
+	$(HELM) template consumer-compat . -f values-argocd.yaml >/tmp/consumer-render-argocd.out )
 
 # Run all validation gates. Assumes /tmp/common-smoke-*.out exists from render-smoke.
 validate: render-smoke validate-kubeconform validate-kube-linter
