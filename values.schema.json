@@ -227,6 +227,10 @@
             "legacySelectorLabels": {
               "type": "boolean",
               "description": "Include `version` and `extraLabels` in `common.labels.matchLabels`. Use only when migrating a chart whose pre-1.3 release stored those labels in selectors -- changing selector contents on existing Deployments/StatefulSets is not allowed by Kubernetes."
+            },
+            "instanceInSelector": {
+              "type": "boolean",
+              "description": "Include app.kubernetes.io/instance in every generated selector. Default true. NEW INSTALLS ONLY: selectors are immutable, so flipping this on a live workload requires delete/recreate (--cascade=orphan for StatefulSets). Set false under ArgoCD when the Application name may diverge from the Helm release name, and supply global.selectorLabels as a replacement discriminator."
             }
           }
         },
@@ -261,6 +265,13 @@
             "type": "string"
           },
           "description": "Labels merged into common.labels on every resource. NOT added to selectors — see global.selectorLabels for that."
+        },
+        "selectorLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Labels added to BOTH common.labels and every generated selector. Use as a stable discriminator when global.compat.instanceInSelector is false. Immutable in practice — changing these on a live workload requires delete/recreate."
         }
       }
     },
