@@ -32,7 +32,7 @@ metadata:
   name: {{ default $cmp $saConfig.name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $saConfig | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $saConfig)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

@@ -71,14 +71,14 @@ metadata:
   labels:
     {{- include "common.labels" .labelCtx | nindent 4 }}
   {{- $ann := include "config.annotations.default" (dict "env" .env "Values" .Values) | trim }}
-  {{- $userAnn := default dict .annotations }}
-  {{- if or $ann (gt (len $userAnn) 0) }}
+  {{- $userAnn := include "common.metadata.annotations" (dict "root" . "annotations" (default dict .annotations)) | trim }}
+  {{- if or $ann $userAnn }}
   annotations:
     {{- if $ann }}
     {{- $ann | nindent 4 }}
     {{- end }}
-    {{- with $userAnn }}
-    {{- toYaml . | nindent 4 }}
+    {{- if $userAnn }}
+    {{- $userAnn | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

@@ -190,8 +190,11 @@ app.kubernetes.io/managed-by: {{ ternary "argocd" (.Release.Service | default "H
 {{- with $version }}
 app.kubernetes.io/version: {{ . | quote }}
 {{- end }}
-{{- with .extraLabels }}
-{{ toYaml . | nindent 0 }}
+{{- /* Chart-wide labels merge first; a caller-supplied extraLabels wins. */ -}}
+{{- $extra := dig "global" "extraLabels" dict $values }}
+{{- with .extraLabels }}{{- $extra = mergeOverwrite (deepCopy $extra) . }}{{- end }}
+{{- with $extra }}
+{{- toYaml . | nindent 0 }}
 {{- end }}
 {{- end -}}
 

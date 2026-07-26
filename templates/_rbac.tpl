@@ -36,7 +36,7 @@ Parameters:
 {{- $bindingName := default $name .bindingName -}}
 {{- $bindingKind := printf "%sBinding" $kind -}}
 {{- $emitNamespace := and (eq $kind "Role") .namespace }}
-{{- $ann := include "common.annotations" (dict "annotations" (default dict .annotations)) | trim }}
+{{- $ann := include "common.metadata.annotations" (dict "root" .root "annotations" (default dict .annotations)) | trim }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $kind }}

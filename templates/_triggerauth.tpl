@@ -22,7 +22,7 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $val | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

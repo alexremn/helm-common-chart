@@ -53,8 +53,9 @@ Usage: {{ include "common.image.toString" $imgValue }}
 {{- end }}
 
 {{/*
-Render workload-level annotations (werf + user annotations + optional
-extra key/value), or emit nothing when no source is present.
+Render workload-level annotations (chart-wide global.annotations + werf +
+user annotations + optional extra key/value), or emit nothing when no
+source is present.
 
 Used by Deployment and StatefulSet renderers (and any future workload
 kind that follows the same contract).
@@ -85,10 +86,15 @@ Usage:
        `werf.io/failures-allowed-per-replica: "0"`), producing a duplicate
        mapping key. Most YAML parsers take the last one, but strict decoders —
        including `kubectl --validate=strict` and server-side apply — reject the
-       manifest outright. Precedence is unchanged: werf < component < extra. */ -}}
+       manifest outright. Precedence: chart-wide < werf < component < extra. */ -}}
 {{- $annotations := dict -}}
+{{- range $key, $val := dig "global" "annotations" dict (include "common._values" $root | fromYaml | default dict) -}}
+  {{- $_ := set $annotations $key ($val | toString) -}}
+{{- end -}}
 {{- if $werfAnn -}}
-  {{- $annotations = fromYaml $werfAnn -}}
+  {{- range $key, $val := fromYaml $werfAnn -}}
+    {{- $_ := set $annotations $key $val -}}
+  {{- end -}}
 {{- end -}}
 {{- range $key, $val := $userAnn -}}
   {{- $_ := set $annotations $key ($val | toString) -}}

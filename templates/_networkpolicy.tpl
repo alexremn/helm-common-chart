@@ -56,8 +56,10 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- with $np.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $npCompAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $np)) | trim }}
+  {{- if $npCompAnn }}
+  annotations:
+    {{- $npCompAnn | nindent 4 }}
   {{- end }}
 spec:
   podSelector:
@@ -120,7 +122,7 @@ metadata:
     {{- end }}
   {{- /* `annotations` and `labels` are metadata, not spec: emitting them
          verbatim inside `spec:` produces a manifest the API server rejects. */ -}}
-  {{- $npAnn := include "common.annotations" $spec | trim }}
+  {{- $npAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $spec)) | trim }}
   {{- if $npAnn }}
   annotations:
     {{- $npAnn | nindent 4 }}
