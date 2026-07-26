@@ -158,17 +158,20 @@ spec:
         {{ $key }}: {{ $value | quote }}
       {{- end }}
   {{- end }}
+  {{- /* These are siblings of `type:` within the trigger sequence item, so they
+         indent to 6 — the column `metadata:` sits at. At 4 they fell outside
+         the item and the rendered manifest failed to parse. */ -}}
   {{- with .authenticationRef }}
-    authenticationRef: {{ toYaml . | nindent 6 }}
+      authenticationRef: {{ toYaml . | nindent 8 }}
   {{- end }}
   {{- with .name }}
-    name: {{ . }}
+      name: {{ . }}
   {{- end }}
   {{- with .metricType }}
-    metricType: {{ . }}
+      metricType: {{ . }}
   {{- end }}
   {{- with .extraConfig }}
-    {{ toYaml . | nindent 6 }}
+      {{ toYaml . | nindent 6 }}
   {{- end }}
   {{- end }}
 {{- end }}

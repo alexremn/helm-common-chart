@@ -56,6 +56,8 @@ web:
     triggers:
       - type: cpu
         value: "75"
+        name: cpu-utilization
+        metricType: Utilization
   pdb:
     minAvailable: 2
   configmap:
