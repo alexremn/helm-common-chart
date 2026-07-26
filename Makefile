@@ -5,7 +5,7 @@ SMOKE_DIR ?= tests/smoke
 GOLDEN_DIR ?= tests/golden
 
 .PHONY: lint lint-library lint-smoke lint-negative render-smoke golden-update golden-check lint-consumer \
-        validate validate-kubeconform validate-kube-linter
+        validate validate-kubeconform validate-kube-linter determinism-check
 
 # Phase C1 — validation tooling.
 KUBECONFORM_VERSION ?= v0.7.0
@@ -156,3 +156,33 @@ validate-kube-linter:
 	  kube-linter lint /tmp/common-smoke-$$variant.out --config .kube-linter.yaml \
 	    || { echo "FAIL kube-linter: $$variant" >&2; exit 1; }; \
 	done
+
+# Render every variant twice under the argocd dialect, WITHOUT the force-sync /
+# TOKEN normalization that render-smoke applies, and diff the raw outputs.
+# ArgoCD re-renders on every reconcile, so any per-render variance is permanent
+# drift. Variants that legitimately require cluster access can be listed in
+# DETERMINISM_EXCLUDE, but prefer letting them fall through to the
+# does-not-render skip below: that branch states why a variant was skipped,
+# whereas an exclude-list entry only says someone listed it, and would
+# permanently suppress a real FAIL if the variant ever started rendering.
+DETERMINISM_EXCLUDE :=
+
+determinism-check:
+	( cd $(SMOKE_DIR) && \
+	trap 'rm -f Chart.lock charts/common-*.tgz; rmdir charts 2>/dev/null || true' EXIT && \
+	$(HELM) dependency build --skip-refresh >/tmp/common-smoke-deps.log && \
+	rc=0; \
+	for variant in $(SMOKE_VARIANTS); do \
+	  case " $(DETERMINISM_EXCLUDE) " in *" $$variant "*) \
+	    echo "SKIP determinism: $$variant (in DETERMINISM_EXCLUDE)"; continue;; esac; \
+	  if ! $(HELM) template smoke . -f values-$$variant.yaml --set global.deployTool=argocd >/tmp/det-a-$$variant.out 2>/dev/null; then \
+	    echo "SKIP determinism: $$variant (does not render under deployTool=argocd)"; continue; \
+	  fi; \
+	  $(HELM) template smoke . -f values-$$variant.yaml --set global.deployTool=argocd >/tmp/det-b-$$variant.out 2>/dev/null; \
+	  if ! diff -u /tmp/det-a-$$variant.out /tmp/det-b-$$variant.out >/dev/null; then \
+	    echo "FAIL determinism: $$variant renders differently on consecutive runs" >&2; \
+	    diff -u /tmp/det-a-$$variant.out /tmp/det-b-$$variant.out | head -20 >&2; \
+	    rc=1; \
+	  fi; \
+	done; \
+	exit $$rc )
