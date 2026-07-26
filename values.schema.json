@@ -278,6 +278,23 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "properties": {
+            "description": "Remote fields to fetch. A list uses each field name as the Secret key; a map is <secretKey>: <remoteProperty>, for stores whose field names differ from the keys the workload expects.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            ]
           }
         }
       }

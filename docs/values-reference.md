@@ -199,6 +199,39 @@ When disabled, `{{ ... }}` in a value is emitted literally (no evaluation, no in
 
 Off by default (rendered output is unchanged unless opted in). The hash is computed from in-chart rendered manifests, so it is deterministic and offline.
 
+### ExternalSecret `properties`: list or map
+
+`secrets.<name>.properties` selects which fields to pull from the remote secret
+at `secrets.<name>.secretKey`. It takes either shape:
+
+```yaml
+secrets:
+  # list — the remote field name is also the key written into the Secret
+  app-db:
+    secretKey: secret/data/app/db
+    properties:
+      - DB_USERNAME
+      - DB_PASSWORD
+
+  # map — <secretKey>: <remoteProperty>
+  app-pki:
+    secretKey: secret/data/app/pki
+    properties:
+      CA_CERT: ca-certificate
+      CA_PRIVATE_KEY: ca-private-key
+```
+
+Use the map form when the field names in the store differ from the env vars the
+workload reads — common with Vault paths that use kebab-case fields. Without it
+you would have to reshape the Secret with a `template` block, or wire each key
+through `<cmp>.env[].valueFrom.secretKeyRef`.
+
+Map keys render in sorted order, so output is byte-stable.
+
+A secret spanning **several** remote paths cannot be expressed with
+`properties` (one `secretKey` per entry) — use `dataFrom` with one `extract` per
+path, plus a `template` block if you also need to rename.
+
 ### `envFrom` shape and rails-profile phantom defaults
 
 `envFrom` is **not** a flat list of Kubernetes `envFrom` entries. It is a structured map with two keys:

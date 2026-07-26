@@ -50,6 +50,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   schema-reserved-keys \
                   global-pdb-minavailable \
                   extsecret-datafrom \
+                  extsecret-properties-map \
                   config-checksum \
                   httproute
 
