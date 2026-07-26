@@ -298,8 +298,7 @@ Usage (shape b, legacy):
 {{- /* P3-3: env values run through `tpl` by default (consumer templating).
        Opt out chart-wide via `global.tpl.envValues: false` or per-component
        via `<cmp>.envRaw: true` to emit values verbatim (no injection). */ -}}
-{{- $tplEnabled := dig "global" "tpl" "envValues" true (toYaml $rootValues | fromYaml) }}
-{{- if (dig "envRaw" false $componentValues) }}{{- $tplEnabled = false }}{{- end }}
+{{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" (dict "Values" $rootValues) "component" $componentValues)) "true" }}
 env:
 {{- range $key, $value := $componentValues.env }}
 {{- if kindIs "map" $value }}

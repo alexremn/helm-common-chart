@@ -52,8 +52,7 @@ stringData:
 {{- /* P3-3: stringData runs through `tpl` by default. Opt out chart-wide via
        `global.tpl.envValues: false` or per-secret via `envRaw: true`. */ -}}
 {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
-{{- $tplEnabled := dig "global" "tpl" "envValues" true (toYaml $.Values | fromYaml) }}
-{{- if (dig "envRaw" false $val) }}{{- $tplEnabled = false }}{{- end }}
+{{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $val)) "true" }}
 {{- range $k, $v := . }}
   {{ $k }}: {{ if $tplEnabled }}{{ tpl (toString $v) $tplCtx | quote }}{{ else }}{{ toString $v | quote }}{{ end }}
 {{- end }}

@@ -236,7 +236,7 @@
           "properties": {
             "envValues": {
               "type": "boolean",
-              "description": "Render <cmp>.env values and native Secret stringData through Helm `tpl`. Default true. Set false to emit values verbatim (closes the templating-injection surface for untrusted multi-tenant values). Per-component override: `<cmp>.envRaw: true`. v3.0 will flip the default to false."
+              "description": "Render <cmp>.env values, ConfigMap data, native Secret stringData and KEDA prometheus queries through Helm `tpl`. Default true under deployTool generic/werf, false under deployTool argocd, where consumer-authored non-deterministic template text re-renders on every reconcile. Set false to emit values verbatim (closes the templating-injection surface for untrusted multi-tenant values). Per-component override: <cmp>.envRaw: true. v3.0 will flip the default to false everywhere."
             }
           }
         },
