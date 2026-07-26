@@ -1,0 +1,255 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+value: 1000
+globalDefault: false
+description: "high priority"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: annotations-fixture
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: annotations-sa
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bootstrap
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+type: Opaque
+stringData:
+  HELLO: "world"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+data:
+  APP_MODE: "test"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+rules: 
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: web
+subjects:
+  - kind: ServiceAccount
+    name: annotations-sa
+    namespace: default
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    example.com/enabled: "true"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: annotations-fixture
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: annotations-fixture
+        app.kubernetes.io/component: web
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: annotations-sa
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-auth
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: annotations-fixture
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  secretTargetRef: 
+    - key: HELLO
+      name: bootstrap
+      parameter: connection

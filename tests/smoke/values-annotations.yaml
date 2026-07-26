@@ -1,0 +1,59 @@
+# Phase 0: annotation values that are not strings must still render as strings,
+# and the four emitters that previously had no annotation passthrough must
+# honour one.
+name: annotations-fixture
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  annotations:
+    argocd.argoproj.io/sync-wave: 2
+    example.com/enabled: true
+  configmap:
+    data:
+      APP_MODE: "test"
+  persistence:
+    name: data
+    size: 1Gi
+  serviceAccount:
+    name: annotations-sa
+  # Per-component RBAC requires the `.role` nesting — see templates/_rbac.tpl:82-89.
+  # A bare `rbac.rules` renders NOTHING at all, not merely an annotation-less Role.
+  rbac:
+    role:
+      rules:
+        - apiGroups: [""]
+          resources: ["pods"]
+          verbs: ["get", "list"]
+      annotations:
+        argocd.argoproj.io/sync-wave: -3
+
+nativeSecrets:
+  bootstrap:
+    type: Opaque
+    stringData:
+      HELLO: world
+    annotations:
+      argocd.argoproj.io/sync-wave: -5
+
+priorityClasses:
+  high:
+    value: 1000
+    description: "high priority"
+    annotations:
+      argocd.argoproj.io/sync-wave: -10
+
+triggerAuthentications:
+  keda-auth:
+    secretTargetRef:
+      - parameter: connection
+        name: bootstrap
+        key: HELLO
+    annotations:
+      argocd.argoproj.io/sync-wave: -4

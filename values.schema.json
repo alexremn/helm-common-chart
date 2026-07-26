@@ -424,12 +424,9 @@
     "annotations": {
       "type": "object",
       "additionalProperties": {
-        "type": [
-          "string",
-          "number",
-          "boolean"
-        ]
-      }
+        "type": "string"
+      },
+      "description": "Annotation map. Values MUST be strings — metadata.annotations is map[string]string. Quote numeric values (e.g. argocd.argoproj.io/sync-wave: \"-1\")."
     },
     "intOrPercent": {
       "oneOf": [

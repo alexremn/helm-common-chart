@@ -52,7 +52,8 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   extsecret-datafrom \
                   extsecret-properties-map \
                   config-checksum \
-                  httproute
+                  httproute \
+                  annotations
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
