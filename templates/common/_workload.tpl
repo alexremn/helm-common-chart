@@ -79,17 +79,24 @@ Usage:
 {{- $extra := default dict .extra -}}
 {{- $werfAnn := include "common.annotations.werf" $root | trim -}}
 {{- $userAnn := dig "annotations" dict $component -}}
-{{- if or $werfAnn (gt (len $userAnn) 0) (gt (len $extra) 0) }}
+{{- /* Collapse the three sources into one map before emitting. Rendering them
+       as three separate blocks wrote a key twice whenever a component
+       overrode a werf default (e.g. a Job setting
+       `werf.io/failures-allowed-per-replica: "0"`), producing a duplicate
+       mapping key. Most YAML parsers take the last one, but strict decoders —
+       including `kubectl --validate=strict` and server-side apply — reject the
+       manifest outright. Precedence is unchanged: werf < component < extra. */ -}}
+{{- $annotations := dict -}}
+{{- if $werfAnn -}}
+  {{- $annotations = fromYaml $werfAnn -}}
+{{- end -}}
+{{- $annotations = mergeOverwrite $annotations (deepCopy $userAnn) -}}
+{{- range $key, $val := $extra -}}
+  {{- $_ := set $annotations $key ($val | toString) -}}
+{{- end -}}
+{{- if gt (len $annotations) 0 }}
   annotations:
-    {{- if $werfAnn }}
-    {{- $werfAnn | nindent 4 }}
-    {{- end }}
-    {{- with $userAnn }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- range $key, $val := $extra }}
-    {{ $key }}: {{ $val | quote }}
-    {{- end }}
+    {{- toYaml $annotations | nindent 4 }}
 {{- end -}}
 {{- end -}}
 

@@ -29,6 +29,10 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "chart.scaledobject emitted scaling.triggers[].name, .metricType, .authenticationRef and .extraConfig at the wrong indentation, outside the trigger list item, so any consumer setting one of them rendered an unparseable manifest"
+    - kind: fixed
+      description: "workload annotations are merged into a single map before rendering; a component overriding a werf default (e.g. werf.io/failures-allowed-per-replica on a Job) previously emitted the key twice, which strict YAML decoders reject"
     - kind: added
       description: "configs.<name>.annotations and secrets.<name>.annotations are now rendered, merged after the chart defaults (same order as workload annotations); previously these keys were accepted by the schema but silently ignored"
     - kind: added
