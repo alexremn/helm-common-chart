@@ -46,3 +46,24 @@ werf
 generic
 {{- end -}}
 {{- end -}}
+
+{{/*
+Deploy-ordering annotation for the active dialect.
+
+werf orders with `werf.io/weight`, ArgoCD with
+`argocd.argoproj.io/sync-wave`. Both are lower-runs-first integers, so the
+weight maps 1:1. Plain Helm needs nothing — its install order already puts
+ConfigMaps and Secrets ahead of workloads.
+
+Usage:
+  {{- include "common.annotations.ordering" (dict "root" . "weight" -1) }}
+*/}}
+{{- define "common.annotations.ordering" -}}
+{{- $tool := include "common.deployTool" .root -}}
+{{- $weight := .weight | toString -}}
+{{- if eq $tool "werf" -}}
+werf.io/weight: {{ $weight | quote }}
+{{- else if eq $tool "argocd" -}}
+argocd.argoproj.io/sync-wave: {{ $weight | quote }}
+{{- end -}}
+{{- end -}}
