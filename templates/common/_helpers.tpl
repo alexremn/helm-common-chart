@@ -52,16 +52,39 @@ SECRET OPERATORS
 */}}
 
 {{/*
-Generate external secret data entries
+Generate external secret data entries.
+
+`values` accepts two shapes:
+
+  list — the remote field name is also the key written into the Secret:
+    (dict "key" "path/to/secret" "values" (list "TOKEN" "API_KEY"))
+
+  map  — <secretKey>: <remoteProperty>, for when the key the workload expects
+         differs from the field name in the store:
+    (dict "key" "path/to/secret" "values" (dict "CA_CERT" "ca-certificate"))
+
+Map keys are emitted in sorted order so renders stay byte-stable regardless of
+Go's map iteration.
+
 Usage: {{ include "secrets.generate" (dict "key" "secret-key" "values" (list "property1" "property2")) }}
 */}}
 {{- define "secrets.generate" -}}
 {{- $key := .key -}}
-{{- range $value := .values }}
+{{- $values := .values -}}
+{{- if kindIs "map" $values -}}
+{{- range $secretKey := keys $values | sortAlpha }}
+  - secretKey: {{ $secretKey }}
+    remoteRef:
+      key: {{ $key }}
+      property: {{ index $values $secretKey }}
+{{- end -}}
+{{- else -}}
+{{- range $value := $values }}
   - secretKey: {{ $value }}
     remoteRef:
       key: {{ $key }}
       property: {{ $value }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
