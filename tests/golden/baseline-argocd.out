@@ -1,5 +1,24 @@
 ---
 # Source: common-smoke/templates/all.yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: argocd-high
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+value: 1000
+globalDefault: false
+description: "shared cluster-scoped object — two Applications may declare it"
+
+---
+# Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -54,6 +73,76 @@ data:
   LOG_LEVEL: "info"
 ---
 # Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "1Gi"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-app-web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+rules: 
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - list
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-app-web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-app-web
+subjects:
+  - kind: ServiceAccount
+    name: web
+    namespace: default
+---
+# Source: common-smoke/templates/all.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -77,6 +166,34 @@ spec:
     app.kubernetes.io/name: argocd-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/instance: smoke
+  publishNotReadyAddresses: false
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -150,6 +267,98 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-app
+      app.kubernetes.io/component: stateful
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: argocd-app
+        app.kubernetes.io/component: stateful
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/version: "7.8.9"
+      annotations:
+        checksum/config: 266ce9fc8101c6909d69f1a4a1fae8d2405555793c5d11e0447707c1a83d3683
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          helm.sh/chart: common-smoke-0.1.0
+          app.kubernetes.io/name: argocd-app
+          app.kubernetes.io/component: stateful
+          helm.sh/environment: staging
+          app.kubernetes.io/instance: smoke
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/version: "7.8.9"
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "1Gi"
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
