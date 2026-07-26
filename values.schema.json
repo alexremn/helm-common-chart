@@ -250,6 +250,17 @@
             }
           },
           "description": "ArgoCD-specific escape hatches."
+        },
+        "annotations": {
+          "$ref": "#/$defs/annotations",
+          "description": "Annotations merged into workloads (Deployment/StatefulSet/DaemonSet/Job/CronJob), ConfigMap, Secret, ExternalSecret, Service, ServiceAccount, PDB, PVC, PodMonitor, NetworkPolicy, RBAC, PriorityClass, ScaledObject and TriggerAuthentication. A resource's own annotations win. Use for chart-wide argocd.argoproj.io/sync-options or ownership metadata. NOT applied to HPA, VPA, HTTPRoute, PrometheusRule or ServiceMonitor (set those per-resource), nor to Ingress (use global.ingress.annotations)."
+        },
+        "extraLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Labels merged into common.labels on every resource. NOT added to selectors — see global.selectorLabels for that."
         }
       }
     },

@@ -70,7 +70,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $serviceConfig | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $serviceConfig)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}
@@ -124,8 +124,10 @@ metadata:
   name: {{ include "common.safeName" (dict "name" (printf "%s-%s" $cmp $extraName)) | trim }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- with $extra.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $extraAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $extra)) | trim }}
+  {{- if $extraAnn }}
+  annotations:
+    {{- $extraAnn | nindent 4 }}
   {{- end }}
 spec:
   type: {{ dig "type" "ClusterIP" $extra }}
@@ -166,7 +168,7 @@ metadata:
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
     service.kubernetes.io/headless: "true"
-  {{- $ann := include "common.annotations" $serviceConfig | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $serviceConfig)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

@@ -73,7 +73,7 @@ metadata:
   {{- with $componentValues.podMonitor.labels }}
     {{ toYaml . | nindent 4 }}
   {{- end }}
-  {{- $ann := include "common.annotations" $pmConfig | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $pmConfig)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

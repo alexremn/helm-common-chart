@@ -28,7 +28,7 @@ metadata:
   name: {{ default $cmp $persistence.name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $persistence | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $persistence)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}
@@ -45,7 +45,7 @@ metadata:
   name: {{ required "PVC name is required" $pvc.name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" $pvc | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $pvc)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

@@ -135,3 +135,26 @@ Usage:
 {{- if dig "envRaw" false (default dict .component) -}}{{- $enabled = false -}}{{- end -}}
 {{- ternary "true" "false" (eq $enabled true) -}}
 {{- end -}}
+
+{{/*
+Merge chart-wide `global.annotations` under a resource's own annotations.
+
+Returns the YAML body only (no leading `annotations:` key), matching
+`common.annotations`. The caller emits the key, gated on non-empty output.
+
+Usage:
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
+*/}}
+{{- define "common.metadata.annotations" -}}
+{{- $values := include "common._values" .root | fromYaml | default dict -}}
+{{- $merged := dict -}}
+{{- range $k, $v := (dig "global" "annotations" dict $values) -}}
+  {{- $_ := set $merged $k ($v | toString) -}}
+{{- end -}}
+{{- range $k, $v := (default dict .annotations) -}}
+  {{- $_ := set $merged $k ($v | toString) -}}
+{{- end -}}
+{{- if gt (len $merged) 0 -}}
+{{- toYaml $merged -}}
+{{- end -}}
+{{- end -}}

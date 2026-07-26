@@ -28,7 +28,7 @@ metadata:
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- $ann := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
-  {{- $userAnn := include "common.annotations" $val | trim }}
+  {{- $userAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
   {{- if or $ann $userAnn }}
   annotations:
     {{- if $ann }}

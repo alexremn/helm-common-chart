@@ -34,7 +34,7 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.annotations" (dict "annotations" $effectiveAnn) | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" $effectiveAnn) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}
