@@ -85,3 +85,30 @@ werf.io/no-activity-timeout: {{ default "6m" .timeout | quote }}
 werf.io/failures-allowed-per-replica: {{ default "3" .failures | quote }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Refuse a cluster-dependent or non-deterministic operation under ArgoCD.
+
+ArgoCD's repo-server renders with `helm template` and no Kubernetes API
+access, so Helm's `lookup` always returns an empty dict. Helpers that fall
+back to a generated or empty value therefore either rotate credentials on
+every reconcile or apply empty data over live cluster material.
+
+Escape hatch: `global.argocd.allowClusterlessLookups: true`, so blanking or
+regenerating live data is always a deliberate, greppable choice.
+
+Usage:
+  {{- include "common.argocd.requireCluster" (dict
+        "root" $ctx
+        "helper" "secrets.define"
+        "detail" "pass an explicit `value`, or manage the secret with chart.extsecret") }}
+*/}}
+{{- define "common.argocd.requireCluster" -}}
+{{- $root := .root -}}
+{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- if eq (include "common.deployTool" $root) "argocd" -}}
+{{- if not (dig "global" "argocd" "allowClusterlessLookups" false $values) -}}
+{{- fail (printf "%s requires a cluster lookup, which is unavailable under global.deployTool: argocd (ArgoCD renders with `helm template`, so Helm's `lookup` always returns empty and this helper would emit a regenerated or empty value over live cluster data). %s. To keep the current behaviour anyway, set global.argocd.allowClusterlessLookups: true." .helper .detail) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

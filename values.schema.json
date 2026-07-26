@@ -239,6 +239,17 @@
               "description": "Render <cmp>.env values and native Secret stringData through Helm `tpl`. Default true. Set false to emit values verbatim (closes the templating-injection surface for untrusted multi-tenant values). Per-component override: `<cmp>.envRaw: true`. v3.0 will flip the default to false."
             }
           }
+        },
+        "argocd": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "allowClusterlessLookups": {
+              "type": "boolean",
+              "description": "Allow lookup-dependent and random helpers to render under deployTool: argocd. Default false, because ArgoCD's repo-server has no cluster access: lookup returns empty, so these helpers emit regenerated or empty values that ArgoCD then applies over live Secret/ConfigMap data."
+            }
+          },
+          "description": "ArgoCD-specific escape hatches."
         }
       }
     },

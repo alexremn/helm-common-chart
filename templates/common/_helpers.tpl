@@ -31,9 +31,10 @@ CONFIG OPERATORS
 
 {{/*
 Define a config value, with lookup for existing values
-Usage: {{ include "config.define" (dict "name" "config-name" "key" "KEY_NAME" "value" "default-value" "ns" .Release.Namespace) }}
+Usage: {{ include "config.define" (dict "root" $ "name" "config-name" "key" "KEY_NAME" "value" "default-value" "ns" .Release.Namespace) }}
 */}}
 {{- define "config.define" -}}
+  {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "config.define" "detail" "pass an explicit `value`, or use `configs.<name>.data`") -}}
   {{- $name       := default "config" .name -}}
   {{- $key        := required "Key is required" .key -}}
   {{- $namespace  := .ns | default "" -}}
@@ -102,9 +103,10 @@ If the Secret does not exist, an empty string (or `KEY: ""` when
 fail. This is intentional for bootstrapping new clusters; callers that
 need the value to exist must guard externally.
 
-Usage: {{ include "secrets.retrieve" (dict "name" "secret-name" "key" "KEY_NAME" "type" "full" "ns" .Release.Namespace) }}
+Usage: {{ include "secrets.retrieve" (dict "root" $ "name" "secret-name" "key" "KEY_NAME" "type" "full" "ns" .Release.Namespace) }}
 */}}
 {{- define "secrets.retrieve" -}}
+  {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "secrets.retrieve" "detail" "manage the secret with chart.extsecret") -}}
   {{- $type       := default "full" .type -}}
   {{- $name       := default "secrets" .name -}}
   {{- $key        := required "Key is required" .key -}}
@@ -139,7 +141,7 @@ drift unless the underlying Secret is created before the next upgrade.
 Use this for first-install bootstrap of secrets that the cluster will
 then own. Do not use as a long-running source of truth.
 
-Usage: {{ include "secrets.define" (dict "name" "secret-name" "key" "KEY_NAME" "value" "default-value" "type" "full" "var" "base" "ns" .Release.Namespace) }}
+Usage: {{ include "secrets.define" (dict "root" $ "name" "secret-name" "key" "KEY_NAME" "value" "default-value" "type" "full" "var" "base" "ns" .Release.Namespace) }}
 */}}
 {{- define "secrets.define" -}}
   {{- $type       := default "full" .type -}}
@@ -148,6 +150,7 @@ Usage: {{ include "secrets.define" (dict "name" "secret-name" "key" "KEY_NAME" "
   {{- $key        := required "Key is required" .key -}}
   {{- $namespace  := .ns | default "" -}}
   {{- $value      := .value -}}
+  {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "secrets.define" "detail" "pass an explicit `value`, or manage the secret with chart.extsecret") -}}
   {{- if or (not $value) (eq $value "") -}}
     {{- if eq $var "base" -}}
       {{- $value = randAlphaNum 64 -}}
@@ -182,9 +185,10 @@ Usage: {{ include "secrets.define" (dict "name" "secret-name" "key" "KEY_NAME" "
 
 {{/*
 Retrieve a secret across namespaces with fallback support
-Usage: {{ include "secrets.retrieve.external" (dict "key" "KEY_NAME" "base" (dict "name" "base-secret" "ns" "default") "ext" (dict "name" "external-secret" "ns" "external-ns")) }}
+Usage: {{ include "secrets.retrieve.external" (dict "root" $ "key" "KEY_NAME" "base" (dict "name" "base-secret" "ns" "default") "ext" (dict "name" "external-secret" "ns" "external-ns")) }}
 */}}
 {{- define "secrets.retrieve.external" -}}
+  {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "secrets.retrieve.external" "detail" "manage the secret with chart.extsecret") -}}
   {{- $key                := required "Key is required" .key -}}
   {{- $nameBase           := default "secrets" .base.name -}}
   {{- $namespaceBase      := .base.ns -}}

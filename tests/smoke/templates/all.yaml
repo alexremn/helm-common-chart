@@ -91,7 +91,7 @@ metadata:
   name: hex-bootstrap
 type: Opaque
 stringData:
-  {{ include "secrets.define" (dict "name" "hex-bootstrap" "key" "TOKEN" "var" "hex" "ns" .Release.Namespace) }}
+  {{ include "secrets.define" (dict "root" $ "name" "hex-bootstrap" "key" "TOKEN" "var" "hex" "ns" .Release.Namespace) }}
 {{- end }}
 {{- if hasKey .Values "api-gateway" }}
 {{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "api-gateway") }}
