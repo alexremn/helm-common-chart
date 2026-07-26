@@ -1,0 +1,13 @@
+# MUST fail to render: `argo` is not a valid deployTool.
+name: invalid-fixture
+environment: staging
+
+global:
+  deployTool: argo
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
