@@ -28,14 +28,38 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 {{- /* `force-sync` drives ESO to re-reconcile when its value changes.
        Default: per-render `now` timestamp so ESO always reconciles on upgrade.
        Opt out with `global.externalSecrets.forceSync: false`, which falls
-       back to a stable per-revision value (noise-free diffs, no churn). */ -}}
-{{- $forceSync := dig "global" "externalSecrets" "forceSync" true $values }}
-{{- if $forceSync }}
-force-sync: {{ now | quote }}
-{{- else }}
+       back to a stable per-revision value (noise-free diffs, no churn).
+
+       Under `deployTool: argocd` the annotation is omitted entirely: the
+       repo-server re-renders on every reconcile, so a timestamp is permanent
+       drift, and the per-revision fallback is the frozen constant "1"
+       (ArgoCD always installs at revision 1) — a stale secret rather than a
+       sync loop. ESO's own refreshInterval is the reconcile trigger there. */ -}}
+{{- $tool := include "common.deployTool" . }}
+{{- $isArgoCD := eq $tool "argocd" }}
+{{- $forceSync := dig "global" "externalSecrets" "forceSync" (not $isArgoCD) $values }}
+{{- /* Three outcomes, two conditions. `eq $forceSync $isArgoCD` reads oddly but is
+       exact: it is true precisely when the two booleans AGREE, which is the stable
+       per-revision case in both of its forms — opted OUT under helm/werf, or opted
+       IN under argocd. Full truth table:
+
+         dialect      forceSync   ->  emitted
+         helm/werf    unset(true)     force-sync: <now>          (per-deploy trigger)
+         helm/werf    true           force-sync: <now>
+         helm/werf    false          force-sync: <Release.Revision>   (stable, no diff noise)
+         argocd       unset(false)   nothing                     (a timestamp is permanent drift)
+         argocd       true           force-sync: <Release.Revision>   (asked for the annotation, not drift)
+         argocd       false          nothing
+
+       Do NOT collapse this to `if and $forceSync (not $isArgoCD) / else if $forceSync`:
+       that leaves helm/werf + explicit false with no branch at all, silently dropping
+       the annotation and breaking tests/golden/baseline-schema-global.out. */ -}}
+{{- if eq $forceSync $isArgoCD }}
 {{- $rev := "1" }}
 {{- if .Release }}{{- $rev = .Release.Revision | toString }}{{- end }}
 force-sync: {{ $rev | quote }}
+{{- else if $forceSync }}
+force-sync: {{ now | quote }}
 {{- end }}
 {{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values }}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values }}

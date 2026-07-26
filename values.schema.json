@@ -186,7 +186,7 @@
               "type": "boolean"
             }
           },
-          "description": "ExternalSecret behavior knobs. forceSync (default true) re-stamps the force-sync annotation per render; false falls back to a stable per-revision value."
+          "description": "ExternalSecret behavior knobs. forceSync stamps a force-sync annotation so ESO re-reconciles. Default true under deployTool generic/werf (per-render timestamp) and false under deployTool argocd, where a per-render value is permanent drift. Setting it true under argocd yields a stable per-revision value, never a timestamp."
         },
         "hooks": {
           "type": "object",

@@ -1,0 +1,42 @@
+# Full-surface ArgoCD dialect fixture. Mirrors values-generic.yaml so the two
+# goldens can be diffed against each other to see exactly what the dialect
+# changes.
+name: argocd-app
+environment: staging
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  secretStore: my-cluster-store
+  prometheusEndpoint: http://prometheus.monitoring:9090
+
+web:
+  ports:
+    http: 8080
+  configmap:
+    data:
+      APP_MODE: "internal"
+  # `scaling` without `triggers` renders `triggers: null`, which KEDA rejects —
+  # every other scaling fixture in this suite sets triggers, so match them. The
+  # prometheus trigger's `query` also gives Task 12's `tpl`-gate change a real
+  # surface to be verified against.
+  scaling:
+    min: 2
+    max: 5
+    triggers:
+      - type: prometheus
+        threshold: "1"
+        query: vector(1)
+
+configs:
+  app-config:
+    data:
+      LOG_LEVEL: "info"
+
+secrets:
+  app-secrets:
+    secretKey: "internal/app/staging"
+    properties:
+      - API_KEY
