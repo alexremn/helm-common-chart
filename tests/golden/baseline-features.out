@@ -503,3 +503,5 @@ spec:
     - type: cpu
       metadata:
         value: "75"
+      name: cpu-utilization
+      metricType: Utilization
