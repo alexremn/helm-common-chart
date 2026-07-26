@@ -361,6 +361,55 @@ spec:
             storage: "1Gi"
 ---
 # Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-task
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: argocd-app
+    app.kubernetes.io/component: run-task
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: argocd-app
+        app.kubernetes.io/component: run-task
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: run-task
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          command: 
+            - /bin/sh
+            - -c
+          args: 
+            - echo migrate
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:

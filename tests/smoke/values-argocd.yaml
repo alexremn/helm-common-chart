@@ -63,3 +63,9 @@ secrets:
     secretKey: "internal/app/staging"
     properties:
       - API_KEY
+
+jobs:
+  run_task:
+    hook: PreSync
+    command: ["/bin/sh", "-c"]
+    args: ["echo migrate"]
