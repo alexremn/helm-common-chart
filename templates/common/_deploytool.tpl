@@ -67,3 +67,21 @@ werf.io/weight: {{ $weight | quote }}
 argocd.argoproj.io/sync-wave: {{ $weight | quote }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Workload lifecycle / rollout-tracking annotations for the active dialect.
+
+werf tracks rollouts with `werf.io/no-activity-timeout` and
+`werf.io/failures-allowed-per-replica`. ArgoCD has no per-resource
+equivalent — retry patience lives in Application.spec.syncPolicy.retry — and
+plain Helm has none either, so both emit nothing.
+
+Usage:
+  {{- include "common.annotations.lifecycle" $root }}
+*/}}
+{{- define "common.annotations.lifecycle" -}}
+{{- if eq (include "common.deployTool" .) "werf" -}}
+werf.io/no-activity-timeout: {{ default "6m" .timeout | quote }}
+werf.io/failures-allowed-per-replica: {{ default "3" .failures | quote }}
+{{- end -}}
+{{- end -}}

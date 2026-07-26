@@ -234,37 +234,19 @@ ANNOTATION HELPERS
 */}}
 
 {{/*
-Decide whether werf-specific annotations should be emitted.
-Resolution order:
-  1. .Values.global.werf.annotations (explicit opt-in/out)
-  2. true if `.Values.werf.name` AND `.Values.werf.env` both set
-     (preserves the legacy behavior for charts still on werf values)
-  3. false otherwise
+DEPRECATED — use `common.deployTool` directly. Retained for one minor so
+consumer charts calling it keep working. Returns "true" when the active
+dialect is werf.
 */}}
 {{- define "common.werf.annotationsEnabled" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- $explicit := dig "global" "werf" "annotations" nil $values -}}
-{{- $werfName := dig "werf" "name" nil $values -}}
-{{- $werfEnv := dig "werf" "env" nil $values -}}
-{{- if not (kindIs "invalid" $explicit) -}}
-{{ $explicit }}
-{{- else if and $werfName $werfEnv -}}
-true
-{{- else -}}
-false
-{{- end -}}
+{{- ternary "true" "false" (eq (include "common.deployTool" .) "werf") -}}
 {{- end }}
 
 {{/*
-Werf-specific Deployment / StatefulSet annotations. Emitted only when
-`common.werf.annotationsEnabled` resolves truthy.
+DEPRECATED — alias of `common.annotations.lifecycle`.
 */}}
 {{- define "common.annotations.werf" -}}
-{{- $enabled := eq (include "common.werf.annotationsEnabled" .) "true" -}}
-{{- if $enabled -}}
-werf.io/no-activity-timeout: {{ default "6m" .timeout | quote }}
-werf.io/failures-allowed-per-replica: {{ default "3" .failures | quote }}
-{{- end }}
+{{- include "common.annotations.lifecycle" . -}}
 {{- end -}}
 
 {{/*
