@@ -33,8 +33,9 @@ Lookup order:
   3. .Values.app.name
   4. .Values.name
   5. .Values.werf.name (legacy fallback)
-  6. .Chart.Name
-  7. literal "app"
+  6. .Values.global.werf.name (werf-injected)
+  7. .Chart.Name
+  8. literal "app"
 */}}
 {{- define "common.appName" -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
@@ -42,7 +43,7 @@ Lookup order:
 {{- with .Chart }}
   {{- $chartName = .Name -}}
 {{- end }}
-{{- coalesce .svc (dig "global" "name" nil $values) (dig "app" "name" nil $values) (dig "name" nil $values) (dig "werf" "name" nil $values) $chartName "app" -}}
+{{- coalesce .svc (dig "global" "name" nil $values) (dig "app" "name" nil $values) (dig "name" nil $values) (dig "werf" "name" nil $values) (dig "global" "werf" "name" nil $values) $chartName "app" -}}
 {{- end }}
 
 {{/*
@@ -52,11 +53,12 @@ Lookup order:
   2. .Values.global.environment / .Values.global.env
   3. .Values.environment / .Values.env
   4. .Values.werf.env (legacy fallback)
-  5. literal "default"
+  5. .Values.global.werf.env (werf-injected)
+  6. literal "default"
 */}}
 {{- define "common.environment" -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
-{{- coalesce .env (dig "global" "environment" nil $values) (dig "global" "env" nil $values) (dig "environment" nil $values) (dig "env" nil $values) (dig "werf" "env" nil $values) "default" -}}
+{{- coalesce .env (dig "global" "environment" nil $values) (dig "global" "env" nil $values) (dig "environment" nil $values) (dig "env" nil $values) (dig "werf" "env" nil $values) (dig "global" "werf" "env" nil $values) "default" -}}
 {{- end }}
 
 {{/*
