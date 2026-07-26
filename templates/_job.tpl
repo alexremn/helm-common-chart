@@ -20,7 +20,21 @@ metadata:
   name: {{ $cmp }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues) }}
+  {{- /* Under ArgoCD a Job is an ordinary tracked resource: its spec.template
+         is immutable, so the first change fails the apply, and when nothing
+         changed the completed Job already matches desired state and never
+         re-runs. An ArgoCD hook with BeforeHookCreation fixes both. */ -}}
+  {{- $jobExtra := dict }}
+  {{- $hook := dig "hook" "" $componentValues }}
+  {{- if and $hook (ne $hook "Skip") (eq (include "common.deployTool" .) "argocd") }}
+  {{- $valid := list "PreSync" "Sync" "PostSync" "Skip" }}
+  {{- if not (has $hook $valid) }}
+  {{- fail (printf "Unknown jobs.%s.hook %q. Valid values: %s." $cmp $hook (join ", " $valid)) }}
+  {{- end }}
+  {{- $_ := set $jobExtra "argocd.argoproj.io/hook" $hook }}
+  {{- $_ := set $jobExtra "argocd.argoproj.io/hook-delete-policy" (dig "hookDeletePolicy" "BeforeHookCreation" $componentValues) }}
+  {{- end }}
+  {{- include "common.workload.annotations" (dict "root" . "component" $componentValues "extra" $jobExtra) }}
 spec:
   backoffLimit: {{ default 0 $componentValues.backoffLimit | int }}
   {{- with $componentValues.activeDeadlineSeconds }}

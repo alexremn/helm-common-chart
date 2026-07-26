@@ -317,7 +317,12 @@ Resolution order:
 {{/*
 Deterministic resource name "<name>-<suffix>". Unlike `common.generateName`
 (which is RANDOM), this is STABLE across renders and REQUIRES an explicit
-`suffix` — pass `.Release.Revision` for a per-revision name. Use for Job /
+`suffix` — a deterministic, content-derived string. Under plain Helm
+`.Release.Revision` works; under ArgoCD it is ALWAYS 1 (ArgoCD renders with
+install semantics), so the name never changes and the Job silently stops
+re-running. Prefer an image tag or digest, or the sha256 from
+common.configChecksum. Under `deployTool: argocd`, prefer `jobs.<name>.hook`
+over name suffixing entirely. Use for Job /
 CronJob names that must not churn on every `helm upgrade`.
 Usage: {{ include "generateName" (dict "name" "migrate" "suffix" .Release.Revision) }}
 */}}
@@ -325,7 +330,7 @@ Usage: {{ include "generateName" (dict "name" "migrate" "suffix" .Release.Revisi
   {{- $name := required "Name is required" .name }}
   {{- $suffix := .suffix }}
   {{- if not $suffix }}
-    {{- $suffix = required "generateName: suffix is required (pass .Release.Revision for a per-revision suffix, or any deterministic string)" .suffix }}
+    {{- $suffix = required "generateName: suffix is required (pass a deterministic, content-derived string such as an image tag or digest; .Release.Revision is always 1 under ArgoCD)" .suffix }}
   {{- end }}
   {{- printf "%s-%s" $name (toString $suffix) }}
 {{- end -}}

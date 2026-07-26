@@ -975,6 +975,20 @@
         "rollOnConfigChange": {
           "type": "boolean",
           "description": "Emit a checksum/config pod annotation so ConfigMap/Secret changes roll this workload. Default false."
+        },
+        "hook": {
+          "type": "string",
+          "enum": [
+            "PreSync",
+            "Sync",
+            "PostSync",
+            "Skip"
+          ],
+          "description": "For jobs.<name> under deployTool: argocd, emit argocd.argoproj.io/hook with this phase plus hook-delete-policy: BeforeHookCreation, so the Job re-runs each sync instead of failing on Job spec immutability. Ignored under other deploy tools."
+        },
+        "hookDeletePolicy": {
+          "type": "string",
+          "description": "Override for argocd.argoproj.io/hook-delete-policy. Default BeforeHookCreation."
         }
       }
     },
