@@ -115,6 +115,16 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $topLabelCtx | nindent 4 }}
-spec: {{ toYaml $spec | nindent 2 }}
+    {{- with $spec.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- /* `annotations` and `labels` are metadata, not spec: emitting them
+         verbatim inside `spec:` produces a manifest the API server rejects. */ -}}
+  {{- $npAnn := include "common.annotations" $spec | trim }}
+  {{- if $npAnn }}
+  annotations:
+    {{- $npAnn | nindent 4 }}
+  {{- end }}
+spec: {{ toYaml (omit $spec "annotations" "labels") | nindent 2 }}
 {{- end }}
 {{- end }}
