@@ -1,0 +1,34 @@
+# ArgoCD dialect with the Helm-hook path activated. The hook intent must
+# become a sync-wave; helm.sh/hook must never appear.
+name: argocd-hooks-app
+environment: review
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  secretStore: my-cluster-store
+  hooks:
+    preInstallEnvironments:
+      - review
+    weight: "-5"
+
+web:
+  ports:
+    http: 8080
+  configmap:
+    data:
+      APP_MODE: "review"
+
+nativeSecrets:
+  bootstrap:
+    type: Opaque
+    stringData:
+      HELLO: world
+
+secrets:
+  app-secrets:
+    secretKey: "internal/app/review"
+    properties:
+      - API_KEY

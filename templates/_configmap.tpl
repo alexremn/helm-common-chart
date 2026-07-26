@@ -25,13 +25,20 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 {{- define "config.annotations.default" -}}
 {{- $env := .env -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $tool := include "common.deployTool" . -}}
 {{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values -}}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values -}}
-{{- if and (ne $hooksEnabled false) (has $env $hookEnvs) }}
+{{- $hookWanted := and (ne $hooksEnabled false) (has $env $hookEnvs) -}}
+{{- $weight := dig "global" "ordering" "configWeight" (dig "werf" "configWeight" "-1" $values) $values -}}
+{{- if $hookWanted }}{{- $weight = dig "global" "hooks" "weight" "-5" $values }}{{- end }}
+{{- /* ArgoCD reinterprets helm.sh/hook as a PreSync hook: the object leaves
+       the Application's desired state (no diff, no selfHeal, no prune) and the
+       default BeforeHookCreation policy deletes and recreates it every sync.
+       Translate the ordering intent to a sync-wave instead. */ -}}
+{{- if and $hookWanted (ne $tool "argocd") }}
 helm.sh/hook: pre-install,pre-upgrade
-helm.sh/hook-weight: {{ dig "global" "hooks" "weight" "-5" $values | quote }}
+helm.sh/hook-weight: {{ $weight | quote }}
 {{- else }}
-{{- $weight := dig "global" "ordering" "configWeight" (dig "werf" "configWeight" "-1" $values) $values }}
 {{- $ordering := include "common.annotations.ordering" (dict "root" . "weight" $weight) | trim }}
 {{- if $ordering }}
 {{ $ordering }}

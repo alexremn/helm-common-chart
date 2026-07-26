@@ -55,7 +55,9 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   httproute \
                   annotations \
                   werf-service-values \
-                  argocd
+                  argocd \
+                  argocd-hooks \
+                  hooks-generic
 
 # Lint the smoke chart and render every value set. Used by CI.
 lint-smoke:
