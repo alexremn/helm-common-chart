@@ -255,6 +255,17 @@
           },
           "description": "ArgoCD-specific escape hatches."
         },
+        "persistence": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "retain": {
+              "type": "boolean",
+              "description": "Protect standalone PVCs from deletion. Default false. Emits helm.sh/resource-policy: keep, plus argocd.argoproj.io/sync-options: Prune=false under deployTool: argocd, where resource-policy is inert and an auto-sync prune destroys the claim and its data within one reconcile."
+            }
+          },
+          "description": "Chart-wide persistence behaviour."
+        },
         "annotations": {
           "$ref": "#/$defs/annotations",
           "description": "Annotations merged into workloads (Deployment/StatefulSet/DaemonSet/Job/CronJob), ConfigMap, Secret, ExternalSecret, Service, ServiceAccount, PDB, PVC, PodMonitor, NetworkPolicy, RBAC, PriorityClass, ScaledObject and TriggerAuthentication. A resource's own annotations win. Use for chart-wide argocd.argoproj.io/sync-options or ownership metadata. NOT applied to HPA, VPA, HTTPRoute, PrometheusRule or ServiceMonitor (set those per-resource), nor to Ingress (use global.ingress.annotations)."

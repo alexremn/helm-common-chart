@@ -158,3 +158,20 @@ Usage:
 {{- toYaml $merged -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Retention metadata for data-bearing and shared objects.
+
+`helm.sh/resource-policy: keep` is inert under ArgoCD — ArgoCD never runs
+helm install/upgrade — so the ArgoCD-native `Prune=false` sync-option is
+emitted alongside it. Both are emitted under argocd so the guarantee survives
+a later migration back to plain Helm.
+
+Usage: {{- include "common.annotations.retain" $ctx }}
+*/}}
+{{- define "common.annotations.retain" -}}
+helm.sh/resource-policy: keep
+{{- if eq (include "common.deployTool" .) "argocd" }}
+argocd.argoproj.io/sync-options: Prune=false
+{{- end }}
+{{- end -}}

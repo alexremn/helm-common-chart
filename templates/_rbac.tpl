@@ -37,6 +37,9 @@ Parameters:
 {{- $bindingKind := printf "%sBinding" $kind -}}
 {{- $emitNamespace := and (eq $kind "Role") .namespace }}
 {{- $ann := include "common.metadata.annotations" (dict "root" .root "annotations" (default dict .annotations)) | trim }}
+{{- if and (eq $kind "ClusterRole") (eq (include "common.deployTool" .root) "argocd") }}
+{{- $ann = printf "argocd.argoproj.io/sync-options: Prune=false\n%s" $ann | trim }}
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $kind }}

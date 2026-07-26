@@ -21,6 +21,9 @@ metadata:
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
   {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
+  {{- if eq (include "common.deployTool" $) "argocd" }}
+  {{- $ann = printf "argocd.argoproj.io/sync-options: Prune=false\n%s" $ann | trim }}
+  {{- end }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

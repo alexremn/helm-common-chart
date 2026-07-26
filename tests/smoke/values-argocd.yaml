@@ -11,6 +11,8 @@ global:
     tag: "1.0.0"
   secretStore: my-cluster-store
   prometheusEndpoint: http://prometheus.monitoring:9090
+  persistence:
+    retain: true
 
 web:
   ports:
@@ -29,6 +31,27 @@ web:
       - type: prometheus
         threshold: "1"
         query: vector(1)
+  # Per-component cluster RBAC requires the `.clusterRole` nesting — a bare
+  # `rbacCluster.rules` renders nothing. Exercises Task 15's Prune=false on a
+  # shared ClusterRole under argocd.
+  rbacCluster:
+    clusterRole:
+      rules:
+        - apiGroups: [""]
+          resources: ["nodes"]
+          verbs: ["get", "list"]
+
+stateful:
+  ports:
+    http: 8081
+  persistence:
+    - name: data
+      size: 1Gi
+
+priorityClasses:
+  argocd-high:
+    value: 1000
+    description: "shared cluster-scoped object — two Applications may declare it"
 
 configs:
   app-config:
