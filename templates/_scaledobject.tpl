@@ -100,7 +100,8 @@ spec:
         threshold: {{ .threshold | quote }}
         {{- /* F2: scope tpl context to Values/Release/Chart + componentValues
                instead of leaking the full chart root via `$`. */}}
-        query: {{ tpl .query (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValues) | quote }}
+        {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $componentValues)) "true" }}
+        query: {{ if $tplEnabled }}{{ tpl .query (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValues) | quote }}{{ else }}{{ .query | quote }}{{ end }}
         {{- with .authModes }}
         authModes: {{ . | quote }}
         {{- end }}

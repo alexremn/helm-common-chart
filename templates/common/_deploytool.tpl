@@ -112,3 +112,26 @@ Usage:
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Whether consumer-supplied content is rendered through Helm `tpl`.
+
+Default true under generic/werf. Default false under argocd: `tpl` executes
+arbitrary consumer template text, so `{{ now }}` or `{{ uuidv4 }}` in a value
+re-renders on every reconcile — permanent OutOfSync for a ConfigMap or
+ScaledObject, and a rolling restart of every replica when it reaches a pod
+template under selfHeal.
+
+Overrides: global.tpl.envValues (chart-wide), <cmp>.envRaw: true (per-component,
+forces off).
+
+Usage:
+  {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $componentValues)) "true" }}
+*/}}
+{{- define "common.tpl.enabled" -}}
+{{- $values := include "common._values" .root | fromYaml | default dict -}}
+{{- $default := ne (include "common.deployTool" .root) "argocd" -}}
+{{- $enabled := dig "global" "tpl" "envValues" $default $values -}}
+{{- if dig "envRaw" false (default dict .component) -}}{{- $enabled = false -}}{{- end -}}
+{{- ternary "true" "false" (eq $enabled true) -}}
+{{- end -}}

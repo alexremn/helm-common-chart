@@ -100,8 +100,9 @@ data:
 {{- /* F2: scope tpl context to Values/Release/Chart + this configmap's
        componentValues instead of leaking the full chart root via `$`. */ -}}
 {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
+{{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $val)) "true" }}
 {{- range $key, $value := $val.data }}
-  {{ $key }}: {{ tpl (toString $value) $tplCtx | quote }}
+  {{ $key }}: {{ if $tplEnabled }}{{ tpl (toString $value) $tplCtx | quote }}{{ else }}{{ toString $value | quote }}{{ end }}
 {{- end }}
 {{- range $glob := $val.fromFiles | default list }}
 {{- range $path, $content := $.Files.Glob $glob }}
@@ -134,8 +135,9 @@ data:
   {{- /* F2: scope tpl context to Values/Release/Chart + componentValues
          instead of leaking the full chart root via `$`. */ -}}
   {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValue }}
+  {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $componentValue)) "true" }}
   {{- range $key, $value := $componentValue.configmap.data }}
-  {{ $key }}: {{ tpl (toString $value) $tplCtx | quote }}
+  {{ $key }}: {{ if $tplEnabled }}{{ tpl (toString $value) $tplCtx | quote }}{{ else }}{{ toString $value | quote }}{{ end }}
   {{- end }}
 {{- end }}
 {{- end }}
