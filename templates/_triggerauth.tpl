@@ -22,6 +22,11 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
+  {{- $ann := include "common.annotations" $val | trim }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
 spec:
   {{- with $val.podIdentity }}
   podIdentity: {{ toYaml . | nindent 4 }}

@@ -36,6 +36,7 @@ Parameters:
 {{- $bindingName := default $name .bindingName -}}
 {{- $bindingKind := printf "%sBinding" $kind -}}
 {{- $emitNamespace := and (eq $kind "Role") .namespace }}
+{{- $ann := include "common.annotations" (dict "annotations" (default dict .annotations)) | trim }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $kind }}
@@ -43,6 +44,10 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" .labelCtx | nindent 4 }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
   {{- if $emitNamespace }}
   namespace: {{ .namespace }}
   {{- end }}
@@ -55,6 +60,10 @@ metadata:
   name: {{ $bindingName }}
   labels:
     {{- include "common.labels" .labelCtx | nindent 4 }}
+  {{- if $ann }}
+  annotations:
+    {{- $ann | nindent 4 }}
+  {{- end }}
   {{- if $emitNamespace }}
   namespace: {{ .namespace }}
   {{- end }}
@@ -86,7 +95,9 @@ subjects:
     "name" $cmp
     "labelCtx" $labelCtx
     "rules" .rules
-    "subjects" $saSubject) }}
+    "subjects" $saSubject
+    "annotations" (dig "annotations" dict .)
+    "root" $) }}
 {{- end }}
 {{- end }}
 
@@ -98,7 +109,9 @@ subjects:
     "name" (printf "%s-%s" $svc $cmp)
     "labelCtx" $labelCtx
     "rules" .rules
-    "subjects" $saSubject) }}
+    "subjects" $saSubject
+    "annotations" (dig "annotations" dict .)
+    "root" $) }}
 {{- end }}
 {{- end }}
 
@@ -111,6 +124,8 @@ subjects:
     "namespace" (default "" $val.namespace)
     "labelCtx" $labelCtx
     "rules" $val.rules
-    "subjects" $val.subjects) }}
+    "subjects" $val.subjects
+    "annotations" (dig "annotations" dict $val)
+    "root" $) }}
 {{- end }}
 {{- end }}
