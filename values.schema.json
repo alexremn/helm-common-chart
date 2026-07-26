@@ -58,6 +58,15 @@
           ],
           "description": "Container/pod securityContext posture, independent of `profile`. `minimal` (default): baseline container hardening \u2014 allowPrivilegeEscalation:false, capabilities drop-ALL, pod seccompProfile RuntimeDefault (runAsNonRoot and readOnlyRootFilesystem stay opt-in). `generic`: adds runAsNonRoot and readOnlyRootFilesystem on top of the minimal baseline. Overridable per-scope via `global.securityContext` and `<cmp>.securityContext`."
         },
+        "deployTool": {
+          "type": "string",
+          "enum": [
+            "generic",
+            "werf",
+            "argocd"
+          ],
+          "description": "Which tool consumes the rendered manifests. Selects the dialect of ordering and lifecycle metadata the chart emits. Default: werf when werf service values are present, otherwise generic. ArgoCD cannot be auto-detected and must be set explicitly. See docs/values-reference.md#deploy-tool-dialect."
+        },
         "secretStore": {
           "type": "string",
           "description": "Default secretStoreRef name for all ExternalSecrets rendered by chart.extsecret. Overridable per secret via secrets.<name>.secretStore. No default \u2014 when unset, every secret must declare its own store."

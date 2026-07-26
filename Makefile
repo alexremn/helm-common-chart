@@ -100,7 +100,7 @@ golden-check: render-smoke
 
 # Negative render checks — these fixtures MUST fail (invalid input rejected).
 # Not part of SMOKE_VARIANTS (would break render-smoke / golden-check).
-NEGATIVE_VARIANTS := security-invalid affinity-scalar hpa-badkind extrapodconfig-containers hpa-no-maxreplicas
+NEGATIVE_VARIANTS := security-invalid affinity-scalar hpa-badkind extrapodconfig-containers hpa-no-maxreplicas deploytool-invalid
 
 lint-negative:
 	( cd $(SMOKE_DIR) && \
