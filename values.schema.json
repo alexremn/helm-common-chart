@@ -265,7 +265,7 @@
           "properties": {
             "retain": {
               "type": "boolean",
-              "description": "Protect standalone PVCs from deletion. Default false. Emits helm.sh/resource-policy: keep, plus argocd.argoproj.io/sync-options: Prune=false under deployTool: argocd, where resource-policy is inert and an auto-sync prune destroys the claim and its data within one reconcile."
+              "description": "Protect standalone PVCs from deletion. Default false. Emits helm.sh/resource-policy: keep, plus argocd.argoproj.io/sync-options: Prune=false under deployTool: argocd, where resource-policy is inert and an auto-sync prune destroys the claim and its data within one reconcile. This knob is PVC-scoped only: under deployTool: argocd, PriorityClass and ClusterRole/ClusterRoleBinding also carry Prune=false, but unconditionally -- not gated by this flag, since those are cluster-scoped objects that can be shared across Applications. Prune=false is not opt-out-able there: a conflicting sync-options value in a resource's own annotations is merged into the union, not substituted, so the chart's Prune=false always survives. That is deliberately asymmetric with helm.sh/resource-policy: keep, which a resource's own annotations CAN override."
             }
           },
           "description": "Chart-wide persistence behaviour."
