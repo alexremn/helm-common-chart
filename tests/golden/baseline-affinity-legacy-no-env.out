@@ -140,7 +140,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       affinity:
-      
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
@@ -149,8 +148,6 @@ spec:
                     operator: In
                     values:
                       - "1"
-      
-        
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
@@ -224,8 +221,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       affinity:
-      
-        
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
