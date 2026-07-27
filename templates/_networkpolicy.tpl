@@ -127,6 +127,6 @@ metadata:
   annotations:
     {{- $npAnn | nindent 4 }}
   {{- end }}
-spec: {{ toYaml (omit $spec "annotations" "labels") | nindent 2 }}
+spec:{{ toYaml (omit $spec "annotations" "labels") | nindent 2 }}
 {{- end }}
 {{- end }}

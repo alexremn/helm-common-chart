@@ -54,7 +54,7 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
-spec: 
+spec:
   egress:
   - ports:
     - port: 53
@@ -77,7 +77,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-spec: 
+spec:
   podSelector: {}
   policyTypes:
   - Ingress
