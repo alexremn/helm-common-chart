@@ -33,9 +33,18 @@ Lookup order:
   3. .Values.app.name
   4. .Values.name
   5. .Values.werf.name (legacy fallback)
-  6. .Values.global.werf.name (werf-injected)
-  7. .Chart.Name
-  8. literal "app"
+  6. .Chart.Name
+  7. literal "app"
+
+Deliberately does NOT fall back to `.Values.global.werf.name` (the
+werf-injected service value): `app.kubernetes.io/name` lands in
+`spec.selector.matchLabels` (see `common.labels.matchLabels`), which is
+immutable. For a werf chart that does not hand-write `werf.name`, that
+fallback would flip the resolved name — and the selector with it — on
+upgrade, and `helm upgrade`/`werf converge` would fail with `field is
+immutable`. `common.environment` (below) takes the equivalent
+`global.werf.env` fallback because `helm.sh/environment` is never a
+selector key.
 */}}
 {{- define "common.appName" -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
@@ -43,7 +52,7 @@ Lookup order:
 {{- with .Chart }}
   {{- $chartName = .Name -}}
 {{- end }}
-{{- coalesce .svc (dig "global" "name" nil $values) (dig "app" "name" nil $values) (dig "name" nil $values) (dig "werf" "name" nil $values) (dig "global" "werf" "name" nil $values) $chartName "app" -}}
+{{- coalesce .svc (dig "global" "name" nil $values) (dig "app" "name" nil $values) (dig "name" nil $values) (dig "werf" "name" nil $values) $chartName "app" -}}
 {{- end }}
 
 {{/*
