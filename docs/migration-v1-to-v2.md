@@ -16,7 +16,7 @@ Pin `version: "^1.0.0"` to stay on v1. Pin `version: "^2.0.0"` to opt into v2.
 | Ingress class auto-mapping | `internal` → `nginx-internal`, `external` → `nginx` (Hubstaff-only) | No auto-map; `className` required per entry or via `global.ingress.className` |
 | ExternalSecret `secretStore` | Defaults to `secrets-manager` (AWS) with kind `ClusterSecretStore` | **Required** — no default |
 | KEDA Prometheus trigger `serverAddress` | Defaults to `http://prometheus-prometheus.prometheus.svc.cluster.local:9090` | **Required** — set `global.prometheusEndpoint` or per-trigger |
-| `generateName` suffix | Random alphanumeric per render (non-deterministic) | Caller must pass `suffix` (typically `.Release.Revision`) |
+| `generateName` suffix | Random alphanumeric per render (non-deterministic) | Caller must pass a deterministic `suffix` (an image tag, digest, or `common.configChecksum` hash) — **not** `.Release.Revision`: under ArgoCD it is always `1`, so the suffix never changes and the resource silently stops being replaced |
 | Image without tag/digest | Falls back to `:latest` (silent) | `fail`s at render time |
 | RBAC↔Pod SA-name resolution | Diverged (pod = `"default"`, RBAC = `$cmp`) — silent no-op bindings | Both routed through `common.serviceAccountName` |
 
@@ -47,7 +47,7 @@ If your values file relies on any of the v1 defaults below, **v2 will fail to re
 | Helper / template | Field | Where to set |
 |---|---|---|
 | `common.image.toString` | image tag or digest (or `.Chart.AppVersion`) | `.<cmp>.image.tag` |
-| `generateName` | `suffix` arg | Pass `.Release.Revision` at call site |
+| `generateName` | `suffix` arg | Pass a deterministic, content-derived `suffix` at call site — not `.Release.Revision`, which is always `1` under ArgoCD |
 | `_extsecret.tpl` | `secretStore` | `secrets.<name>.secretStore` |
 | `_scaledobject.tpl` (prometheus trigger) | `serverAddress` | `global.prometheusEndpoint` or per-trigger override |
 | `common/_profile.tpl` | recognized profile name | `global.profile` must be one of `generic`, `rails`, `python`, `go` (unknown name → `fail` with valid list) |
@@ -102,7 +102,7 @@ Each must be addressed in your application chart's values.
 5. **Set `global.prometheusEndpoint`** if any chart uses KEDA prometheus triggers.
 6. **Set `serviceAccount.automount: true`** on workloads that call the Kubernetes API.
 7. **Set `storageClass`** on PVCs, or accept your cluster's default.
-8. **Pass `suffix: .Release.Revision`** to every `generateName` call.
+8. **Pass a deterministic `suffix`** (an image tag, digest, or `common.configChecksum` hash) to every `generateName` call — avoid `.Release.Revision`, which is always `1` under ArgoCD and never changes the suffix.
 9. **Set `.<cmp>.image.tag` or `.digest`** explicitly on every component. The `:latest` fallback is gone.
 10. **Re-render and diff.** `helm template` v2 vs v1 with your values; expect changes only in the rows above.
 
