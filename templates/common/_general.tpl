@@ -214,7 +214,9 @@ app.kubernetes.io/version: {{ . | quote }}
 Stable match-labels for selectors. Selectors are immutable on existing
 Deployments / StatefulSets, so this set is the minimum stable identity.
 
-By default, emits: name, component, environment, instance.
+By default, emits: name, component, instance. Does NOT include environment --
+`helm.sh/environment` is metadata-only (see `common.labels`), never a
+selector key.
 
 DEPRECATED: `.Values.global.compat.legacySelectorLabels: true` is scheduled
 for removal in 3.0. It is a NO-OP for every chart-generated selector -- none
