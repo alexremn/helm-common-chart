@@ -50,6 +50,14 @@ web:
         - apiGroups: [""]
           resources: ["nodes"]
           verbs: ["get", "list"]
+  # G1: podAnnotations colliding with the chart-computed checksum/config must
+  # merge into one key (same duplicate-mapping-key failure mode as the F3
+  # annotations above), with the consumer's value winning -- a consumer who
+  # sets this key is overriding the chart's rollout hash deliberately. The
+  # unrelated key alongside it proves the merge doesn't drop other entries.
+  podAnnotations:
+    checksum/config: consumer-supplied-checksum
+    example.com/owned-by: platform-team
 
 stateful:
   ports:

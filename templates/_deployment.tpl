@@ -70,15 +70,7 @@ spec:
         {{- include "common.labels" $labelCtx | nindent 8 }}
       {{- $podAnn := include "common.podAnnotations" $componentValues | trim }}
       {{- $configChecksum := include "common.configChecksum" (dict "root" $ "component" $componentValues "cmp" $cmp) | trim }}
-      {{- if or $podAnn $configChecksum }}
-      annotations:
-        {{- with $configChecksum }}
-        checksum/config: {{ . }}
-        {{- end }}
-        {{- with $podAnn }}
-        {{- . | nindent 8 }}
-        {{- end }}
-      {{- end }}
+      {{- include "common.podTemplate.annotations" (dict "configChecksum" $configChecksum "podAnnotations" $podAnn) }}
     spec:
       {{- include "common.workload.podSpec" (merge (dict
         "root" $

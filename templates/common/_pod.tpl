@@ -148,6 +148,51 @@ Usage:
 {{- end -}}
 
 {{/*
+Merge the chart-computed `checksum/config` rollout annotation with the
+consumer's `podAnnotations` into ONE map before emitting.
+
+Deployment/StatefulSet/DaemonSet used to emit these as two concatenated
+annotation blocks; a consumer setting `podAnnotations.checksum/config`
+produced a duplicate `checksum/config` mapping key -- accepted by Go's
+lenient YAML but rejected by `kubeconform -strict` (and by ArgoCD's own
+recommended server-side apply).
+
+Precedence: the consumer's `podAnnotations` wins on collision -- a consumer
+who explicitly sets `checksum/config` is overriding the chart's automatic
+rollout hash deliberately. This mirrors the precedence
+`common.metadata.annotations` already established between a chart-emitted
+default and a resource's own annotations; `checksum/config` here plays the
+same role as that helper's `defaults` parameter.
+
+Returns the full `annotations:` block (or nothing, if both inputs are
+empty) at the fixed indent used by all three call sites (`template.metadata`).
+
+Parameters:
+  configChecksum — the (trimmed) output of common.configChecksum, or ""
+  podAnnotations — the (trimmed) YAML body from common.podAnnotations, or ""
+
+Usage:
+  {{- $podAnn := include "common.podAnnotations" $componentValues | trim }}
+  {{- $configChecksum := include "common.configChecksum" (dict "root" $ "component" $componentValues "cmp" $cmp) | trim }}
+  {{- include "common.podTemplate.annotations" (dict "configChecksum" $configChecksum "podAnnotations" $podAnn) }}
+*/}}
+{{- define "common.podTemplate.annotations" -}}
+{{- $merged := dict -}}
+{{- with .configChecksum -}}
+  {{- $_ := set $merged "checksum/config" . -}}
+{{- end -}}
+{{- with .podAnnotations -}}
+  {{- range $key, $val := fromYaml . -}}
+    {{- $_ := set $merged $key $val -}}
+  {{- end -}}
+{{- end -}}
+{{- if gt (len $merged) 0 }}
+      annotations:
+        {{- toYaml $merged | nindent 8 }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Render a list of container specs (init containers or sidecars), injecting the
 posture-derived container securityContext into each, with the container's own
 `securityContext` winning (deep-merged). Accepts the map form (name -> spec) or
