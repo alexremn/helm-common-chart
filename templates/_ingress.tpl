@@ -12,7 +12,14 @@ Combines global, component-specific, and type-specific annotations
 {{- define "ingress.annotations" -}}
 {{- $baseAnnotations := default dict .baseAnnotations -}}
 {{- $ingressAnnotations := dig "annotations" dict .conf -}}
-{{- $annotations := mergeOverwrite $baseAnnotations $ingressAnnotations -}}
+{{- $merged := mergeOverwrite $baseAnnotations $ingressAnnotations -}}
+{{- /* metadata.annotations is map[string]string; coerce non-string values
+       (e.g. an unquoted nginx.ingress.kubernetes.io/* boolean or number) the
+       same way common.annotations does, instead of rejecting them. */ -}}
+{{- $annotations := dict -}}
+{{- range $k, $v := $merged -}}
+  {{- $_ := set $annotations $k ($v | toString) -}}
+{{- end -}}
 {{- if $annotations }}
 annotations:
   {{- $annotations | toYaml | nindent 2 }}
