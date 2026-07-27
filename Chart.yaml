@@ -32,25 +32,35 @@ annotations:
     - kind: added
       description: "global.deployTool (generic|werf|argocd) selects the dialect of ordering and lifecycle metadata the chart emits; werf is auto-detected from its injected service values, ArgoCD must be set explicitly"
     - kind: added
-      description: "chart-wide global.annotations and global.extraLabels, plus global.selectorLabels as a stable selector discriminator"
+      description: "chart-wide global.annotations and global.extraLabels, plus global.selectorLabels and global.compat.instanceInSelector as stable selector discriminators"
     - kind: added
       description: "annotation passthrough on native Secret, RBAC, PriorityClass and TriggerAuthentication, which previously discarded a consumer-supplied annotations key"
     - kind: added
       description: "jobs.<name>.hook emits ArgoCD hook annotations so a Job re-runs each sync instead of failing on spec immutability; cronjobs.<name>.jobAnnotations reaches spec.jobTemplate.metadata"
     - kind: added
       description: "global.persistence.retain (default false) protects standalone PVCs with both helm.sh/resource-policy: keep and argocd.argoproj.io/sync-options: Prune=false"
+    - kind: added
+      description: "global.ordering.configWeight / global.ordering.secretWeight override the default ordering weight (-1) used for ConfigMap/Secret and ExternalSecret werf.io/weight / argocd.argoproj.io/sync-wave"
+    - kind: added
+      description: "under deployTool: argocd, PriorityClass, ClusterRole and ClusterRoleBinding objects unconditionally carry argocd.argoproj.io/sync-options: Prune=false (not gated by global.persistence.retain), so two Applications sharing one of these cluster-scoped objects cannot prune it out from under each other"
+    - kind: added
+      description: "app.kubernetes.io/managed-by resolves to argocd under deployTool: argocd instead of Helm"
     - kind: fixed
-      description: "annotation values are coerced to strings; a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
+      description: "annotation values are coerced to strings (including in the public common.annotations helper); a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
     - kind: fixed
       description: "top-level networkPolicies.<name> treats annotations and labels as metadata instead of dumping them into spec, which the API server rejected"
     - kind: fixed
-      description: "name and environment now resolve from werf's own global.werf.name / global.werf.env service values, not only the hand-written werf.name / werf.env"
+      description: "environment now also resolves from werf's own global.werf.env service value, not only the hand-written werf.env; app.kubernetes.io/name resolution is unchanged from 2.4.3, since it feeds an immutable spec.selector.matchLabels"
     - kind: fixed
       description: "werf.io/weight is gated by the resolved deploy tool instead of the bare presence of a werf key, so global.werf.annotations: false now suppresses it"
     - kind: fixed
       description: "under deployTool: argocd the ExternalSecret force-sync annotation is omitted (a per-render timestamp is permanent drift), Helm hooks become sync-waves, checksum/config defaults on, and cluster-lookup or random helpers fail loudly instead of blanking live Secret data"
     - kind: changed
       description: "global.werf.annotations is deprecated in favour of global.deployTool and will be removed in 3.0"
+    - kind: changed
+      description: "under deployTool: werf, werf.io/no-activity-timeout and werf.io/failures-allowed-per-replica (and the werf.io/replicas-on-creation fallback) are now emitted whenever any top-level werf key is present, not only when both werf.name and werf.env are set; a werf consumer mid-migration may see these annotations for the first time"
+    - kind: changed
+      description: "global.tpl.envValues: false (and <cmp>.envRaw: true) now also disables tpl templating of configs.<name>.data / <cmp>.configmap.data and the KEDA ScaledObject prometheus trigger's query, not only <cmp>.env values and native Secret stringData"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
