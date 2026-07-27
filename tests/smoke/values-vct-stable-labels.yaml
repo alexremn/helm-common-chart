@@ -1,0 +1,29 @@
+# Knob-ON regression pin for global.compat.stableVolumeClaimTemplateLabels.
+# volumeClaimTemplates[].metadata.labels must carry only the stable subset
+# (name/component/instance/selectorLabels): global.extraLabels must NOT reach
+# it, while global.selectorLabels still must, since it is part of
+# common.labels.matchLabels. Every other label site on the StatefulSet (its
+# own metadata, the pod template, spec.selector) and the standalone PVC
+# rendered by chart.pvc keep the full common.labels set, unaffected by this
+# knob.
+name: vct-app
+environment: staging
+
+global:
+  image:
+    repository: ghcr.io/example/vct
+    tag: "1.0.0"
+  compat:
+    stableVolumeClaimTemplateLabels: true
+  extraLabels:
+    team: platform
+  selectorLabels:
+    app.example.com/tenant: green
+
+stateful:
+  ports:
+    http: 8080
+  persistence:
+    - name: data
+      size: 5Gi
+      storageClass: standard
