@@ -197,6 +197,8 @@ output byte-identical). `.val.default` emits the 100/99 zone+host spread;
 `.val.custom` is appended verbatim.
 */}}
 {{- define "common.affinities.legacy.podAntiAffinity" }}
+{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values }}
 podAntiAffinity:
 {{- if .val.default }}
   preferredDuringSchedulingIgnoredDuringExecution:
@@ -212,10 +214,12 @@ podAntiAffinity:
           operator: In
           values:
           - {{ .cmp }}
+        {{- if $emitEnv }}
         - key: helm.sh/environment
           operator: In
           values:
           - {{ .env }}
+        {{- end }}
       topologyKey: topology.kubernetes.io/zone
   - weight: 99
     podAffinityTerm:
@@ -229,10 +233,12 @@ podAntiAffinity:
           operator: In
           values:
           - {{ .cmp }}
+        {{- if $emitEnv }}
         - key: helm.sh/environment
           operator: In
           values:
           - {{ .env }}
+        {{- end }}
       topologyKey: kubernetes.io/hostname
 {{- end }}
 {{ with .val.custom }}

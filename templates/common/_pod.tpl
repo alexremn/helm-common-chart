@@ -451,6 +451,8 @@ Usage: {{ include "common.affinity" . }}
 {{- $cmp := .cmp -}}
 {{- $env := .env -}}
 {{- $val := .val -}}
+{{- $rootValues := dict -}}
+{{- with .root }}{{- $rootValues = .Values -}}{{- end -}}
 {{- if kindIs "map" $val -}}
 {{- with $val.affinity -}}
 {{- if not (kindIs "map" .) -}}
@@ -479,7 +481,7 @@ affinity:
 {{- end }}
 {{- with $podAntiAffinity }}
 {{- if $isLegacyPodAntiAffinity }}
-{{ include "common.affinities.legacy.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" .) | nindent 2 }}
+{{ include "common.affinities.legacy.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" . "Values" $rootValues) | nindent 2 }}
 {{- else }}
   podAntiAffinity:
 {{- toYaml . | nindent 4 }}
