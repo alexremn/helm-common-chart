@@ -226,7 +226,7 @@
           "properties": {
             "legacySelectorLabels": {
               "type": "boolean",
-              "description": "Include `version` and `extraLabels` in `common.labels.matchLabels`. Use only when migrating a chart whose pre-1.3 release stored those labels in selectors -- changing selector contents on existing Deployments/StatefulSets is not allowed by Kubernetes."
+              "description": "DEPRECATED, scheduled for removal in 3.0. Include `version` and `extraLabels` in `common.labels.matchLabels` / `common.affinities.pods.*` output -- but a NO-OP for every chart-generated selector, since no chart.* template supplies `version` or `extraLabels` to those helpers. Only affects a consumer template calling those helpers directly with those keys in context (including indirectly via common.labelCtx, which propagates them). Use `global.selectorLabels` instead -- the supported, working mechanism for a stable selector discriminator."
             },
             "instanceInSelector": {
               "type": "boolean",

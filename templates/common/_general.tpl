@@ -216,9 +216,15 @@ Deployments / StatefulSets, so this set is the minimum stable identity.
 
 By default, emits: name, component, environment, instance.
 
-Set `.Values.global.compat.legacySelectorLabels: true` to additionally include
-`version` and any `extraLabels` in selectors -- useful only when migrating
-from a chart whose pre-1.3 release stored those labels in the selector.
+DEPRECATED: `.Values.global.compat.legacySelectorLabels: true` is scheduled
+for removal in 3.0. It is a NO-OP for every chart-generated selector -- none
+of the chart's own `$labelCtx` builders populate `version` or `extraLabels`,
+so the `with` guards below never fire for chart.* templates. It can only
+affect a consumer template that calls this helper (or
+`common.affinities.pods.*`) directly with `version`/`extraLabels` in its own
+context, including indirectly via `common.labelCtx`, which propagates both
+keys. Use `global.selectorLabels` instead -- it is the supported mechanism
+for adding a stable discriminator to selectors, and it actually works.
 
 Usage: {{ include "common.labels.matchLabels" (dict "svc" "my-service" "cmp" "web" "env" "prod" "Values" .Values) }}
 */}}

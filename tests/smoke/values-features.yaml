@@ -2,7 +2,9 @@
 #  - generic name/environment (no werf)
 #  - structured image map with `registry`
 #  - list-style ingress with global+entry annotations
-#  - global.compat.legacySelectorLabels flag
+#  - global.compat.legacySelectorLabels flag (deprecated, no-op regression pin --
+#    proves the flag stays inert for chart-generated selectors, NOT a demo of
+#    working behaviour; see common.labels.matchLabels docstring)
 #  - global.imagePullSecrets
 #  - explicit deployment.replicasOnCreationAnnotation
 name: features-app
