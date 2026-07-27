@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -33,7 +33,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -49,7 +49,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -67,7 +67,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -93,7 +93,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -117,13 +117,13 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: selector-app
         app.kubernetes.io/component: web
-        helm.sh/environment: staging
+        helm.sh/environment: "staging"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
         app.example.com/tenant: blue
       annotations:
-        checksum/config: 1ff01fd404eed50a39ae13d871bf3db6dacf0267785e68a43f2c12c5ee2c3c76
+        checksum/config: 22542ae8cf8f71837d90ebf64c8948b8855a969ebf24c8b8ad5cc56bfde7fec1
     spec:
       containers:
         - name: web

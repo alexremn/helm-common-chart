@@ -180,7 +180,7 @@ app.kubernetes.io/name: {{ $svc }}
 app.kubernetes.io/component: {{ $cmp }}
 {{- end }}
 {{- if and $env $emitEnv }}
-helm.sh/environment: {{ $env }}
+helm.sh/environment: {{ $env | quote }}
 {{- end }}
 {{- if $instance }}
 app.kubernetes.io/instance: {{ $instance }}

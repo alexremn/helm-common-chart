@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -29,7 +29,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -44,7 +44,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -59,7 +59,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -81,7 +81,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -103,7 +103,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -126,7 +126,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -148,7 +148,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -170,7 +170,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -192,7 +192,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -217,7 +217,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
-    helm.sh/environment: dev
+    helm.sh/environment: "dev"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -240,7 +240,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: rbac-app
         app.kubernetes.io/component: web
-        helm.sh/environment: dev
+        helm.sh/environment: "dev"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"

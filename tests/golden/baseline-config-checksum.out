@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: checksum-app
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -32,7 +32,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: checksum-app
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -47,7 +47,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: checksum-app
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -63,7 +63,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: checksum-app
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -88,7 +88,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: checksum-app
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -111,12 +111,12 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: checksum-app
         app.kubernetes.io/component: web
-        helm.sh/environment: production
+        helm.sh/environment: "production"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
       annotations:
-        checksum/config: 566b322e2011ff7f3c6e60ce3657dfe1666ceb62b010368dcbd2a89aa921a911
+        checksum/config: 94179bbf35c468f4d837de244729842e91789ab3372ef3a42a84ff10f4f57cca
     spec:
       containers:
         - name: web

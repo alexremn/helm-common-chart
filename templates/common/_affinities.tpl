@@ -218,7 +218,7 @@ podAntiAffinity:
         - key: helm.sh/environment
           operator: In
           values:
-          - {{ .env }}
+          - {{ .env | quote }}
         {{- end }}
       topologyKey: topology.kubernetes.io/zone
   - weight: 99
@@ -237,7 +237,7 @@ podAntiAffinity:
         - key: helm.sh/environment
           operator: In
           values:
-          - {{ .env }}
+          - {{ .env | quote }}
         {{- end }}
       topologyKey: kubernetes.io/hostname
 {{- end }}
