@@ -331,7 +331,7 @@ Usage: {{ include "common.renderTemplateOrDefault" (dict "name" "my-template" "c
 
 {{/*
 Generate a random string with a prefix and optional separator.
-Usage: {{ include "common.generateName" (dict "prefix" "app" "separator" "-" "length" 8) }}
+Usage: {{ include "common.generateName" (dict "root" $ "prefix" "app" "separator" "-" "length" 8) }}
 */}}
 {{- define "common.generateName" }}
 {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "common.generateName" "detail" "use the deterministic `generateName` helper in _helpers.tpl with a content-derived suffix (an image tag, digest, or the sha256 from common.configChecksum)") -}}
