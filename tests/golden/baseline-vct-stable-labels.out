@@ -1,0 +1,147 @@
+---
+# Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: vct-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: green
+    team: platform
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "5Gi"
+  storageClassName: standard
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: vct-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: green
+    team: platform
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: vct-app
+    app.kubernetes.io/component: stateful
+    app.kubernetes.io/instance: smoke
+    app.example.com/tenant: green
+  publishNotReadyAddresses: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: vct-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: staging
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tenant: green
+    team: platform
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vct-app
+      app.kubernetes.io/component: stateful
+      app.kubernetes.io/instance: smoke
+      app.example.com/tenant: green
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: vct-app
+        app.kubernetes.io/component: stateful
+        helm.sh/environment: staging
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+        app.example.com/tenant: green
+        team: platform
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/vct:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: vct-app
+          app.kubernetes.io/component: stateful
+          app.kubernetes.io/instance: smoke
+          app.example.com/tenant: green
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "5Gi"
+        storageClassName: standard

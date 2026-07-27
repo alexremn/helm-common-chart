@@ -230,7 +230,11 @@
             },
             "instanceInSelector": {
               "type": "boolean",
-              "description": "Include app.kubernetes.io/instance in every generated selector. Default true. NEW INSTALLS ONLY: selectors are immutable, so flipping this on a live workload requires delete/recreate (--cascade=orphan for StatefulSets). Set false under ArgoCD when the Application name may diverge from the Helm release name, and supply global.selectorLabels as a replacement discriminator."
+              "description": "Include app.kubernetes.io/instance in every generated selector -- and, when global.compat.stableVolumeClaimTemplateLabels is true, in volumeClaimTemplates[].metadata.labels as well, since that mode reuses common.labels.matchLabels there too. Default true. NEW INSTALLS ONLY: selectors are immutable, so flipping this on a live workload requires delete/recreate (--cascade=orphan for StatefulSets). Set false under ArgoCD when the Application name may diverge from the Helm release name, and supply global.selectorLabels as a replacement discriminator."
+            },
+            "stableVolumeClaimTemplateLabels": {
+              "type": "boolean",
+              "description": "Use only the stable label subset (common.labels.matchLabels: name, component, instance, global.selectorLabels) in a StatefulSet's volumeClaimTemplates[].metadata.labels, instead of the full common.labels set. The full set includes helm.sh/chart and app.kubernetes.io/version, which change on every chart/appVersion bump; Kubernetes forbids updating an existing StatefulSet's volumeClaimTemplates, so that bump's helm upgrade fails with 'spec: Forbidden'. Default false. NEW INSTALLS ONLY: turning this on for an existing StatefulSet hits that identical 'spec: Forbidden' error, because it mutates the same immutable field. The only migration is 'kubectl delete sts <name> --cascade=orphan' followed by helm upgrade -- verified non-disruptive (pod UID unchanged, both PVC UIDs retained) but a one-way door per StatefulSet: pre-existing PVCs keep their original label set, so ordinals carry mixed label sets after migration. v3.0 will flip the default to true."
             }
           }
         },

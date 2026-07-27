@@ -6,6 +6,14 @@
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" (include "common.safeName" (dict "name" $cmp) | trim) "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- /* Kubernetes rejects any update to spec.volumeClaimTemplates on an existing
+       StatefulSet ("spec: Forbidden"). The full common.labels set includes
+       helm.sh/chart and app.kubernetes.io/version, both of which change on every
+       chart/appVersion bump, so using it here fails every bump's `helm upgrade`.
+       Gate the stable subset behind global.compat.stableVolumeClaimTemplateLabels
+       (default false) -- see docs/values-reference.md. */ -}}
+{{- $stableVct := dig "global" "compat" "stableVolumeClaimTemplateLabels" false (include "common._values" . | fromYaml | default dict) -}}
+{{- $vctLabels := ternary (include "common.labels.matchLabels" $labelCtx) (include "common.labels" $labelCtx) $stableVct }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -56,7 +64,7 @@ spec:
     - metadata:
         name: {{ default "data" .name }}
         labels:
-          {{- include "common.labels" $labelCtx | nindent 10 }}
+          {{- $vctLabels | nindent 10 }}
         {{- with .annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
@@ -66,7 +74,7 @@ spec:
     - metadata:
         name: {{ required "Volume name is required" $vol.name }}
         labels:
-          {{- include "common.labels" $labelCtx | nindent 10 }}
+          {{- $vctLabels | nindent 10 }}
         {{- with $vol.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
