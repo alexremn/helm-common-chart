@@ -469,7 +469,7 @@ affinity:
 affinity:
 {{- with $nodeAffinity }}
 {{- if kindIs "slice" . }}
-{{ include "common.affinities.legacy.nodeSlice" . | nindent 2 }}
+{{- include "common.affinities.legacy.nodeSlice" . | trim | nindent 2 }}
 {{- else }}
   nodeAffinity:
 {{- toYaml . | nindent 4 }}
@@ -481,7 +481,7 @@ affinity:
 {{- end }}
 {{- with $podAntiAffinity }}
 {{- if $isLegacyPodAntiAffinity }}
-{{ include "common.affinities.legacy.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" . "Values" $rootValues) | nindent 2 }}
+{{- include "common.affinities.legacy.podAntiAffinity" (dict "svc" $svc "cmp" $cmp "env" $env "val" . "Values" $rootValues) | trim | nindent 2 }}
 {{- else }}
   podAntiAffinity:
 {{- toYaml . | nindent 4 }}

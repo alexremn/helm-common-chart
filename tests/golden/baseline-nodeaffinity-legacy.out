@@ -149,7 +149,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       affinity:
-      
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
