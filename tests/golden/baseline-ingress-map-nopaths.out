@@ -163,9 +163,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
 spec:
-  
   rules:
     - host: app.example.com
       http:
