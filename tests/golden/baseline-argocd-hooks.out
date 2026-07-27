@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -29,7 +29,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -44,7 +44,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -64,7 +64,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -82,7 +82,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -107,7 +107,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
@@ -130,12 +130,12 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: argocd-hooks-app
         app.kubernetes.io/component: web
-        helm.sh/environment: review
+        helm.sh/environment: "review"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
       annotations:
-        checksum/config: 67c9e84c8bf23ad51073668c930b9ed6d6084d423c606cc8471f9d669e33f0d6
+        checksum/config: d7b4b1cbf7c531c9ee892ce6b56eef9cf5ea3232f5fb45db30b1098e884d2591
     spec:
       containers:
         - name: web
@@ -181,7 +181,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
-    helm.sh/environment: review
+    helm.sh/environment: "review"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"

@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: long-app
     app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
-    helm.sh/environment: prod
+    helm.sh/environment: "prod"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -38,7 +38,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: long-app
     app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
-    helm.sh/environment: prod
+    helm.sh/environment: "prod"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -60,7 +60,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: long-app
         app.kubernetes.io/component: this-is-a-very-long-stateful-component-name-well-over-sixty-thr
-        helm.sh/environment: prod
+        helm.sh/environment: "prod"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"

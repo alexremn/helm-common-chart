@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -29,7 +29,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: override
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -51,7 +51,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -66,7 +66,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: override
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -81,7 +81,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -96,7 +96,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -121,7 +121,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: override
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -146,7 +146,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -169,7 +169,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: security-minimal
         app.kubernetes.io/component: web
-        helm.sh/environment: production
+        helm.sh/environment: "production"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
@@ -218,7 +218,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: override
-    helm.sh/environment: production
+    helm.sh/environment: "production"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -241,7 +241,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: security-minimal
         app.kubernetes.io/component: override
-        helm.sh/environment: production
+        helm.sh/environment: "production"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"

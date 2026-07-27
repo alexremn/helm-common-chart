@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -29,7 +29,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -44,7 +44,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -61,7 +61,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -77,7 +77,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -97,7 +97,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -126,7 +126,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -154,7 +154,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -176,7 +176,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: web
-        helm.sh/environment: staging
+        helm.sh/environment: "staging"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
@@ -229,7 +229,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: stateful
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -251,7 +251,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: stateful
-        helm.sh/environment: staging
+        helm.sh/environment: "staging"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
@@ -300,7 +300,7 @@ spec:
           helm.sh/chart: common-smoke-0.1.0
           app.kubernetes.io/name: internal-platform
           app.kubernetes.io/component: stateful
-          helm.sh/environment: staging
+          helm.sh/environment: "staging"
           app.kubernetes.io/instance: smoke
           app.kubernetes.io/managed-by: Helm
           app.kubernetes.io/version: "7.8.9"
@@ -320,7 +320,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: run-task
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -332,7 +332,7 @@ spec:
         helm.sh/chart: common-smoke-0.1.0
         app.kubernetes.io/name: internal-platform
         app.kubernetes.io/component: run-task
-        helm.sh/environment: staging
+        helm.sh/environment: "staging"
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
@@ -366,7 +366,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: sync-task
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -384,7 +384,7 @@ spec:
             helm.sh/chart: common-smoke-0.1.0
             app.kubernetes.io/name: internal-platform
             app.kubernetes.io/component: sync-task
-            helm.sh/environment: staging
+            helm.sh/environment: "staging"
             app.kubernetes.io/instance: smoke
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/version: "7.8.9"
@@ -419,7 +419,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -448,7 +448,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -485,7 +485,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -518,7 +518,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
@@ -547,7 +547,7 @@ metadata:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
-    helm.sh/environment: staging
+    helm.sh/environment: "staging"
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
