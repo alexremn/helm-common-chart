@@ -73,6 +73,8 @@ annotations:
       description: "global.tpl.envValues: false (and <cmp>.envRaw: true) now also disables tpl templating of configs.<name>.data / <cmp>.configmap.data and the KEDA ScaledObject prometheus trigger's query, not only <cmp>.env values and native Secret stringData"
     - kind: changed
       description: "merging previously-concatenated annotation blocks (metadata-level and pod-template-level, both above) into one map changes the order annotation keys appear in rendered output. This is semantically inert -- annotations are an unordered map, and every tool diffs the structured object, not the text -- but consumers who commit rendered manifests to git will see a one-time, non-functional text diff on upgrade"
+    - kind: deprecated
+      description: "global.compat.legacySelectorLabels is deprecated and will be removed in 3.0. It is a documented no-op for every chart-generated selector (no chart.* template supplies the version/extraLabels keys its guards read); it only ever affected a consumer template calling common.labels.matchLabels or common.affinities.pods.* directly with those keys in context. Use global.selectorLabels instead"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
