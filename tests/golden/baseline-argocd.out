@@ -12,7 +12,8 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    argocd.argoproj.io/sync-options: Prune=false
+    argocd.argoproj.io/sync-options: ServerSideApply=true,Prune=false
+    argocd.argoproj.io/sync-wave: "5"
 value: 1000
 globalDefault: false
 description: "shared cluster-scoped object — two Applications may declare it"
@@ -31,6 +32,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   maxUnavailable: 25%
   selector:
@@ -52,6 +56,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -68,6 +75,7 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
     argocd.argoproj.io/sync-wave: "-1"
 data:
   LOG_LEVEL: "info"
@@ -86,8 +94,9 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true,Prune=false
+    argocd.argoproj.io/sync-wave: "5"
     helm.sh/resource-policy: keep
-    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -108,7 +117,8 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    argocd.argoproj.io/sync-options: Prune=false
+    argocd.argoproj.io/sync-options: ServerSideApply=true,Prune=false
+    argocd.argoproj.io/sync-wave: "5"
 rules: 
   - apiGroups:
     - ""
@@ -132,7 +142,8 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
-    argocd.argoproj.io/sync-options: Prune=false
+    argocd.argoproj.io/sync-options: ServerSideApply=true,Prune=false
+    argocd.argoproj.io/sync-wave: "5"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -155,6 +166,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   type: ClusterIP
   ports:
@@ -181,6 +195,9 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
     service.kubernetes.io/headless: "true"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   type: ClusterIP
   clusterIP: None
@@ -208,6 +225,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   minReadySeconds: 10
   strategy:
@@ -231,7 +251,7 @@ spec:
         app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
       annotations:
-        checksum/config: 89609510680cd4bc29c43756a1fbeca4e04426784c3e3629abe8bf629cbc1f53
+        checksum/config: 6de2417596c8c9df430fcffcb3c800794a5c5e9a018c3240970d6b5111cc9d4f
     spec:
       containers:
         - name: web
@@ -281,6 +301,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -304,7 +327,7 @@ spec:
         app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
       annotations:
-        checksum/config: 266ce9fc8101c6909d69f1a4a1fae8d2405555793c5d11e0447707c1a83d3683
+        checksum/config: 231b8094380cd9cd9df0f1ca7a7bac894cee993a075abea875ca1a34bc82913c
     spec:
       containers:
         - name: stateful
@@ -376,6 +399,8 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   backoffLimit: 0
   template:
@@ -422,6 +447,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: "Forbid"
@@ -478,6 +506,7 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
   annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   refreshInterval: "10000h"
@@ -506,6 +535,9 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   scaleTargetRef:
     name: web

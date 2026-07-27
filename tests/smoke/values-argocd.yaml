@@ -13,6 +13,16 @@ global:
   prometheusEndpoint: http://prometheus.monitoring:9090
   persistence:
     retain: true
+  # F3: a chart-wide annotation colliding with a chart-emitted default must
+  # merge into one key, not render twice (kubeconform -strict rejects a
+  # duplicate mapping key). sync-wave collides with the ConfigMap/ExternalSecret
+  # ordering default ("-1"); sync-options collides with the Prune=false the
+  # chart emits on PriorityClass/ClusterRole/ClusterRoleBinding and, via
+  # persistence.retain above, PVC — exercising the union-not-overwrite
+  # semantics that keep Prune=false even when a consumer also sets sync-options.
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: ServerSideApply=true
 
 web:
   ports:

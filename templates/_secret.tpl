@@ -27,16 +27,11 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
-  {{- $userAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
-  {{- if or $ann $userAnn }}
+  {{- $defaults := include "config.annotations.default" (dict "env" $env "Values" $.Values) | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $defaults "annotations" (dig "annotations" dict $val)) | trim }}
+  {{- if $ann }}
   annotations:
-    {{- if $ann }}
     {{- $ann | nindent 4 }}
-    {{- end }}
-    {{- if $userAnn }}
-    {{- $userAnn | nindent 4 }}
-    {{- end }}
   {{- end }}
 type: {{ default "Opaque" $val.type }}
 {{- if $val.immutable }}
