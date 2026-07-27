@@ -216,7 +216,7 @@
           "properties": {
             "annotations": {
               "type": "boolean",
-              "description": "Explicit override for emitting werf.io/* annotations. When unset, defaults to true if both werf.name and werf.env are present."
+              "description": "DEPRECATED, scheduled for removal in 3.0 -- superseded by global.deployTool. Explicit override of the resolved dialect's werf branch: true forces werf, false forces non-werf. When unset, the dialect is auto-detected instead: werf if any werf service value is present (global.werf.version, global.werf.name, or a hand-written werf.name), otherwise generic."
             }
           }
         },
