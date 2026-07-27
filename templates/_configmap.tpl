@@ -50,9 +50,11 @@ helm.sh/hook-weight: {{ $weight | quote }}
 Render the shared ConfigMap header (separator, apiVersion, kind,
 metadata.name, labels, annotations).
 
-`annotations` is optional: a dict of user-supplied annotations merged AFTER the defaults, so a
-caller can override a default key or add its own (e.g. argocd.argoproj.io/sync-wave). Mirrors the
-merge order of `common.workload.annotations`.
+`annotations` is optional: a dict of user-supplied annotations, merged with
+chart-wide `global.annotations` and the chart-emitted ordering/hook defaults
+into ONE map via `common.metadata.annotations` — a caller can override a
+default key or add its own (e.g. argocd.argoproj.io/sync-wave) without
+producing a duplicate mapping key.
 
 Usage:
   {{- include "chart._configmap.header" (dict
@@ -70,16 +72,11 @@ metadata:
   name: {{ .name }}
   labels:
     {{- include "common.labels" .labelCtx | nindent 4 }}
-  {{- $ann := include "config.annotations.default" (dict "env" .env "Values" .Values) | trim }}
-  {{- $userAnn := include "common.metadata.annotations" (dict "root" . "annotations" (default dict .annotations)) | trim }}
-  {{- if or $ann $userAnn }}
+  {{- $defaults := include "config.annotations.default" (dict "env" .env "Values" .Values) | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" . "defaults" $defaults "annotations" (default dict .annotations)) | trim }}
+  {{- if $ann }}
   annotations:
-    {{- if $ann }}
     {{- $ann | nindent 4 }}
-    {{- end }}
-    {{- if $userAnn }}
-    {{- $userAnn | nindent 4 }}
-    {{- end }}
   {{- end }}
 {{- end -}}
 

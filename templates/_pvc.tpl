@@ -29,10 +29,11 @@ metadata:
   name: {{ default $cmp $persistence.name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $persistence)) | trim }}
+  {{- $defaults := dict }}
   {{- if dig "global" "persistence" "retain" false $values }}
-  {{- $ann = printf "%s\n%s" (include "common.annotations.retain" $labelCtx | trim) $ann | trim }}
+  {{- $defaults = include "common.annotations.retain" $labelCtx | trim }}
   {{- end }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $defaults "annotations" (dig "annotations" dict $persistence)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}
@@ -49,10 +50,11 @@ metadata:
   name: {{ required "PVC name is required" $pvc.name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $pvc)) | trim }}
+  {{- $defaults := dict }}
   {{- if dig "global" "persistence" "retain" false $values }}
-  {{- $ann = printf "%s\n%s" (include "common.annotations.retain" $labelCtx | trim) $ann | trim }}
+  {{- $defaults = include "common.annotations.retain" $labelCtx | trim }}
   {{- end }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $defaults "annotations" (dig "annotations" dict $pvc)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}

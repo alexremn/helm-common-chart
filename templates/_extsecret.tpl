@@ -121,18 +121,16 @@ kind: ExternalSecret
 metadata:
   name: {{ $name }}
   labels: {{ include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "secrets.annotations.default" (dict "env" $env "Values" $.Values "Release" $.Release) | trim }}
-  {{- /* user annotations merge AFTER the defaults, so a consumer can override a default key or
-         add its own (e.g. argocd.argoproj.io/sync-wave). Same order as workload annotations. */ -}}
-  {{- $userAnn := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
-  {{- if or $ann $userAnn }}
+  {{- $defaults := include "secrets.annotations.default" (dict "env" $env "Values" $.Values "Release" $.Release) | trim }}
+  {{- /* Chart-wide global.annotations, the defaults above, and the resource's own
+         annotations merge into one map via common.metadata.annotations, so a consumer
+         can override a default key or add its own (e.g. argocd.argoproj.io/sync-wave)
+         without producing a duplicate mapping key. Same precedence as workload
+         annotations. */ -}}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $defaults "annotations" (dig "annotations" dict $val)) | trim }}
+  {{- if $ann }}
   annotations:
-    {{- if $ann }}
     {{- $ann | nindent 4 }}
-    {{- end }}
-    {{- if $userAnn }}
-    {{- $userAnn | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
   refreshInterval: {{ dig "refreshInterval" "10000h" $val | quote }}

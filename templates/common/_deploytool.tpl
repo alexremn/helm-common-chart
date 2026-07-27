@@ -137,25 +137,93 @@ Usage:
 {{- end -}}
 
 {{/*
-Merge chart-wide `global.annotations` under a resource's own annotations.
+Merge chart-wide `global.annotations`, a chart-emitted default block, and a
+resource's own annotations into ONE map, so a caller no longer has to emit
+two separate YAML blocks that collide into a duplicate mapping key whenever
+`global.annotations` (or the resource's own annotations) repeats a key the
+chart already emits (e.g. `argocd.argoproj.io/sync-wave`,
+`argocd.argoproj.io/sync-options`) — the bug `eccbb27` fixed for
+`common.workload.annotations` only.
 
 Returns the YAML body only (no leading `annotations:` key), matching
 `common.annotations`. The caller emits the key, gated on non-empty output.
 
+Precedence (lowest to highest): `global.annotations` < `defaults` <
+the resource's own `annotations`.
+
+`argocd.argoproj.io/sync-options` is a comma-separated LIST, not a scalar —
+overwriting it on collision would silently drop the chart's own
+`Prune=false` retention guarantee. It is therefore always merged by taking
+the union of the comma-separated entries across all three layers (in
+precedence order, de-duplicated), never overwritten.
+
+Parameters:
+  root        — chart root (or an ancestor dict carrying .Values, matching
+                common._values)
+  defaults    — optional chart-emitted defaults: either the YAML text
+                another helper returned (e.g. common.annotations.retain,
+                config.annotations.default) or a plain map
+  annotations — the resource's own annotations map (highest precedence)
+
 Usage:
-  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $orderingAnn "annotations" (dig "annotations" dict $val)) | trim }}
 */}}
 {{- define "common.metadata.annotations" -}}
 {{- $values := include "common._values" .root | fromYaml | default dict -}}
+{{- $syncOptKey := "argocd.argoproj.io/sync-options" -}}
+{{- $globalAnn := dig "global" "annotations" dict $values -}}
+{{- $ownAnn := default dict .annotations -}}
+{{- $defaultsIn := .defaults -}}
+{{- $defaultsMap := dict -}}
+{{- if kindIs "string" $defaultsIn -}}
+  {{- $defaultsMap = fromYaml $defaultsIn | default dict -}}
+{{- else if kindIs "map" $defaultsIn -}}
+  {{- $defaultsMap = $defaultsIn -}}
+{{- end -}}
+
+{{- $syncOpts := list -}}
+{{- range $layer := (list $globalAnn $defaultsMap $ownAnn) -}}
+  {{- if hasKey $layer $syncOptKey -}}
+    {{- range $opt := splitList "," (index $layer $syncOptKey | toString) -}}
+      {{- $opt = trim $opt -}}
+      {{- if and $opt (not (has $opt $syncOpts)) -}}
+        {{- $syncOpts = append $syncOpts $opt -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Precedence (lowest to highest): global.annotations < defaults < the
+       resource's own annotations — later layers overwrite earlier ones. */ -}}
 {{- $merged := dict -}}
-{{- range $k, $v := (dig "global" "annotations" dict $values) -}}
-  {{- $_ := set $merged $k ($v | toString) -}}
+{{- range $layer := (list $globalAnn $defaultsMap $ownAnn) -}}
+  {{- range $k, $v := $layer -}}
+    {{- if ne $k $syncOptKey -}}
+      {{- $_ := set $merged $k ($v | toString) -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
-{{- range $k, $v := (default dict .annotations) -}}
-  {{- $_ := set $merged $k ($v | toString) -}}
+{{- if gt (len $syncOpts) 0 -}}
+  {{- $_ := set $merged $syncOptKey (join "," $syncOpts) -}}
 {{- end -}}
-{{- if gt (len $merged) 0 -}}
-{{- toYaml $merged -}}
+
+{{- /* Emit per key (not one whole-map `toYaml`) so `force-sync` —
+       secrets.annotations.default's own already-rendered timestamp, quoted
+       there via Sprig `quote` — can be force-quoted explicitly. `toYaml`
+       only re-quotes a value when go-yaml's own ambiguity check thinks it
+       looks like another scalar type (bool/int/null/timestamp); a Go
+       time.Time's default String() text does not trip that check, so a
+       naive fromYaml/toYaml round-trip through this helper would silently
+       drop its quoting. Every other key (ordering weights, hook fields,
+       Prune=false, resource-policy: keep, and any global/own-annotations
+       value) keeps rendering through `toYaml`, byte-identical to before
+       `defaults` existed, so already-correct callers see no change. */ -}}
+{{- range $k := (keys $merged | sortAlpha) }}
+{{- if eq $k "force-sync" }}
+{{ $k }}: {{ index $merged $k | quote }}
+{{- else }}
+{{ toYaml (dict $k (index $merged $k)) }}
+{{- end }}
 {{- end -}}
 {{- end -}}
 

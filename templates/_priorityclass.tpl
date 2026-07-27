@@ -20,10 +20,11 @@ metadata:
   name: {{ $name }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- $ann := include "common.metadata.annotations" (dict "root" $ "annotations" (dig "annotations" dict $val)) | trim }}
+  {{- $defaults := dict }}
   {{- if eq (include "common.deployTool" $) "argocd" }}
-  {{- $ann = printf "argocd.argoproj.io/sync-options: Prune=false\n%s" $ann | trim }}
+  {{- $defaults = dict "argocd.argoproj.io/sync-options" "Prune=false" }}
   {{- end }}
+  {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $defaults "annotations" (dig "annotations" dict $val)) | trim }}
   {{- if $ann }}
   annotations:
     {{- $ann | nindent 4 }}
