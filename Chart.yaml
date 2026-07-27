@@ -46,7 +46,7 @@ annotations:
     - kind: added
       description: "app.kubernetes.io/managed-by resolves to argocd under deployTool: argocd instead of Helm"
     - kind: fixed
-      description: "annotation values are coerced to strings (including in the public common.annotations helper); a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
+      description: "annotation values are coerced to strings (including in the public common.annotations helper and, for the one path that had no coercion at all, templates/_ingress.tpl's merge of global.ingress.annotations); a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
     - kind: fixed
       description: "top-level networkPolicies.<name> treats annotations and labels as metadata instead of dumping them into spec, which the API server rejected"
     - kind: fixed
@@ -55,12 +55,20 @@ annotations:
       description: "werf.io/weight is gated by the resolved deploy tool instead of the bare presence of a werf key, so global.werf.annotations: false now suppresses it"
     - kind: fixed
       description: "under deployTool: argocd the ExternalSecret force-sync annotation is omitted (a per-render timestamp is permanent drift), Helm hooks become sync-waves, checksum/config defaults on, and cluster-lookup or random helpers fail loudly instead of blanking live Secret data"
+    - kind: fixed
+      description: "ConfigMap/Secret/ExternalSecret/PriorityClass/RBAC/PVC annotations no longer render as two concatenated YAML blocks; a chart-wide global.annotations or a resource's own annotations colliding with a chart-emitted default (e.g. argocd.argoproj.io/sync-wave) produced a duplicate mapping key, which kubeconform -strict and any strict decoder reject outright"
+    - kind: fixed
+      description: "argocd.argoproj.io/sync-options is merged as a union (split, trimmed, de-duplicated) across global.annotations, chart defaults and a resource's own annotations instead of last-key-wins, so a consumer cannot override the chart's Prune=false retention guarantee -- intentionally asymmetric with helm.sh/resource-policy: keep, which a resource's own annotations can still override"
+    - kind: fixed
+      description: "Deployment/StatefulSet/DaemonSet pod-template annotations had the same duplicate-mapping-key defect: a consumer's podAnnotations colliding with the chart-computed checksum/config (on by default under deployTool: argocd) rendered the key twice. The two sources now merge into one map, with the consumer's podAnnotations winning on collision"
     - kind: changed
       description: "global.werf.annotations is deprecated in favour of global.deployTool and will be removed in 3.0"
     - kind: changed
       description: "under deployTool: werf, werf.io/no-activity-timeout and werf.io/failures-allowed-per-replica (and the werf.io/replicas-on-creation fallback) are now emitted whenever any top-level werf key is present, not only when both werf.name and werf.env are set; a werf consumer mid-migration may see these annotations for the first time"
     - kind: changed
       description: "global.tpl.envValues: false (and <cmp>.envRaw: true) now also disables tpl templating of configs.<name>.data / <cmp>.configmap.data and the KEDA ScaledObject prometheus trigger's query, not only <cmp>.env values and native Secret stringData"
+    - kind: changed
+      description: "merging previously-concatenated annotation blocks (metadata-level and pod-template-level, both above) into one map changes the order annotation keys appear in rendered output. This is semantically inert -- annotations are an unordered map, and every tool diffs the structured object, not the text -- but consumers who commit rendered manifests to git will see a one-time, non-functional text diff on upgrade"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
