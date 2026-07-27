@@ -344,7 +344,7 @@ terminationGracePeriodSeconds: {{ default 30 $component.terminationGracePeriod }
 {{- $sections := list
     (include "common.pod.securityContext" (dict "root" $root "component" $component) | trim)
     (include "common.tolerations" (dict "component" $component "root" $root) | trim)
-    (include "common.affinity" (dict "val" $component "svc" $svc "cmp" $cmp "env" $env) | trim)
+    (include "common.affinity" (dict "val" $component "svc" $svc "cmp" $cmp "env" $env "root" $root) | trim)
     (include "common.serviceAccount" (dict "component" $component "root" $root "cmp" $cmp) | trim)
     (include "common.volumes" $volumesComponent | trim)
     (include "common.nodeSelector" $component | trim)

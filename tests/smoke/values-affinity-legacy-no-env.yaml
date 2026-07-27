@@ -1,0 +1,25 @@
+name: aff-app
+environment: dev
+
+global:
+  emitEnvironmentLabel: false
+
+web:
+  image: { repository: nginx, tag: "1.27" }
+  ports:
+    http: 8080
+  affinity:
+    nodeAffinity:
+      - key: zone
+        value: 1
+    podAntiAffinity:
+      default: true
+
+jobs:
+  run_task:
+    image: ghcr.io/example/jobs:latest
+    command: ["/bin/sh", "-c"]
+    args: ["echo job"]
+    affinity:
+      podAntiAffinity:
+        default: true
