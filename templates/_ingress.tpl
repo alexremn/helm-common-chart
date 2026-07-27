@@ -152,7 +152,10 @@ metadata:
   name: {{ $ingressName }}
   labels:
     {{- include "common.labels" $labelCtx | nindent 4 }}
-  {{- include "ingress.annotations" (dict "baseAnnotations" $entry.baseAnnotations "conf" $conf) | nindent 2 }}
+  {{- $ingressAnn := include "ingress.annotations" (dict "baseAnnotations" $entry.baseAnnotations "conf" $conf) | trim }}
+  {{- if $ingressAnn }}
+  {{- $ingressAnn | nindent 2 }}
+  {{- end }}
 spec:
   {{- if $className }}
   ingressClassName: {{ $className }}
@@ -163,9 +166,9 @@ spec:
          (`tls: {}`) or `tls: true` is still truthy, preserving the auto-host
          + auto-secretName behaviour for consumers that explicitly request it. */ -}}
   {{- if $conf.tls }}
-  {{- include "ingress.tls" (dict "conf" $conf "secretName" $ingressName) | nindent 2 }}
+  {{- include "ingress.tls" (dict "conf" $conf "secretName" $ingressName) | trim | nindent 2 }}
   {{- end }}
-  {{- include "ingress.rules" (dict "conf" $conf "cmp" $cmp) | nindent 2 }}
+  {{- include "ingress.rules" (dict "conf" $conf "cmp" $cmp) | trim | nindent 2 }}
   {{- with $conf.defaultBackend }}
   defaultBackend:
     {{- toYaml . | nindent 4 }}

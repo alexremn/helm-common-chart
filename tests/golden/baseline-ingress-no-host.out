@@ -163,15 +163,12 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
 spec:
   ingressClassName: nginx
-  
   tls:
     - hosts:
         - api.example.com
       secretName: web-public-ingress
-  
   rules:
     - host: api.example.com
       http:

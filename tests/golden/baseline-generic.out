@@ -423,9 +423,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
 spec:
-  
   rules:
     - host: web.example.com
       http:
@@ -452,17 +450,14 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 64m
 spec:
   ingressClassName: nginx-internal
-  
   tls:
     - hosts:
         - web.internal.example.com
       secretName: web-internal-tls
-  
   rules:
     - host: web.internal.example.com
       http:

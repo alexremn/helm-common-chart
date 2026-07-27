@@ -413,18 +413,15 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 32m
 spec:
   ingressClassName: nginx
-  
   tls:
     - hosts:
         - app.example.com
       secretName: web-public
-  
   rules:
     - host: app.example.com
       http:
@@ -451,18 +448,15 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-  
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 32m
 spec:
   ingressClassName: nginx-internal
-  
   tls:
     - hosts:
         - admin.example.com
       secretName: web-admin-tls
-  
   rules:
     - host: admin.example.com
       http:
