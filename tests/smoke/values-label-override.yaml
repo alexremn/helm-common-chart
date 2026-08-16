@@ -1,0 +1,27 @@
+# A consumer overriding a CHART-EMITTED label.
+#
+# The case this exists for: a fleet running werf in production and ArgoCD in
+# the lower environments wants app.kubernetes.io/managed-by to read the same
+# everywhere, rather than flipping to `argocd` in whichever environments happen
+# to be on the GitOps path.
+#
+# Before 2.5.1 extraLabels rendered as a second YAML block after the chart's
+# own labels, so this emitted app.kubernetes.io/managed-by twice and every
+# strict decoder rejected the whole file:
+#   error converting YAML to JSON: yaml: unmarshal errors:
+#     line 14: key "app.kubernetes.io/managed-by" already set in map
+name: label-override-app
+environment: staging
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  extraLabels:
+    app.kubernetes.io/managed-by: Helm
+    team: platform
+
+web:
+  ports:
+    http: 8080
