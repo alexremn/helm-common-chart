@@ -13,7 +13,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
     app.example.com/tenant: green
-    team: platform
+    team: "platform"
 spec:
   accessModes: [ReadWriteOnce]
   resources:
@@ -36,7 +36,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
     app.example.com/tenant: green
-    team: platform
+    team: "platform"
     service.kubernetes.io/headless: "true"
 spec:
   type: ClusterIP
@@ -67,7 +67,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
     app.example.com/tenant: green
-    team: platform
+    team: "platform"
 spec:
   serviceName: "stateful-headless"
   updateStrategy:
@@ -92,7 +92,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
         app.example.com/tenant: green
-        team: platform
+        team: "platform"
     spec:
       containers:
         - name: stateful

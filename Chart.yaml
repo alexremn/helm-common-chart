@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.5.0"
+version: "2.5.1"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,54 +29,10 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
-    - kind: added
-      description: "global.deployTool (generic|werf|argocd) selects the dialect of ordering and lifecycle metadata the chart emits; werf is auto-detected from its injected service values, ArgoCD must be set explicitly"
-    - kind: added
-      description: "chart-wide global.annotations and global.extraLabels, plus global.selectorLabels and global.compat.instanceInSelector as stable selector discriminators"
-    - kind: added
-      description: "annotation passthrough on native Secret, RBAC, PriorityClass and TriggerAuthentication, which previously discarded a consumer-supplied annotations key"
-    - kind: added
-      description: "jobs.<name>.hook emits ArgoCD hook annotations so a Job re-runs each sync instead of failing on spec immutability; cronjobs.<name>.jobAnnotations reaches spec.jobTemplate.metadata"
-    - kind: added
-      description: "global.persistence.retain (default false) protects standalone PVCs with both helm.sh/resource-policy: keep and argocd.argoproj.io/sync-options: Prune=false"
-    - kind: added
-      description: "global.ordering.configWeight / global.ordering.secretWeight override the default ordering weight (-1) used for ConfigMap/Secret and ExternalSecret werf.io/weight / argocd.argoproj.io/sync-wave"
-    - kind: added
-      description: "under deployTool: argocd, PriorityClass, ClusterRole and ClusterRoleBinding objects unconditionally carry argocd.argoproj.io/sync-options: Prune=false (not gated by global.persistence.retain), so two Applications sharing one of these cluster-scoped objects cannot prune it out from under each other"
-    - kind: added
-      description: "app.kubernetes.io/managed-by resolves to argocd under deployTool: argocd instead of Helm"
     - kind: fixed
-      description: "annotation values are coerced to strings (including in the public common.annotations helper and, for the one path that had no coercion at all, templates/_ingress.tpl's merge of global.ingress.annotations); a numeric value such as sync-wave: 2 rendered unquoted and failed manifest deserialization"
-    - kind: fixed
-      description: "top-level networkPolicies.<name> treats annotations and labels as metadata instead of dumping them into spec, which the API server rejected"
-    - kind: fixed
-      description: "environment now also resolves from werf's own global.werf.env service value, not only the hand-written werf.env; app.kubernetes.io/name resolution is unchanged from 2.4.3, since it feeds an immutable spec.selector.matchLabels"
-    - kind: fixed
-      description: "werf.io/weight is gated by the resolved deploy tool instead of the bare presence of a werf key, so global.werf.annotations: false now suppresses it"
-    - kind: fixed
-      description: "under deployTool: argocd the ExternalSecret force-sync annotation is omitted (a per-render timestamp is permanent drift), Helm hooks become sync-waves, checksum/config defaults on, and cluster-lookup or random helpers fail loudly instead of blanking live Secret data"
-    - kind: fixed
-      description: "ConfigMap/Secret/ExternalSecret/PriorityClass/RBAC/PVC annotations no longer render as two concatenated YAML blocks; a chart-wide global.annotations or a resource's own annotations colliding with a chart-emitted default (e.g. argocd.argoproj.io/sync-wave) produced a duplicate mapping key, which kubeconform -strict and any strict decoder reject outright"
-    - kind: fixed
-      description: "argocd.argoproj.io/sync-options is merged as a union (split, trimmed, de-duplicated) across global.annotations, chart defaults and a resource's own annotations instead of last-key-wins, so a consumer cannot override the chart's Prune=false retention guarantee -- intentionally asymmetric with helm.sh/resource-policy: keep, which a resource's own annotations can still override"
-    - kind: fixed
-      description: "Deployment/StatefulSet/DaemonSet pod-template annotations had the same duplicate-mapping-key defect: a consumer's podAnnotations colliding with the chart-computed checksum/config (on by default under deployTool: argocd) rendered the key twice. The two sources now merge into one map, with the consumer's podAnnotations winning on collision"
-    - kind: fixed
-      description: "the legacy podAntiAffinity.default/custom emitter (jobs.<name>/cronjobs.<name>/*.affinity.podAntiAffinity) now gates its two helm.sh/environment matchExpressions on global.emitEnvironmentLabel, matching common.labels. With global.emitEnvironmentLabel: false the expressions previously required a label no pod carried, so the 100/99 zone+host anti-affinity spread silently matched nothing. For consumers already on global.emitEnvironmentLabel: false with podAntiAffinity.default, this changes spec.template.spec.affinity: Deployment/StatefulSet/DaemonSet take a one-time rolling restart, and any surviving non-TTL, non-hook Job or CronJob-created Job fails its next helm upgrade with 'spec.template: field is immutable' (mitigate by deleting the completed Job, setting ttlSecondsAfterFinished, or using jobs.<name>.hook). Consumers on the default global.emitEnvironmentLabel: true see no change"
-    - kind: fixed
-      description: "a StatefulSet's volumeClaimTemplates[].metadata.labels now defaults to the full common.labels set unchanged from 2.4.3 (no render diff at the default), but can be gated to a stable subset via global.compat.stableVolumeClaimTemplateLabels (default false, new installs only). The default set includes helm.sh/chart and app.kubernetes.io/version, both of which change on every chart/appVersion bump; Kubernetes forbids updating volumeClaimTemplates on an existing StatefulSet, so that bump's helm upgrade previously failed with 'spec: Forbidden'. Turning the knob on for an existing StatefulSet hits the identical error, because it mutates the same immutable field -- the supported migration is 'kubectl delete sts <name> --cascade=orphan' followed by helm upgrade, a one-way door per StatefulSet. v3.0 will flip the default to true"
-    - kind: fixed
-      description: "helm.sh/environment is now quoted at both emission sites (common.labels and the legacy podAntiAffinity.default/custom matchExpressions), matching app.kubernetes.io/version's existing | quote. A consumer passing a numeric environment (e.g. environment: 2024) previously rendered helm.sh/environment: 2024 and matchExpression value - 2024 as unquoted YAML integers; Kubernetes rejects non-string label and matchExpression values at apply time, and the library's own values.schema.json string type on environment cannot catch this because a library chart's schema only validates its own values scope, not a consumer's. dev and \"dev\" deserialize identically, so labeled resources themselves see no drift. The one exception: common.configChecksum hashes the raw rendered ConfigMap/Secret text rather than parsed content, so on global.checksumAnnotations: true (or deployTool: argocd, where it defaults on) the checksum/config pod-template annotation's value changes and triggers one legitimate rollout on upgrade to this version -- consistent with that annotation's purpose of rolling pods on any config text change"
+      description: "global.extraLabels and a caller-supplied extraLabels now OVERRIDE a chart-emitted label of the same key instead of being appended after it as a second YAML block. Overriding one -- pinning app.kubernetes.io/managed-by back to Helm under deployTool: argocd, say, so the label reads the same across a mixed werf/ArgoCD fleet -- previously emitted the key twice, and every strict decoder (kubeconform -strict, the API server's YAML-to-JSON step) rejected every document in the file with 'key ... already set in map'. There was therefore no way to override a chart label at all. This is the same duplicate-mapping-key defect 2.5.0 fixed for annotations. The emission ORDER of the chart's own labels is unchanged, so a consumer that overrides nothing sees no render diff"
     - kind: changed
-      description: "global.werf.annotations is deprecated in favour of global.deployTool and will be removed in 3.0"
-    - kind: changed
-      description: "under deployTool: werf, werf.io/no-activity-timeout and werf.io/failures-allowed-per-replica (and the werf.io/replicas-on-creation fallback) are now emitted whenever any top-level werf key is present, not only when both werf.name and werf.env are set; a werf consumer mid-migration may see these annotations for the first time"
-    - kind: changed
-      description: "global.tpl.envValues: false (and <cmp>.envRaw: true) now also disables tpl templating of configs.<name>.data / <cmp>.configmap.data and the KEDA ScaledObject prometheus trigger's query, not only <cmp>.env values and native Secret stringData"
-    - kind: changed
-      description: "merging previously-concatenated annotation blocks (metadata-level and pod-template-level, both above) into one map changes the order annotation keys appear in rendered output. This is semantically inert -- annotations are an unordered map, and every tool diffs the structured object, not the text -- but consumers who commit rendered manifests to git will see a one-time, non-functional text diff on upgrade"
-    - kind: deprecated
-      description: "global.compat.legacySelectorLabels is deprecated and will be removed in 3.0. It is a documented no-op for every chart-generated selector (no chart.* template supplies the version/extraLabels keys its guards read); it only ever affected a consumer template calling common.labels.matchLabels or common.affinities.pods.* directly with those keys in context. Use global.selectorLabels instead"
+      description: "label values sourced from extraLabels are now quoted. A Kubernetes label value must be a string, and an unquoted numeric one (team: 2024) is rejected at apply time -- the same trap helm.sh/environment was quoted for in 2.5.0. Consumers already setting extraLabels see a one-time, non-functional quoting diff; global.extraLabels only became reachable in 2.5.0, so this is a narrow surface"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification

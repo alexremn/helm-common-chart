@@ -172,42 +172,64 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
 {{- $instance := include "common.releaseName" . | trim -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
 {{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values -}}
-{{- with .Chart -}}
-helm.sh/chart: {{ printf "%s-%s" .Name (.Version | replace "+" "_") }}
-{{- end }}
-app.kubernetes.io/name: {{ $svc }}
-{{- if $cmp }}
-app.kubernetes.io/component: {{ $cmp }}
-{{- end }}
-{{- if and $env $emitEnv }}
-helm.sh/environment: {{ $env | quote }}
-{{- end }}
-{{- if $instance }}
-app.kubernetes.io/instance: {{ $instance }}
-{{- end }}
+{{- /* .Chart may be a struct (helm 3 / werf render context) or a map
+       (helm 4, or a caller-built dict). `dig` only traverses maps, so use
+       field access via `with`, which works on both. */ -}}
+{{- $version := default "" .version -}}
+{{- if not $version }}{{- with .Chart }}{{- $version = .AppVersion }}{{- end }}{{- end -}}
+
+{{- /* Chart-wide labels merge first; a caller-supplied extraLabels wins.
+       Both also OVERRIDE a chart-emitted label of the same key.
+
+       They used to be appended as a SECOND YAML block after the chart's own
+       labels, so overriding one — pinning app.kubernetes.io/managed-by back to
+       Helm under `deployTool: argocd`, say — emitted the key twice and every
+       strict decoder rejected the whole manifest
+       (`key "app.kubernetes.io/managed-by" already set in map`), which left no
+       way to override a chart label at all. This is the same
+       duplicate-mapping-key defect 2.5.0 fixed for annotations, where
+       common.metadata.annotations merges its three layers into one map.
+
+       Values coming from extraLabels are quoted: a Kubernetes label value must
+       be a string, and an unquoted numeric one (`team: 2024`) is rejected at
+       apply time — the same trap `helm.sh/environment` was quoted for. */ -}}
+{{- $extra := dig "global" "extraLabels" dict $values -}}
+{{- with .extraLabels }}{{- $extra = mergeOverwrite (deepCopy $extra) . }}{{- end -}}
+
+{{- /* Chart-emitted labels, built as ordered pairs rather than a map: a map
+       would render through toYaml in alphabetical order and churn the
+       committed render of every consumer in the fleet. */ -}}
+{{- $pairs := list -}}
+{{- with .Chart }}{{- $pairs = append $pairs (list "helm.sh/chart" (printf "%s-%s" .Name (.Version | replace "+" "_"))) }}{{- end -}}
+{{- $pairs = append $pairs (list "app.kubernetes.io/name" $svc) -}}
+{{- if $cmp }}{{- $pairs = append $pairs (list "app.kubernetes.io/component" $cmp) }}{{- end -}}
+{{- if and $env $emitEnv }}{{- $pairs = append $pairs (list "helm.sh/environment" ($env | quote)) }}{{- end -}}
+{{- if $instance }}{{- $pairs = append $pairs (list "app.kubernetes.io/instance" $instance) }}{{- end -}}
 {{- /* Under ArgoCD there is no Helm release behind the manifest — no release
        Secret, no `helm history`, no `helm rollback` — so claiming Helm here
-       misleads operators and cleanup tooling. */}}
-app.kubernetes.io/managed-by: {{ ternary "argocd" (.Release.Service | default "Helm") (eq (include "common.deployTool" .) "argocd") }}
-{{- /* .Chart may be a struct (helm 3 / werf render context) or a map
-     (helm 4, or a caller-built dict). `dig` only traverses maps, so use
-     field access via `with`, which works on both. */ -}}
-{{- $version := default "" .version }}
-{{- if not $version }}
-{{- with .Chart }}{{- $version = .AppVersion }}{{- end }}
-{{- end }}
-{{- with $version }}
-app.kubernetes.io/version: {{ . | quote }}
-{{- end }}
-{{- with dig "global" "selectorLabels" dict $values }}
-{{- toYaml . | nindent 0 }}
-{{- end }}
-{{- /* Chart-wide labels merge first; a caller-supplied extraLabels wins. */ -}}
-{{- $extra := dig "global" "extraLabels" dict $values }}
-{{- with .extraLabels }}{{- $extra = mergeOverwrite (deepCopy $extra) . }}{{- end }}
-{{- with $extra }}
-{{- toYaml . | nindent 0 }}
-{{- end }}
+       misleads operators and cleanup tooling. Consumers who need the label
+       stable across a mixed werf/ArgoCD fleet override it via extraLabels. */ -}}
+{{- $pairs = append $pairs (list "app.kubernetes.io/managed-by" (ternary "argocd" (.Release.Service | default "Helm") (eq (include "common.deployTool" .) "argocd"))) -}}
+{{- with $version }}{{- $pairs = append $pairs (list "app.kubernetes.io/version" (. | quote)) }}{{- end -}}
+{{- range $k, $v := (dig "global" "selectorLabels" dict $values) }}{{- $pairs = append $pairs (list $k $v) }}{{- end -}}
+
+{{- $lines := list -}}
+{{- $claimed := list -}}
+{{- range $p := $pairs -}}
+  {{- $k := index $p 0 -}}
+  {{- $claimed = append $claimed $k -}}
+  {{- if hasKey $extra $k -}}
+    {{- $lines = append $lines (printf "%s: %s" $k (index $extra $k | toString | quote)) -}}
+  {{- else -}}
+    {{- $lines = append $lines (printf "%s: %s" $k (index $p 1)) -}}
+  {{- end -}}
+{{- end -}}
+{{- range $k, $v := $extra -}}
+  {{- if not (has $k $claimed) -}}
+    {{- $lines = append $lines (printf "%s: %s" $k ($v | toString | quote)) -}}
+  {{- end -}}
+{{- end -}}
+{{ join "\n" $lines }}
 {{- end -}}
 
 {{/*
