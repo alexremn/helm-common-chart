@@ -58,7 +58,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   argocd \
                   argocd-hooks \
                   hooks-generic \
-                  selector-labels \
+                  selector-labels selector-labels-component \
                   vct-stable-labels
 
 # Lint the smoke chart and render every value set. Used by CI.

@@ -1,0 +1,353 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grouped-app
+      app.kubernetes.io/component: "general"
+      app.example.com/tier: "backend"
+      app.kubernetes.io/part-of: "web"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+---
+# Source: common-smoke/templates/all.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: stateful
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "fallback"
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "5Gi"
+  storageClassName: standard
+
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateful-headless
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "fallback"
+    service.kubernetes.io/headless: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: stateful
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "fallback"
+  publishNotReadyAddresses: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grouped-app
+      app.kubernetes.io/component: "general"
+      app.example.com/tier: "backend"
+      app.kubernetes.io/part-of: "web"
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: grouped-app
+        app.kubernetes.io/component: "general"
+        helm.sh/environment: "staging"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/version: "7.8.9"
+        app.example.com/tier: "backend"
+        app.kubernetes.io/part-of: "web"
+      annotations:
+        checksum/config: eb2b7c406ddd01802080b8bd90e221e9c494ad92862d015a6c75c65c98544768
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: stateful
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "fallback"
+spec:
+  serviceName: "stateful-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grouped-app
+      app.kubernetes.io/component: stateful
+      app.example.com/tier: "backend"
+      app.kubernetes.io/part-of: "fallback"
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: grouped-app
+        app.kubernetes.io/component: stateful
+        helm.sh/environment: "staging"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/version: "7.8.9"
+        app.example.com/tier: "backend"
+        app.kubernetes.io/part-of: "fallback"
+      annotations:
+        checksum/config: a30a9284655512730bd062681b6bbe958259c85493d4b94434780ea71a0cbd1d
+    spec:
+      containers:
+        - name: stateful
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          helm.sh/chart: common-smoke-0.1.0
+          app.kubernetes.io/name: grouped-app
+          app.kubernetes.io/component: stateful
+          helm.sh/environment: "staging"
+          app.kubernetes.io/instance: smoke
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/version: "7.8.9"
+          app.example.com/tier: "backend"
+          app.kubernetes.io/part-of: "fallback"
+      spec: 
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: "5Gi"
+        storageClassName: standard
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: grouped-app
+    app.kubernetes.io/component: "general"
+    helm.sh/environment: "staging"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/version: "7.8.9"
+    app.example.com/tier: "backend"
+    app.kubernetes.io/part-of: "web"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grouped-app
+      app.kubernetes.io/component: "general"
+      app.example.com/tier: "backend"
+      app.kubernetes.io/part-of: "web"
+  podMetricsEndpoints:
+    - filterRunning: true
+      followRedirects: true
+      interval: 1m
+      path: /metrics
+      port: "http"
+  namespaceSelector:
+    matchNames:
+      - default

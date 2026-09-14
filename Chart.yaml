@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.5.1"
+version: "2.6.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,10 +29,12 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: added
+      description: "<cmp>.selectorLabels -- per-component selector labels, merged over the chart-wide global.selectorLabels and landing in both common.labels and every generated selector. Unlike the chart-wide map these can differ per component, which is what lets one chart reproduce a pre-existing grouped selector during a migration: a Deployment named web-general selecting on {name, part-of: web, component: general}. The component map is read from .Values.<key>, .Values.cronjobs.<key> or .Values.jobs.<key> (first hit wins, each guarded on the node being a map). Selectors are IMMUTABLE, so these keys are new-install-only on a live workload, exactly like global.selectorLabels"
     - kind: fixed
-      description: "global.extraLabels and a caller-supplied extraLabels now OVERRIDE a chart-emitted label of the same key instead of being appended after it as a second YAML block. Overriding one -- pinning app.kubernetes.io/managed-by back to Helm under deployTool: argocd, say, so the label reads the same across a mixed werf/ArgoCD fleet -- previously emitted the key twice, and every strict decoder (kubeconform -strict, the API server's YAML-to-JSON step) rejected every document in the file with 'key ... already set in map'. There was therefore no way to override a chart label at all. This is the same duplicate-mapping-key defect 2.5.0 fixed for annotations. The emission ORDER of the chart's own labels is unchanged, so a consumer that overrides nothing sees no render diff"
+      description: "selector labels now OVERRIDE a chart-emitted label of the same key instead of being appended after it. Setting global.selectorLabels to a map containing app.kubernetes.io/component previously emitted that key TWICE in both metadata.labels and spec.selector.matchLabels, and every strict decoder (kubeconform -strict, the API server's YAML-to-JSON step) rejects a duplicate mapping key -- so the only keys the chart-wide map could safely carry were ones the chart never emits. Same duplicate-mapping-key defect 2.5.0 fixed for annotations and 2.5.1 for extraLabels; selector labels were the remaining path"
     - kind: changed
-      description: "label values sourced from extraLabels are now quoted. A Kubernetes label value must be a string, and an unquoted numeric one (team: 2024) is rejected at apply time -- the same trap helm.sh/environment was quoted for in 2.5.0. Consumers already setting extraLabels see a one-time, non-functional quoting diff; global.extraLabels only became reachable in 2.5.0, so this is a narrow surface"
+      description: "label values sourced from selectorLabels are now quoted, matching extraLabels since 2.5.1. A Kubernetes label value must be a string and an unquoted numeric one (tenant: 2024) is rejected at apply time. Consumers already setting global.selectorLabels see a one-time, non-functional quoting diff; where such a label reaches a pod template this also changes a checksum/config annotation once, so those pods roll once on the next deploy"
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification

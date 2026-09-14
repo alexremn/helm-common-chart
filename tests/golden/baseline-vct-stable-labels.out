@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: green
+    app.example.com/tenant: "green"
     team: "platform"
 spec:
   accessModes: [ReadWriteOnce]
@@ -35,7 +35,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: green
+    app.example.com/tenant: "green"
     team: "platform"
     service.kubernetes.io/headless: "true"
 spec:
@@ -50,7 +50,7 @@ spec:
     app.kubernetes.io/name: vct-app
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
-    app.example.com/tenant: green
+    app.example.com/tenant: "green"
   publishNotReadyAddresses: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -66,7 +66,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: green
+    app.example.com/tenant: "green"
     team: "platform"
 spec:
   serviceName: "stateful-headless"
@@ -80,7 +80,7 @@ spec:
       app.kubernetes.io/name: vct-app
       app.kubernetes.io/component: stateful
       app.kubernetes.io/instance: smoke
-      app.example.com/tenant: green
+      app.example.com/tenant: "green"
   template:
     metadata:
       labels:
@@ -91,7 +91,7 @@ spec:
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "7.8.9"
-        app.example.com/tenant: green
+        app.example.com/tenant: "green"
         team: "platform"
     spec:
       containers:
@@ -138,7 +138,7 @@ spec:
           app.kubernetes.io/name: vct-app
           app.kubernetes.io/component: stateful
           app.kubernetes.io/instance: smoke
-          app.example.com/tenant: green
+          app.example.com/tenant: "green"
       spec: 
         accessModes: [ReadWriteOnce]
         resources:

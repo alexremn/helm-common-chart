@@ -654,6 +654,13 @@
             }
           }
         },
+        "selectorLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Selector labels for THIS component, merged over global.selectorLabels. Land in BOTH common.labels and every generated selector, and may override a chart-emitted key such as app.kubernetes.io/component. Use to reproduce a pre-existing grouped selector during a migration. Immutable in practice \u2014 changing these on a live workload requires delete/recreate."
+        },
         "vpa": {
           "type": "object",
           "additionalProperties": true
