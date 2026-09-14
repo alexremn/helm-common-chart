@@ -19,6 +19,10 @@ spec:
       app.kubernetes.io/name: security-minimal
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
@@ -56,6 +60,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -71,6 +77,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -86,6 +94,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -111,6 +123,11 @@ spec:
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -136,6 +153,9 @@ spec:
     app.kubernetes.io/name: security-minimal
     app.kubernetes.io/component: override
     app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -208,6 +228,8 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

@@ -19,6 +19,10 @@ spec:
       app.kubernetes.io/name: rbac-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -34,6 +38,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -49,6 +55,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -71,6 +81,7 @@ rules:
     verbs:
     - get
     - list
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -93,6 +104,7 @@ subjects:
   - kind: ServiceAccount
     name: web-sa
     namespace: default
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -116,6 +128,7 @@ rules:
     - get
     - list
     - watch
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -138,6 +151,7 @@ rules:
     verbs:
     - get
     - list
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -160,6 +174,7 @@ subjects:
   - kind: ServiceAccount
     name: web-sa
     namespace: default
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -207,6 +222,11 @@ spec:
     app.kubernetes.io/name: rbac-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

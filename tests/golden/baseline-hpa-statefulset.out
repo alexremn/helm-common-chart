@@ -29,6 +29,8 @@ spec:
 
 
     # "Skipping PVC for component 'stateful': no persistence defined"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: autoscaling/v2

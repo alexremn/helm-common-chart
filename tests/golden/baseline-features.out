@@ -19,6 +19,9 @@ spec:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -34,6 +37,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -50,6 +55,10 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
 data:
   LOG_LEVEL: "info"
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -69,6 +78,8 @@ spec:
   resources:
     requests:
       storage: "10Gi"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -98,6 +109,11 @@ spec:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -126,6 +142,9 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -204,6 +223,8 @@ spec:
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -296,6 +317,8 @@ spec:
         resources:
           requests:
             storage: "10Gi"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -344,6 +367,7 @@ spec:
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -434,6 +458,8 @@ spec:
               name: web
               port:
                 name: http
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1
@@ -469,6 +495,8 @@ spec:
               name: web
               port:
                 name: http
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1

@@ -19,6 +19,8 @@ spec:
       app.kubernetes.io/name: internal-platform
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -34,6 +36,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -51,6 +55,7 @@ metadata:
 data:
   APP_MODE: "internal"
   FEATURE_X: "true"
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -67,6 +72,8 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
 binaryData:
   app.bin: "YmluYXJ5"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -87,6 +94,8 @@ spec:
     requests:
       storage: "5Gi"
   storageClassName: standard
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -116,6 +125,11 @@ spec:
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -144,6 +158,9 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -219,6 +236,8 @@ spec:
           type: RuntimeDefault
       serviceAccountName: web-sa
       automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -310,6 +329,8 @@ spec:
           requests:
             storage: "5Gi"
         storageClassName: standard
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -356,6 +377,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -436,6 +458,8 @@ spec:
               name: web
               port:
                 name: http
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1
@@ -470,6 +494,8 @@ spec:
               name: web
               port:
                 name: http
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
@@ -503,6 +529,8 @@ spec:
         remoteRef:
           key: /apps/internal/web
           property: API_KEY
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1
@@ -532,6 +560,8 @@ spec:
   namespaceSelector:
     matchNames:
       - default
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1

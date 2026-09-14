@@ -47,6 +47,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1

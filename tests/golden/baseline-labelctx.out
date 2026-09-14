@@ -43,6 +43,8 @@ metadata:
   annotations:
     example.com/owner: platform-team
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -61,6 +63,10 @@ metadata:
   annotations:
     example.com/owner: platform-team
 data:
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -89,6 +95,11 @@ spec:
     app.kubernetes.io/name: labelctx-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

@@ -52,6 +52,9 @@ spec:
     app.kubernetes.io/instance: smoke
     app.example.com/tenant: "green"
   publishNotReadyAddresses: false
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

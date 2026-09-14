@@ -42,6 +42,9 @@ spec:
       app.kubernetes.io/name: argocd-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -60,6 +63,8 @@ metadata:
     argocd.argoproj.io/sync-options: ServerSideApply=true
     argocd.argoproj.io/sync-wave: "5"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -79,6 +84,9 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
 data:
   LOG_LEVEL: "info"
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -102,6 +110,8 @@ spec:
   resources:
     requests:
       storage: "1Gi"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -127,6 +137,7 @@ rules:
     verbs:
     - get
     - list
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -152,6 +163,8 @@ subjects:
   - kind: ServiceAccount
     name: web
     namespace: default
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -180,6 +193,11 @@ spec:
     app.kubernetes.io/name: argocd-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -211,6 +229,9 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -288,6 +309,8 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -383,6 +406,8 @@ spec:
         resources:
           requests:
             storage: "1Gi"
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -434,6 +459,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -492,6 +518,8 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
@@ -522,6 +550,8 @@ spec:
         remoteRef:
           key: internal/app/staging
           property: API_KEY
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1

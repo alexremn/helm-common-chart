@@ -20,6 +20,8 @@ spec:
   podSelector: {}
   policyTypes:
   - Egress
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1

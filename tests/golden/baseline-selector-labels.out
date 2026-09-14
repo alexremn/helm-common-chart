@@ -39,6 +39,8 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
     app.example.com/tenant: "blue"
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -57,6 +59,10 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 data:
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -83,6 +89,11 @@ spec:
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
     app.example.com/tenant: "blue"
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

@@ -22,6 +22,8 @@ spec:
       app.kubernetes.io/name: internal-platform
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -40,6 +42,8 @@ metadata:
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/web
     example.com/owner: platform-team
 automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -55,6 +59,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -108,6 +116,11 @@ spec:
     app.kubernetes.io/name: internal-platform
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
+
+
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -136,6 +149,9 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
+
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -212,6 +228,8 @@ spec:
           type: RuntimeDefault
       serviceAccountName: web-sa
       automountServiceAccountToken: false
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -306,6 +324,8 @@ spec:
           requests:
             storage: "5Gi"
         storageClassName: standard
+
+
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1
