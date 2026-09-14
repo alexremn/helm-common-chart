@@ -22,13 +22,15 @@ Usage: {{ include "chart.httproute" (dict "Values" .Values "Release" .Release "C
 {{- if $hr }}
 {{- $svcName := include "common.cmp.dns" $cmp | trim }}
 {{- /* Default backend port resolution: <cmp>.httpRoute.port, else the
-       component's `http` Service port (int form or {port|containerPort} map),
-       else 80. Per-rule `.port` overrides. */ -}}
+       component's `http` SERVICE port, else 80. Per-rule `.port` overrides.
+       Resolved through common.ports.servicePort so this always matches what
+       chart.service exposes - a backendRef naming a port the Service does not
+       have still reports ResolvedRefs=True, so drift here fails silently. */ -}}
 {{- $defaultPort := 80 }}
 {{- $ports := dig "ports" dict $componentValues }}
 {{- if and (kindIs "map" $ports) (hasKey $ports "http") }}
-  {{- $http := index $ports "http" }}
-  {{- if kindIs "map" $http }}{{- $defaultPort = (coalesce $http.port $http.containerPort 80) }}{{- else }}{{- $defaultPort = $http }}{{- end }}
+  {{- $resolved := include "common.ports.servicePort" (dict "port" (index $ports "http")) }}
+  {{- if $resolved }}{{- $defaultPort = $resolved }}{{- end }}
 {{- end }}
 {{- $defaultPort = int (dig "port" $defaultPort $hr) }}
 ---

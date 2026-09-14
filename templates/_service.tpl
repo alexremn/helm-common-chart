@@ -25,7 +25,7 @@ Usage:
     {{- $protocol := "TCP" }}
     {{- $appProtocol := "" }}
     {{- if kindIs "map" $port }}
-      {{- $servicePort = coalesce $port.servicePort $port.port $port.containerPort }}
+      {{- $servicePort = include "common.ports.servicePort" (dict "port" $port) }}
       {{- $protocol = default "TCP" $port.protocol }}
       {{- $appProtocol = default "" $port.appProtocol }}
       {{- if hasKey $port "targetPort" }}

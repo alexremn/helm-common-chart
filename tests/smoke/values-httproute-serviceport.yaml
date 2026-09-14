@@ -1,0 +1,25 @@
+# Regression: an HTTPRoute backendRef names a *Service* port. When a port entry
+# sets servicePort different from containerPort, chart.service exposes
+# servicePort while the route previously resolved containerPort - producing a
+# backendRef to a port the Service does not expose. That still reports
+# ResolvedRefs=True (the Service exists), so it fails silently.
+# Expect: Service port 8443, HTTPRoute backendRef port 8443 (NOT 8080).
+name: gateway-ports-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http:
+      containerPort: 8080
+      servicePort: 8443
+  httpRoute:
+    parentRefs:
+      - name: internal
+        namespace: istio-ingress-internal
+    hostnames:
+      - ports.example.com
