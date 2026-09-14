@@ -162,6 +162,54 @@ LABEL HELPERS
 */}}
 
 {{/*
+Selector labels for a component: `global.selectorLabels` merged with the
+component's own `<cmp>.selectorLabels`, the component winning on a clash.
+
+Unlike `global.extraLabels` these land in BOTH `common.labels` and every
+generated selector, and unlike `global.selectorLabels` alone they can differ
+per component -- which is what lets one chart reproduce a pre-existing
+`app.kubernetes.io/part-of` grouping, or give a component an
+`app.kubernetes.io/component` label that differs from its component key (a
+Deployment named `web-general` selecting on `part-of: web, component: general`).
+
+Selectors are IMMUTABLE. These keys are therefore new-install-only on a live
+workload, exactly like `global.selectorLabels`; the supported use is
+reproducing an existing selector during a chart migration, not changing one.
+
+The component's own map is looked up in the three places a component can be
+declared, first hit wins:
+  .Values.<key>                 workloads (Deployment/StatefulSet/DaemonSet/...)
+  .Values.cronjobs.<key>
+  .Values.jobs.<key>
+where <key> is the component name with dashes swapped for underscores
+(`common.cmp.valuesKey`). Each step is guarded on the node actually being a
+map, so a component name that collides with an unrelated scalar or list value
+resolves to "no labels" instead of failing the render.
+
+Usage: {{ include "common.selectorLabels" $labelCtx | fromYaml }}
+*/}}
+{{- define "common.selectorLabels" -}}
+{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $out := dig "global" "selectorLabels" dict $values -}}
+{{- $cmp := default "" .cmp -}}
+{{- if $cmp -}}
+  {{- $key := include "common.cmp.valuesKey" $cmp -}}
+  {{- $own := dict -}}
+  {{- range $holder := (list $values (index $values "cronjobs") (index $values "jobs")) -}}
+    {{- if and (not $own) (kindIs "map" $holder) -}}
+      {{- $node := index $holder $key -}}
+      {{- if kindIs "map" $node -}}
+        {{- $candidate := index $node "selectorLabels" -}}
+        {{- if kindIs "map" $candidate }}{{- $own = $candidate }}{{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $own }}{{- $out = mergeOverwrite (deepCopy $out) $own }}{{- end -}}
+{{- end -}}
+{{- toYaml (default dict $out) -}}
+{{- end -}}
+
+{{/*
 Common labels applied to every resource.
 Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "prod" "Values" .Values) }}
 */}}
@@ -195,6 +243,12 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
        apply time — the same trap `helm.sh/environment` was quoted for. */ -}}
 {{- $extra := dig "global" "extraLabels" dict $values -}}
 {{- with .extraLabels }}{{- $extra = mergeOverwrite (deepCopy $extra) . }}{{- end -}}
+{{- /* Selector labels ride the same override path. They MUST win over
+       extraLabels: they are also written into spec.selector, and a selector
+       that disagrees with the pod-template labels it is supposed to match
+       produces a Deployment that can never find its own pods. */ -}}
+{{- $sel := include "common.selectorLabels" . | fromYaml | default dict -}}
+{{- if $sel }}{{- $extra = mergeOverwrite (deepCopy $extra) $sel }}{{- end -}}
 
 {{- /* Chart-emitted labels, built as ordered pairs rather than a map: a map
        would render through toYaml in alphabetical order and churn the
@@ -211,7 +265,6 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
        stable across a mixed werf/ArgoCD fleet override it via extraLabels. */ -}}
 {{- $pairs = append $pairs (list "app.kubernetes.io/managed-by" (ternary "argocd" (.Release.Service | default "Helm") (eq (include "common.deployTool" .) "argocd"))) -}}
 {{- with $version }}{{- $pairs = append $pairs (list "app.kubernetes.io/version" (. | quote)) }}{{- end -}}
-{{- range $k, $v := (dig "global" "selectorLabels" dict $values) }}{{- $pairs = append $pairs (list $k $v) }}{{- end -}}
 
 {{- $lines := list -}}
 {{- $claimed := list -}}
@@ -258,31 +311,48 @@ Usage: {{ include "common.labels.matchLabels" (dict "svc" "my-service" "cmp" "we
 {{- $instance := include "common.releaseName" . | trim -}}
 {{- $values := include "common._values" . | fromYaml | default dict -}}
 {{- $legacy := dig "global" "compat" "legacySelectorLabels" false $values -}}
-app.kubernetes.io/name: {{ $svc }}
-{{- if $cmp }}
-app.kubernetes.io/component: {{ $cmp }}
-{{- end }}
+{{- $sel := include "common.selectorLabels" . | fromYaml | default dict -}}
+
+{{- /* Built as ordered pairs, then overridden in place by $sel, for the same
+       reason common.labels does it: appending selector labels as a second
+       block emitted `app.kubernetes.io/component` TWICE whenever a consumer
+       supplied that key, and a duplicate mapping key makes every strict
+       decoder reject the manifest. Overriding in place is also what makes a
+       component-specific component label possible at all. */ -}}
+{{- $pairs := list (list "app.kubernetes.io/name" $svc) -}}
+{{- if $cmp }}{{- $pairs = append $pairs (list "app.kubernetes.io/component" $cmp) }}{{- end -}}
 {{- /* ArgoCD rewrites app.kubernetes.io/instance in metadata and pod-template
        labels but never in spec.selector, so when the ArgoCD instance name and
        the Helm release name diverge the selector stops matching. Opting out is
        NEW-INSTALL ONLY: selectors are immutable, and removing this key from a
-       live workload requires delete/recreate. Supply global.selectorLabels as
-       a replacement discriminator when you do. */ -}}
-{{- $instanceInSelector := dig "global" "compat" "instanceInSelector" true $values }}
-{{- if and $instance $instanceInSelector }}
-app.kubernetes.io/instance: {{ $instance }}
-{{- end }}
-{{- with dig "global" "selectorLabels" dict $values }}
-{{- toYaml . | nindent 0 }}
-{{- end }}
-{{- if $legacy }}
-{{- with .version }}
-app.kubernetes.io/version: {{ . | quote }}
-{{- end }}
-{{- with .extraLabels }}
-{{ toYaml . | nindent 0 }}
-{{- end }}
-{{- end }}
+       live workload requires delete/recreate. Supply global.selectorLabels or
+       <cmp>.selectorLabels as a replacement discriminator when you do. */ -}}
+{{- $instanceInSelector := dig "global" "compat" "instanceInSelector" true $values -}}
+{{- if and $instance $instanceInSelector }}{{- $pairs = append $pairs (list "app.kubernetes.io/instance" $instance) }}{{- end -}}
+{{- if $legacy -}}
+{{- with .version }}{{- $pairs = append $pairs (list "app.kubernetes.io/version" (. | quote)) }}{{- end -}}
+{{- range $k, $v := (default dict .extraLabels) }}{{- $pairs = append $pairs (list $k $v) }}{{- end -}}
+{{- end -}}
+
+{{- $lines := list -}}
+{{- $claimed := list -}}
+{{- range $p := $pairs -}}
+  {{- $k := index $p 0 -}}
+  {{- if not (has $k $claimed) -}}
+    {{- $claimed = append $claimed $k -}}
+    {{- if hasKey $sel $k -}}
+      {{- $lines = append $lines (printf "%s: %s" $k (index $sel $k | toString | quote)) -}}
+    {{- else -}}
+      {{- $lines = append $lines (printf "%s: %s" $k (index $p 1)) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- range $k, $v := $sel -}}
+  {{- if not (has $k $claimed) -}}
+    {{- $lines = append $lines (printf "%s: %s" $k ($v | toString | quote)) -}}
+  {{- end -}}
+{{- end -}}
+{{ join "\n" $lines }}
 {{- end -}}
 
 {{/*

@@ -280,6 +280,79 @@ global:
 
 Both `global` and per-component lists are appended to the rendered `envFrom` (not merged), so a custom list at `global.envFrom.configs` replaces the phantom default. Generic / python / go profiles have empty `defaultConfigName` and `defaultSecretName`, so no phantom defaults are emitted under those profiles.
 
+### Per-component selector labels
+
+`<cmp>.selectorLabels` is the per-component form of
+[`global.selectorLabels`](#global-knobs). Both land in `common.labels` **and**
+in every generated selector; the component map is merged over the chart-wide
+one, so the component wins on a clash.
+
+```yaml
+global:
+  compat:
+    instanceInSelector: false     # selectors here predate the instance label
+  selectorLabels:
+    app.kubernetes.io/part-of: fallback
+
+web_general:
+  selectorLabels:
+    app.kubernetes.io/component: general    # overrides the component key
+    app.kubernetes.io/part-of: web          # overrides the chart-wide value
+```
+
+renders, for the component `web_general`:
+
+```yaml
+metadata:
+  name: web-general
+  labels:
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/component: "general"
+    ...
+    app.kubernetes.io/part-of: "web"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/component: "general"
+      app.kubernetes.io/part-of: "web"
+```
+
+The pod template labels are produced by the same helper, so they always stay
+consistent with the selector.
+
+**What this is for.** `spec.selector` is immutable. A chart being migrated onto
+this library has to reproduce whatever selector its live workloads already
+carry, byte for byte, or every apply fails with `field is immutable`. The
+chart-wide map cannot do that when the grouping varies per component — one app
+with `part-of: web` on ten Deployments and `part-of: sidekiq` on twenty, each
+with a `component` label that is the *leaf* name rather than the component key.
+That is the supported use: reproducing an existing selector, not changing one.
+
+**Lookup order.** The component's map is read from the first of these that is a
+map, where `<key>` is the component name with dashes swapped for underscores:
+
+| | |
+|---|---|
+| `.Values.<key>.selectorLabels` | Deployment / StatefulSet / DaemonSet / Service / PDB / PodMonitor / … |
+| `.Values.cronjobs.<key>.selectorLabels` | CronJob |
+| `.Values.jobs.<key>.selectorLabels` | Job |
+
+Each step is guarded on the node actually being a map, so a component name that
+collides with an unrelated scalar or list value resolves to "no labels" instead
+of failing the render.
+
+**Precedence.** `selectorLabels` beats `extraLabels` on the same key. It has to:
+the value is written into `spec.selector` as well as the metadata, and a
+selector that disagrees with the pod-template labels it is meant to match
+produces a Deployment that can never find its own pods.
+
+> **New installs only.** Adding, removing or changing any of these keys on a
+> live workload changes an immutable field. The migration is
+> `kubectl delete deploy <name> --cascade=orphan` followed by `helm upgrade`,
+> or a blue/green colour switch.
+
+
 ## Ingress
 
 Keys: `<cmp>.ingress` (map or list form), `<cmp>.ingress.<entry>.className`,
@@ -638,7 +711,7 @@ Chart-wide values consumed across multiple templates. Each path is read via `dig
 | `global.compat.legacySelectorLabels` | bool | `false` | **Deprecated**, removed in 3.0. Include `version`/`extraLabels` in `common.labels.matchLabels` / `common.affinities.pods.*` — a NO-OP for every chart-generated selector, since no chart.* template supplies those keys. Only affects a consumer template calling those helpers directly with `version`/`extraLabels` in context. Use `global.selectorLabels` instead. |
 | `global.compat.instanceInSelector` | bool | `true` | Include `app.kubernetes.io/instance` in every generated selector — and, when `global.compat.stableVolumeClaimTemplateLabels` is `true`, in `volumeClaimTemplates[].metadata.labels` too, since that mode reuses the same selector label set there. **New installs only** — selectors are immutable, so flipping this on a live workload requires delete/recreate (`--cascade=orphan` for StatefulSets). Set `false` under ArgoCD when the Application name may diverge from the Helm release name, and pair with `global.selectorLabels`. See [Deploy-tool dialect](#deploy-tool-dialect). |
 | `global.compat.stableVolumeClaimTemplateLabels` | bool | `false` | Use only the stable label subset (`app.kubernetes.io/name`/`component`/`instance` plus `global.selectorLabels`) in a StatefulSet's `volumeClaimTemplates[].metadata.labels`, instead of the full `common.labels` set. The full set includes `helm.sh/chart` and `app.kubernetes.io/version`, which change on every chart/appVersion bump — and Kubernetes forbids updating `volumeClaimTemplates` on an existing StatefulSet, so that bump's `helm upgrade` fails with `spec: Forbidden`. **NEW INSTALLS ONLY**: turning this on for an existing StatefulSet hits that identical `spec: Forbidden` error, because it mutates the same immutable field. The only migration is `kubectl delete sts <name> --cascade=orphan` followed by `helm upgrade` — verified non-disruptive (pod UID unchanged, both PVC UIDs retained) but a **one-way door per StatefulSet**: `volumeClaimTemplates` labels only apply at PVC creation, so pre-existing PVCs keep their original 7-key label set and ordinals carry mixed label sets after migration. v3.0 will flip the default to `true`. |
-| `global.selectorLabels` | map | unset | Labels added to both `common.labels` and every generated selector. Use as a stable discriminator when `global.compat.instanceInSelector` is `false`. Immutable in practice — changing these on a live workload also requires delete/recreate. Also lands in `volumeClaimTemplates[].metadata.labels` when `global.compat.stableVolumeClaimTemplateLabels` is `true`. |
+| `global.selectorLabels` | map | unset | Labels added to both `common.labels` and every generated selector. Use as a stable discriminator when `global.compat.instanceInSelector` is `false`. A key that collides with a chart-emitted label (e.g. `app.kubernetes.io/component`) **overrides** it rather than being emitted twice. Immutable in practice — changing these on a live workload also requires delete/recreate. Also lands in `volumeClaimTemplates[].metadata.labels` when `global.compat.stableVolumeClaimTemplateLabels` is `true`. Per-component overrides: [`<cmp>.selectorLabels`](#per-component-selector-labels). |
 | `global.extraLabels` | map | unset | Labels merged into `common.labels` on every resource. NOT added to selectors — see `global.selectorLabels` for that. On a StatefulSet these labels also land in `volumeClaimTemplates[].metadata.labels`, which is immutable in practice — changing this on a live StatefulSet requires delete/recreate — **unless** `global.compat.stableVolumeClaimTemplateLabels` is `true`, in which case `extraLabels` is excluded from `volumeClaimTemplates` (only `global.selectorLabels` still reaches it there). |
 | `global.annotations` | map | unset | Annotations merged into workloads (Deployment/StatefulSet/DaemonSet/Job/CronJob), ConfigMap, Secret, ExternalSecret, Service, ServiceAccount, PDB, PVC, PodMonitor, NetworkPolicy, RBAC, PriorityClass, ScaledObject and TriggerAuthentication. A resource's own `annotations` wins on key conflict. **Not** applied to HPA, VPA, HTTPRoute, PrometheusRule or ServiceMonitor (set those per-resource), nor to Ingress (use `global.ingress.annotations`). |
 | `global.deployTool` | string | `werf` when werf service values are present, else `generic` | Selects the dialect of ordering/lifecycle metadata the chart emits (`generic`\|`werf`\|`argocd`). ArgoCD cannot be auto-detected and must be set explicitly. See [Deploy-tool dialect](#deploy-tool-dialect). |

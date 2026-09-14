@@ -1,0 +1,46 @@
+# Per-component selector labels: reproduce a pre-existing grouped selector during
+# a chart migration, where one app's Deployments select on
+# {name, part-of, component} and `component` differs from the component key.
+#
+# The `web` component renders objects named `web` but must select on
+# `component: general, part-of: web` — the shape hubstaff-server's live
+# Deployments have. `stateful` shows the chart-wide map still applying, and the
+# component map winning where the two collide.
+name: grouped-app
+environment: staging
+
+global:
+  deployTool: argocd
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  compat:
+    # selectors are immutable; the live objects predate the instance label
+    instanceInSelector: false
+  selectorLabels:
+    app.kubernetes.io/part-of: fallback
+    app.example.com/tier: backend
+
+web:
+  ports:
+    http: 8080
+  service:
+    type: ClusterIP
+  pdb:
+    maxUnavailable: 1
+  podMonitor:
+    enabled: true
+    portName: http
+  selectorLabels:
+    # overrides the chart-emitted component label AND the chart-wide part-of
+    app.kubernetes.io/component: general
+    app.kubernetes.io/part-of: web
+
+stateful:
+  workloadType: StatefulSet
+  replicas: 1
+  ports:
+    http: 8080
+  persistence:
+    size: 5Gi
+    storageClass: standard

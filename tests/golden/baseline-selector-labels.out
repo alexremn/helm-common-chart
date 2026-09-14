@@ -12,14 +12,14 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: selector-app
       app.kubernetes.io/component: web
-      app.example.com/tenant: blue
+      app.example.com/tenant: "blue"
 
 
 
@@ -37,7 +37,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
 automountServiceAccountToken: false
 ---
 # Source: common-smoke/templates/all.yaml
@@ -53,7 +53,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 data:
@@ -71,7 +71,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
 spec:
   type: ClusterIP
   ports:
@@ -82,7 +82,7 @@ spec:
   selector:
     app.kubernetes.io/name: selector-app
     app.kubernetes.io/component: web
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -97,7 +97,7 @@ metadata:
     app.kubernetes.io/instance: smoke
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
-    app.example.com/tenant: blue
+    app.example.com/tenant: "blue"
 spec:
   replicas: 1
   minReadySeconds: 10
@@ -110,7 +110,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: selector-app
       app.kubernetes.io/component: web
-      app.example.com/tenant: blue
+      app.example.com/tenant: "blue"
   template:
     metadata:
       labels:
@@ -121,9 +121,9 @@ spec:
         app.kubernetes.io/instance: smoke
         app.kubernetes.io/managed-by: argocd
         app.kubernetes.io/version: "7.8.9"
-        app.example.com/tenant: blue
+        app.example.com/tenant: "blue"
       annotations:
-        checksum/config: 22542ae8cf8f71837d90ebf64c8948b8855a969ebf24c8b8ad5cc56bfde7fec1
+        checksum/config: 068680682ac22e6dc8839935c8fdb893142c302d853af01b27446513c4147b6c
     spec:
       containers:
         - name: web
