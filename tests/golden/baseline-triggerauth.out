@@ -12,9 +12,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 spec:
-  podIdentity: 
+  podIdentity:
     provider: aws-eks
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1
@@ -29,7 +28,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 spec:
-  secretTargetRef: 
+  secretTargetRef:
     - key: password
       name: redis-credentials
       parameter: password

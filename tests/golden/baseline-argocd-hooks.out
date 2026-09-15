@@ -19,10 +19,6 @@ spec:
       app.kubernetes.io/name: argocd-hooks-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -38,8 +34,6 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -59,7 +53,6 @@ metadata:
 type: Opaque
 stringData:
   HELLO: "world"
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -78,9 +71,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "-5"
 data:
   APP_MODE: "review"
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -106,11 +96,6 @@ spec:
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -185,15 +170,13 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: app-secrets
-  labels: 
+  labels:
     helm.sh/chart: common-smoke-0.1.0
     app.kubernetes.io/name: argocd-hooks-app
     app.kubernetes.io/component: web

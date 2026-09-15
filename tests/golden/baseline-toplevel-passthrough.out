@@ -20,8 +20,6 @@ spec:
   podSelector: {}
   policyTypes:
   - Egress
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1
@@ -36,7 +34,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 spec:
-  groups: 
+  groups:
     - name: shared
       rules:
       - alert: SharedDown

@@ -85,11 +85,20 @@ render-smoke:
 	    >/tmp/common-smoke-$$variant.out || exit $$?; \
 	done )
 
+# How a render is stored in, and compared against, a golden. Helm's blank-line
+# emission changes between PATCH releases, and whoever regenerates a golden
+# rarely runs the helm version CI pins, so a raw text golden turns every helm
+# bump into a red check whose diff is entirely empty lines — exactly what
+# blocked the v2.6.1 release (70 variants, zero content changes). Blank lines
+# and trailing whitespace carry no YAML meaning. Only the golden is normalised:
+# kubeconform, kube-linter and determinism-check all read the real render.
+GOLDEN_FORM := grep -v '^[[:space:]]*$$' | sed 's/[[:space:]]*$$//'
+
 # Refresh the golden references after an intentional change.
 golden-update: render-smoke
 	mkdir -p $(GOLDEN_DIR)
 	@for variant in $(SMOKE_VARIANTS); do \
-	  cp /tmp/common-smoke-$$variant.out $(GOLDEN_DIR)/baseline-$$variant.out; \
+	  cat /tmp/common-smoke-$$variant.out | $(GOLDEN_FORM) > $(GOLDEN_DIR)/baseline-$$variant.out; \
 	done
 	@echo "Golden files updated. Review the diff with 'git diff $(GOLDEN_DIR)' before committing."
 
@@ -98,7 +107,8 @@ golden-update: render-smoke
 golden-check: render-smoke
 	@rc=0; \
 	for variant in $(SMOKE_VARIANTS); do \
-	  if ! diff -u $(GOLDEN_DIR)/baseline-$$variant.out /tmp/common-smoke-$$variant.out; then \
+	  cat /tmp/common-smoke-$$variant.out | $(GOLDEN_FORM) > /tmp/common-smoke-$$variant.golden; \
+	  if ! diff -u $(GOLDEN_DIR)/baseline-$$variant.out /tmp/common-smoke-$$variant.golden; then \
 	    echo "FAIL: $$variant render does not match golden. Run 'make golden-update' if intentional." >&2; \
 	    rc=1; \
 	  fi; \

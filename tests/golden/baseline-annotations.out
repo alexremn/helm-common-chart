@@ -16,8 +16,6 @@ metadata:
 value: 1000
 globalDefault: false
 description: "high priority"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
@@ -39,10 +37,6 @@ spec:
       app.kubernetes.io/name: annotations-fixture
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -58,8 +52,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -79,8 +71,6 @@ metadata:
 type: Opaque
 stringData:
   HELLO: "world"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -97,10 +87,6 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
 data:
   APP_MODE: "test"
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -117,7 +103,7 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
   annotations:
     argocd.argoproj.io/sync-wave: "-3"
-rules: 
+rules:
   - apiGroups:
     - ""
     resources:
@@ -125,7 +111,6 @@ rules:
     verbs:
     - get
     - list
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -150,8 +135,6 @@ subjects:
   - kind: ServiceAccount
     name: annotations-sa
     namespace: default
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -177,11 +160,6 @@ spec:
     app.kubernetes.io/name: annotations-fixture
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -265,8 +243,6 @@ spec:
           persistentVolumeClaim:
             claimName: data
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1
@@ -283,7 +259,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-4"
 spec:
-  secretTargetRef: 
+  secretTargetRef:
     - key: HELLO
       name: bootstrap
       parameter: connection
