@@ -19,9 +19,6 @@ spec:
       app.kubernetes.io/name: tpl-scoping
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -37,8 +34,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -57,7 +52,6 @@ type: Opaque
 stringData:
   RELEASE_REV: "1"
   TOKEN_SCOPE: "Opaque"
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -75,10 +69,6 @@ metadata:
 data:
   OWN_TAG: "1.0.0"
   URL: "https://ghcr.io/example/web.example.org"
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -104,11 +94,6 @@ spec:
     app.kubernetes.io/name: tpl-scoping
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -185,8 +170,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: keda.sh/v1alpha1

@@ -22,8 +22,6 @@ spec:
       app.kubernetes.io/component: "general"
       app.example.com/tier: "backend"
       app.kubernetes.io/part-of: "web"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -41,8 +39,6 @@ metadata:
     app.example.com/tier: "backend"
     app.kubernetes.io/part-of: "web"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -62,10 +58,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 data:
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -88,7 +80,6 @@ spec:
     requests:
       storage: "5Gi"
   storageClassName: standard
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -117,11 +108,6 @@ spec:
     app.kubernetes.io/component: "general"
     app.example.com/tier: "backend"
     app.kubernetes.io/part-of: "web"
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -153,9 +139,6 @@ spec:
     app.example.com/tier: "backend"
     app.kubernetes.io/part-of: "fallback"
   publishNotReadyAddresses: false
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -235,8 +218,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -331,14 +312,12 @@ spec:
           app.kubernetes.io/version: "7.8.9"
           app.example.com/tier: "backend"
           app.kubernetes.io/part-of: "fallback"
-      spec: 
+      spec:
         accessModes: [ReadWriteOnce]
         resources:
           requests:
             storage: "5Gi"
         storageClassName: standard
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1

@@ -32,10 +32,10 @@ spec:
         - name: run-task
           image: ghcr.io/example/jobs:latest
           imagePullPolicy: "IfNotPresent"
-          command: 
+          command:
             - /bin/sh
             - -c
-          args: 
+          args:
             - echo job
           securityContext:
             allowPrivilegeEscalation: false
@@ -47,7 +47,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       automountServiceAccountToken: false
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -89,10 +88,10 @@ spec:
             - name: sync-task
               image: ghcr.io/example/cron:latest
               imagePullPolicy: "IfNotPresent"
-              command: 
+              command:
                 - /bin/sh
                 - -c
-              args: 
+              args:
                 - echo cron
               securityContext:
                 allowPrivilegeEscalation: false

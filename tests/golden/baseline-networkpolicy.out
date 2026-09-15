@@ -18,12 +18,12 @@ spec:
       app.kubernetes.io/name: np-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-  policyTypes: 
+  policyTypes:
     - Ingress
     - Egress
   ingress:
     -
-      from: 
+      from:
         - namespaceSelector:
             matchLabels:
               name: ingress-nginx
@@ -32,14 +32,13 @@ spec:
           port: 8080
   egress:
     -
-      to: 
+      to:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: postgres
       ports:
         - protocol: TCP
           port: 5432
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1
@@ -65,7 +64,6 @@ spec:
   podSelector: {}
   policyTypes:
   - Egress
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1
@@ -84,7 +82,6 @@ spec:
   policyTypes:
   - Ingress
   - Egress
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: policy/v1
@@ -106,10 +103,6 @@ spec:
       app.kubernetes.io/name: np-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -125,8 +118,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -142,10 +133,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -171,11 +158,6 @@ spec:
     app.kubernetes.io/name: np-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

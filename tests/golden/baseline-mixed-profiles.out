@@ -19,8 +19,6 @@ spec:
       app.kubernetes.io/name: features-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -36,8 +34,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -53,10 +49,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 kind: PersistentVolumeClaim
@@ -76,8 +68,6 @@ spec:
   resources:
     requests:
       storage: "10Gi"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -107,11 +97,6 @@ spec:
     app.kubernetes.io/name: features-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -140,9 +125,6 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -220,8 +202,6 @@ spec:
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -310,13 +290,11 @@ spec:
           app.kubernetes.io/instance: smoke
           app.kubernetes.io/managed-by: Helm
           app.kubernetes.io/version: "7.8.9"
-      spec: 
+      spec:
         accessModes: [ReadWriteOnce]
         resources:
           requests:
             storage: "10Gi"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -348,10 +326,10 @@ spec:
         - name: run-task
           image: ghcr.io/example/features-app:3.1.4
           imagePullPolicy: "Always"
-          command: 
+          command:
             - /bin/sh
             - -c
-          args: 
+          args:
             - echo features
           securityContext:
             allowPrivilegeEscalation: false
@@ -366,7 +344,6 @@ spec:
       imagePullSecrets:
         - name: ghcr-pull
       automountServiceAccountToken: false
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: batch/v1
@@ -404,10 +381,10 @@ spec:
             - name: sync-task
               image: ghcr.io/example/features-app:3.1.4
               imagePullPolicy: "Always"
-              command: 
+              command:
                 - /bin/sh
                 - -c
-              args: 
+              args:
                 - echo cron features
               securityContext:
                 allowPrivilegeEscalation: false
@@ -421,7 +398,6 @@ spec:
           imagePullSecrets:
             - name: ghcr-pull
           automountServiceAccountToken: false
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: networking.k8s.io/v1
@@ -450,8 +426,6 @@ spec:
               name: web
               port:
                 name: http
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1

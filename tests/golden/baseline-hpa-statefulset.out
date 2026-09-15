@@ -26,11 +26,7 @@ spec:
     app.kubernetes.io/component: stateful
     app.kubernetes.io/instance: smoke
   publishNotReadyAddresses: false
-
-
     # "Skipping PVC for component 'stateful': no persistence defined"
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: autoscaling/v2
@@ -52,14 +48,13 @@ spec:
     name: stateful
   minReplicas: 2
   maxReplicas: 10
-  metrics: 
+  metrics:
     - resource:
         name: cpu
         target:
           averageUtilization: 70
           type: Utilization
       type: Resource
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1

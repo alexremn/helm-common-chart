@@ -19,8 +19,6 @@ spec:
       app.kubernetes.io/name: pm-app
       app.kubernetes.io/component: web
       app.kubernetes.io/instance: smoke
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -36,8 +34,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -53,10 +49,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "7.8.9"
 data:
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: v1
@@ -86,11 +78,6 @@ spec:
     app.kubernetes.io/name: pm-app
     app.kubernetes.io/component: web
     app.kubernetes.io/instance: smoke
-
-
-
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
@@ -167,8 +154,6 @@ spec:
           type: RuntimeDefault
       serviceAccountName: web
       automountServiceAccountToken: false
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: monitoring.coreos.com/v1

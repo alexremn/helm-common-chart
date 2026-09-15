@@ -15,7 +15,7 @@ metadata:
 spec:
   minReadySeconds: 0
   revisionHistoryLimit: 5
-  updateStrategy: 
+  updateStrategy:
     rollingUpdate:
       maxUnavailable: 1
     type: RollingUpdate

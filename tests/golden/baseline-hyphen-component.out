@@ -23,8 +23,6 @@ spec:
     app.kubernetes.io/name: hyphen-component
     app.kubernetes.io/component: api-gateway
     app.kubernetes.io/instance: smoke
-
-
 ---
 # Source: common-smoke/templates/all.yaml
 apiVersion: apps/v1
