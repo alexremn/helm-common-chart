@@ -554,6 +554,6 @@ spec:
   triggers:
     - type: prometheus
       metadata:
-        serverAddress: http://prometheus.monitoring:9090
+        serverAddress: "http://prometheus.monitoring:9090"
         threshold: "1"
         query: "vector(1)"

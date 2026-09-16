@@ -96,7 +96,7 @@ spec:
   {{- else if eq .type "prometheus" }}
     - type: prometheus
       metadata:
-        serverAddress: {{ required "scaledObject.triggers[].type=prometheus requires global.prometheusEndpoint to be set" $.Values.global.prometheusEndpoint }}
+        serverAddress: {{ required "scaledObject.triggers[].type=prometheus requires global.prometheusEndpoint to be set" $.Values.global.prometheusEndpoint | quote }}
         threshold: {{ .threshold | quote }}
         {{- /* F2: scope tpl context to Values/Release/Chart + componentValues
                instead of leaking the full chart root via `$`. */}}
@@ -117,7 +117,10 @@ spec:
         listName: {{ .listName | quote }}
         listLength: {{ .listLength | quote }}
         addressFromEnv: {{ default "REDIS_HOST" .hostEnv | quote }}
-        enableTLS: {{ default "true" .enableTLS }}
+        {{- /* KEDA's CRD types triggers[].metadata as map[string]string, so an
+               unquoted `true` renders a YAML boolean and the API server rejects
+               the whole ScaledObject. Every other key here is already quoted. */}}
+        enableTLS: {{ default "true" .enableTLS | quote }}
         usernameFromEnv: {{ default "REDIS_USERNAME" .usernameEnv | quote }}
         passwordFromEnv: {{ default "REDIS_PASSWORD" .passwordEnv | quote }}
         {{- with .dbIndex }}

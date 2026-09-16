@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.6.1"
+version: "2.6.2"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,6 +29,8 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "scaledobject: triggers[].metadata.enableTLS and the prometheus serverAddress are now quoted. KEDA's CRD types triggers[].metadata as map[string]string, so the unquoted `true` the redis trigger emitted rendered a YAML boolean and the API server rejected the entire ScaledObject with `got boolean, want string`. Every other key in that block was already quoted; these two were not. Consumers using redis triggers could not apply their ScaledObjects at all."
     - kind: added
       description: "<cmp>.selectorLabels -- per-component selector labels, merged over the chart-wide global.selectorLabels and landing in both common.labels and every generated selector. Unlike the chart-wide map these can differ per component, which is what lets one chart reproduce a pre-existing grouped selector during a migration: a Deployment named web-general selecting on {name, part-of: web, component: general}. The component map is read from .Values.<key>, .Values.cronjobs.<key> or .Values.jobs.<key> (first hit wins, each guarded on the node being a map). Selectors are IMMUTABLE, so these keys are new-install-only on a live workload, exactly like global.selectorLabels"
     - kind: fixed

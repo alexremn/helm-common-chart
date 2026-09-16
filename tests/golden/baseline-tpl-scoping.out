@@ -200,6 +200,6 @@ spec:
   triggers:
     - type: prometheus
       metadata:
-        serverAddress: http://prometheus.monitoring.svc:9090
+        serverAddress: "http://prometheus.monitoring.svc:9090"
         threshold: "100"
         query: "rate(http_requests_total{app='ghcr.io/example/web'}[1m])"
