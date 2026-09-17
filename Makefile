@@ -53,7 +53,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   extsecret-datafrom \
                   extsecret-properties-map \
                   config-checksum \
-                  httproute \
+                  httproute httproute-redirect httproute-multi httproute-timeouts httproute-both \
                   annotations \
                   werf-service-values \
                   argocd \

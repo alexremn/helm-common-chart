@@ -1,0 +1,25 @@
+# Change 3: per-rule `timeouts` passthrough.
+name: gateway-timeouts-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: external-gateway
+        namespace: gateway-system
+    hostnames:
+      - timeouts.example.com
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        timeouts:
+          request: 35s

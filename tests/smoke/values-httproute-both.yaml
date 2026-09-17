@@ -1,0 +1,27 @@
+# Both `httpRoute` and `httpRoutes` set on the same component: both render,
+# independently - the singular route named `<cmp>`, plus one HTTPRoute per
+# `httpRoutes` entry. No precedence between them; the names can't collide.
+name: gateway-both-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: legacy-gateway
+        namespace: gateway-system
+    hostnames:
+      - legacy.example.com
+  httpRoutes:
+    canary:
+      parentRefs:
+        - name: canary-gateway
+          namespace: gateway-system
+      hostnames:
+        - canary.example.com

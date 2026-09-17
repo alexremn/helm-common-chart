@@ -1,0 +1,38 @@
+# Change 1 regression: a rule carrying a RequestRedirect filter must render
+# with NO backendRefs - the Gateway API HTTPRoute CRD enforces via CEL that
+# "RequestRedirect filter must not be used together with backendRefs", so
+# emitting both would be rejected by the API server. A normal rule alongside
+# it keeps the default backendRefs behavior (Service "web" on port 8080).
+name: gateway-redirect-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: external-gateway
+        namespace: gateway-system
+    hostnames:
+      - redirect.example.com
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /old
+        filters:
+          - type: RequestRedirect
+            requestRedirect:
+              scheme: https
+              statusCode: 301
+        # backendRefs intentionally omitted; must NOT render for this rule
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        # backendRefs omitted -> defaults to Service "web" on port 8080
