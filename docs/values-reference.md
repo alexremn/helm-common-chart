@@ -185,6 +185,8 @@ Keys: `configMap`, `secret`, `externalSecret`, `envFrom`.
 - `externalSecret` — `ExternalSecret` CRD (requires External Secrets Operator); references a remote backing store
 - `envFrom` — list of ConfigMap/Secret refs projected into container env
 
+A `null` value under `configs.<name>.data` fails the render (2.8.0); Helm keeps nulls that arrive from a values file or `--set`, and the alternative was shipping the literal `"<nil>"`.
+
 **Templating env values & Secret `stringData` (`tpl` opt-out).** By default, `<cmp>.env` values and native Secret `stringData` are rendered through Helm's `tpl` so consumers can interpolate (e.g. `"{{ .Release.Namespace }}"`). In multi-tenant setups where values come from untrusted sources, disable this to emit values verbatim:
 
 - `global.tpl.envValues: false` — chart-wide opt-out.
@@ -738,6 +740,10 @@ Utility templates a consumer chart may `include` directly. Stable public API (`c
 | `common.env.secretRef` | `name`, `secretName`, `key`, `optional` | Emits a single `valueFrom.secretKeyRef` env entry. |
 | `common.env.configMapRef` | `name`, `configMapName`, `key`, `optional` | Emits a single `valueFrom.configMapKeyRef` env entry. |
 | `common.env.fieldRef` | `name`, `fieldPath` | Emits a single `valueFrom.fieldRef` env entry. |
+| `common.dbPool` | `workers` **or** `cpu` (millicores `500m` or cores `2`), `threads`, `extra` (default 5) | `ceil(workers)×ceil(threads)+extra`, or `workers+extra` without `threads`. Fails when neither `workers` nor `cpu` is given. Worker-per-core pool sizing (Puma/Sidekiq). |
+| `config.define` | `root`, `name` (default `config`), `key`, `value`, `ns`, `type` (`full`\|`value`, default `full`) | Existing ConfigMap value via `lookup`, else `value`. `full` emits `KEY: "value"`; `value` emits the bare string for composing inside a tpl'd value. Refuses to run under `deployTool: argocd` (see `common.argocd.requireCluster`). |
+| `secrets.retrieve` | `root`, `name` (default `secrets`), `key`, `ns`, `type` (`full`\|`value`) | Existing Secret value via `lookup`, else empty. Offline/Helm-only. |
+| `secrets.define` | `root`, `name`, `key`, `value`, `ns`, `type`, `var` (`base`\|`hex`), `generate` (default `true`) | Existing Secret value, else `value`, else a generated 64-char random (`generate: true`) or empty (`generate: false`). |
 
 ## Where things live in templates
 
