@@ -1,0 +1,4 @@
+# MUST fail to render: common.dbPool needs `workers` or `cpu`.
+name: dbpool-bad
+environment: dev
+dbPoolMissingInput: true
