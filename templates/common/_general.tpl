@@ -538,7 +538,8 @@ quantity in millicores ("500m" → 1 worker, rounded up) or whole cores ("2").
 `extra` (default 5) is headroom for connections a request does not hold —
 a Sidekiq heartbeat, a cron, a console.
 
-Fails when neither `workers` nor `cpu` is supplied.
+Fails when neither `workers` nor `cpu` is supplied. Fails when the derived
+worker count is not positive, e.g. an unparseable `cpu` quantity.
 
 Usage: {{ include "common.dbPool" (dict "cpu" .componentValues.resources.requests.cpu "threads" 8) }}
        {{ include "common.dbPool" (dict "workers" 10) }}
@@ -555,6 +556,9 @@ Usage: {{ include "common.dbPool" (dict "cpu" .componentValues.resources.request
   {{- else -}}
     {{- $workers = $cpu | float64 | ceil | int -}}
   {{- end -}}
+{{- end -}}
+{{- if le ($workers | int) 0 -}}
+  {{- fail (printf "common.dbPool: could not derive a positive worker count (workers=%v cpu=%v); check the quantity format" .workers .cpu) -}}
 {{- end -}}
 {{- if .threads -}}
   {{- add (mul $workers (.threads | toString | float64 | ceil | int)) $extra -}}

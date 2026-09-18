@@ -132,3 +132,21 @@ metadata:
 data:
   X: {{ include "config.define" (dict "root" $ "type" "bogus" "key" "X" "value" "v" "ns" .Release.Namespace) | quote }}
 {{- end }}
+{{- if .Values.dbPoolMissingInput }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbpool-bad
+data:
+  POOL: {{ include "common.dbPool" (dict "threads" 8) | quote }}
+{{- end }}
+{{- if .Values.dbPoolBadCpu }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbpool-bad-cpu
+data:
+  POOL: {{ include "common.dbPool" (dict "cpu" "500 m" "threads" 8) | quote }}
+{{- end }}

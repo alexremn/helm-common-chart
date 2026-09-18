@@ -30,7 +30,7 @@ annotations:
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
     - kind: added
-      description: "common.dbPool -- worker-per-core connection-pool sizing (workers or cpu quantity, threads, extra). Ported from the Hubstaff product charts, where four byte-identical copies had drifted apart from the library."
+      description: "common.dbPool -- worker-per-core connection-pool sizing (workers or cpu quantity, threads, extra). Consolidates copies that consumer charts had been maintaining outside the library."
     - kind: added
       description: "config.define gains type (full|value), the same output switch secrets.retrieve and secrets.define already had, so a looked-up ConfigMap value can be composed inside a tpl'd string. An unknown type fails the render."
     - kind: added

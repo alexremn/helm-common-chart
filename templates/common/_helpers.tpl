@@ -13,11 +13,14 @@ Usage: {{ include "randHex" 16 }}
     {{- $base := "0123456789abcdef" -}}
     {{- $result := "" -}}
     {{- range $i := until . -}}
-        {{- /* `randNumeric 1` returns "0".."9" — never picks a..f. Pick over
-               the full 0..15 range by drawing a 6-digit number and reducing
-               mod 16. Per-character bias is ~0.0016% (1,000,000 mod 16 = 0,
-               so bias is actually zero for this range size). */ -}}
-        {{- $idx := mod (randNumeric 6 | int) 16 | int -}}
+        {{- /* `randNumeric 1` returns "0".."9" and never picks a..f, so draw a
+               6-digit crypto-random number and reduce it mod 16. The digits are
+               prefixed with "1" before parsing: Sprig's `int` infers the base from
+               the prefix, so a draw with a leading "0" would otherwise be read as
+               octal (or fail to parse and become 0) and skew the distribution
+               toward index 0. 1,000,000 mod 16 == 0, so the prefix does not
+               change the residue and the result is exactly uniform. */ -}}
+        {{- $idx := mod (printf "1%s" (randNumeric 6) | int) 16 | int -}}
         {{- $result = print $result (substr $idx (add $idx 1 | int) $base) -}}
     {{- end -}}
     {{- $result -}}

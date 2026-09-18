@@ -1,0 +1,5 @@
+# MUST fail to render: common.dbPool cannot derive a positive worker count
+# from an unparseable `cpu` quantity.
+name: dbpool-bad-cpu
+environment: dev
+dbPoolBadCpu: true
