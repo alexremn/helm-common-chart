@@ -1,0 +1,11 @@
+# MUST fail to render: a null ConfigMap value. Helm keeps a null that arrives
+# from a -f file or --set (only chart-default nulls are dropped), and
+# `toString nil` is the literal "<nil>", which would ship to every pod as a
+# set-but-garbage variable. Refuse instead.
+name: nil-config
+environment: dev
+configs:
+  config:
+    data:
+      GOOD: "1"
+      BROKEN:

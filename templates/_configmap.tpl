@@ -99,6 +99,9 @@ data:
 {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $val }}
 {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $val)) "true" }}
 {{- range $key, $value := $val.data }}
+{{- if kindIs "invalid" $value }}
+{{- fail (printf "configs.%s.data.%s is null: a ConfigMap value must be a string, and an unset one would ship to every pod as the literal \"<nil>\"" $name $key) }}
+{{- end }}
   {{ $key }}: {{ if $tplEnabled }}{{ tpl (toString $value) $tplCtx | quote }}{{ else }}{{ toString $value | quote }}{{ end }}
 {{- end }}
 {{- range $glob := $val.fromFiles | default list }}
@@ -134,6 +137,9 @@ data:
   {{- $tplCtx := dict "Values" $.Values "Release" $.Release "Chart" $.Chart "componentValues" $componentValue }}
   {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $componentValue)) "true" }}
   {{- range $key, $value := $componentValue.configmap.data }}
+  {{- if kindIs "invalid" $value }}
+  {{- fail (printf "%s.configmap.data.%s is null: a ConfigMap value must be a string, and an unset one would ship to every pod as the literal \"<nil>\"" $cmp $key) }}
+  {{- end }}
   {{ $key }}: {{ if $tplEnabled }}{{ tpl (toString $value) $tplCtx | quote }}{{ else }}{{ toString $value | quote }}{{ end }}
   {{- end }}
 {{- end }}
