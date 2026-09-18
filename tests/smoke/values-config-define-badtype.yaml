@@ -1,0 +1,4 @@
+# MUST fail to render: config.define rejects an unknown `type`.
+name: helper-probe-bad
+environment: dev
+helperProbeBadType: true

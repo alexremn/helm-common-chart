@@ -1,0 +1,26 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: helper-probe
+type: Opaque
+stringData:
+  KEEP: "given"
+  EMPTY: ""
+  BARE_KEEP: "given"
+  BARE_EMPTY: ""
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helper-probe
+data:
+  GREETING: "hello"
+  BARE: "hello"
+  BARE_NIL: ""
+  POOL_WORKERS: "15"
+  POOL_CPU_MILLIS: "13"
+  POOL_CPU_CORES: "18"
+  POOL_FRACTIONAL: "11"

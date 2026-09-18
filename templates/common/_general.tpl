@@ -528,6 +528,42 @@ Usage: {{ include "common.dbUrl" (dict "type" "postgres" "host" "db.example.com"
 {{- end }}
 
 {{/*
+Database connection pool size for a worker-per-core process model.
+
+  workers × threads + extra          when `threads` is given
+  workers + extra                    otherwise
+
+`workers` is either passed directly or derived from `cpu`: a Kubernetes CPU
+quantity in millicores ("500m" → 1 worker, rounded up) or whole cores ("2").
+`extra` (default 5) is headroom for connections a request does not hold —
+a Sidekiq heartbeat, a cron, a console.
+
+Fails when neither `workers` nor `cpu` is supplied.
+
+Usage: {{ include "common.dbPool" (dict "cpu" .componentValues.resources.requests.cpu "threads" 8) }}
+       {{ include "common.dbPool" (dict "workers" 10) }}
+*/}}
+{{- define "common.dbPool" -}}
+{{- $extra := .extra | default 5 -}}
+{{- $workers := 0 -}}
+{{- if .workers -}}
+  {{- $workers = .workers | toString | float64 | ceil | int -}}
+{{- else -}}
+  {{- $cpu := required "common.dbPool: either `cpu` or `workers` is required" .cpu | toString -}}
+  {{- if hasSuffix "m" $cpu -}}
+    {{- $workers = divf (trimSuffix "m" $cpu | float64) 1000.0 | ceil | int -}}
+  {{- else -}}
+    {{- $workers = $cpu | float64 | ceil | int -}}
+  {{- end -}}
+{{- end -}}
+{{- if .threads -}}
+  {{- add (mul $workers (.threads | toString | float64 | ceil | int)) $extra -}}
+{{- else -}}
+  {{- add $workers $extra -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Generate a DNS-safe name.
 Usage: {{ include "common.safeName" (dict "name" "my.service-name_here" "maxLength" 63) }}
 */}}

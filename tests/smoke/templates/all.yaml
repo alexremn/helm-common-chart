@@ -97,3 +97,38 @@ stringData:
 {{ include "chart.deployment" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "api-gateway") }}
 {{ include "chart.service" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "api-gateway") }}
 {{- end }}
+{{- if .Values.helperProbe }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helper-probe
+data:
+  {{ include "config.define" (dict "root" $ "name" "config" "key" "GREETING" "value" "hello" "ns" .Release.Namespace) }}
+  BARE: {{ include "config.define" (dict "root" $ "type" "value" "name" "config" "key" "GREETING" "value" "hello" "ns" .Release.Namespace) | quote }}
+  BARE_NIL: {{ include "config.define" (dict "root" $ "type" "value" "name" "config" "key" "UNSET" "ns" .Release.Namespace) | quote }}
+  POOL_WORKERS: {{ include "common.dbPool" (dict "workers" 10) | quote }}
+  POOL_CPU_MILLIS: {{ include "common.dbPool" (dict "cpu" "500m" "threads" 8) | quote }}
+  POOL_CPU_CORES: {{ include "common.dbPool" (dict "cpu" "2" "threads" 4 "extra" 10) | quote }}
+  POOL_FRACTIONAL: {{ include "common.dbPool" (dict "cpu" "1500m" "threads" 3) | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: helper-probe
+type: Opaque
+stringData:
+  {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "KEEP" "value" "given" "generate" false "ns" .Release.Namespace) }}
+  {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "EMPTY" "generate" false "ns" .Release.Namespace) }}
+  BARE_KEEP: {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "KEEP" "value" "given" "type" "value" "generate" false "ns" .Release.Namespace) | quote }}
+  BARE_EMPTY: {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "EMPTY" "type" "value" "generate" false "ns" .Release.Namespace) | quote }}
+{{- end }}
+{{- if .Values.helperProbeBadType }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helper-probe-bad
+data:
+  X: {{ include "config.define" (dict "root" $ "type" "bogus" "key" "X" "value" "v" "ns" .Release.Namespace) | quote }}
+{{- end }}
