@@ -30,11 +30,21 @@ CONFIG OPERATORS
 */}}
 
 {{/*
-Define a config value, with lookup for existing values
-Usage: {{ include "config.define" (dict "root" $ "name" "config-name" "key" "KEY_NAME" "value" "default-value" "ns" .Release.Namespace) }}
+Define a config value, with lookup for existing values.
+
+`type` selects the output shape, mirroring secrets.retrieve / secrets.define:
+  full  (default)  KEY: "value"   — a ready ConfigMap data line
+  value            value          — the bare string, for composing inside a
+                                    tpl'd value or another helper
+
+Usage: {{ include "config.define" (dict "root" $ "name" "config-name" "key" "KEY_NAME" "value" "default-value" "ns" .Release.Namespace "type" "full") }}
 */}}
 {{- define "config.define" -}}
   {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "config.define" "detail" "pass an explicit `value`, or use `configs.<name>.data`") -}}
+  {{- $type       := default "full" .type -}}
+  {{- if not (has $type (list "full" "value")) -}}
+    {{- fail (printf "config.define: unknown type %q; expected \"full\" or \"value\"" $type) -}}
+  {{- end -}}
   {{- $name       := default "config" .name -}}
   {{- $key        := required "Key is required" .key -}}
   {{- $namespace  := .ns | default "" -}}
@@ -43,7 +53,11 @@ Usage: {{ include "config.define" (dict "root" $ "name" "config-name" "key" "KEY
   {{- if and $configMap (index $configMap $key) -}}
     {{- $value = index $configMap $key -}}
   {{- end -}}
-  {{- printf "%s: %s" $key ($value | toString | quote) -}}
+  {{- if eq $type "value" -}}
+    {{- if not (kindIs "invalid" $value) }}{{ $value | toString }}{{ end -}}
+  {{- else -}}
+    {{- printf "%s: %s" $key ($value | toString | quote) -}}
+  {{- end -}}
 {{- end -}}
 
 {{/*
@@ -141,7 +155,11 @@ drift unless the underlying Secret is created before the next upgrade.
 Use this for first-install bootstrap of secrets that the cluster will
 then own. Do not use as a long-running source of truth.
 
-Usage: {{ include "secrets.define" (dict "root" $ "name" "secret-name" "key" "KEY_NAME" "value" "default-value" "type" "full" "var" "base" "ns" .Release.Namespace) }}
+`generate` (default true) controls whether a missing value is randomly
+generated at all; with `generate: false` and no existing/supplied value,
+the key is emitted empty rather than filled with a random.
+
+Usage: {{ include "secrets.define" (dict "root" $ "name" "secret-name" "key" "KEY_NAME" "value" "default-value" "type" "full" "var" "base" "generate" true "ns" .Release.Namespace) }}
 */}}
 {{- define "secrets.define" -}}
   {{- $type       := default "full" .type -}}
@@ -150,8 +168,14 @@ Usage: {{ include "secrets.define" (dict "root" $ "name" "secret-name" "key" "KE
   {{- $key        := required "Key is required" .key -}}
   {{- $namespace  := .ns | default "" -}}
   {{- $value      := .value -}}
+  {{- /* `generate: false` turns this into a pure read-back: existing Secret
+         value, else the supplied `value`, else empty — never a random. A nil
+         `value` is coerced to "" so the empty case renders as an empty
+         string rather than the literal "<nil>". */ -}}
+  {{- $generate   := ne .generate false -}}
+  {{- if kindIs "invalid" $value }}{{ $value = "" }}{{ end -}}
   {{- include "common.argocd.requireCluster" (dict "root" (default dict .root) "helper" "secrets.define" "detail" "pass an explicit `value`, or manage the secret with chart.extsecret") -}}
-  {{- if or (not $value) (eq $value "") -}}
+  {{- if and $generate (or (not $value) (eq $value "")) -}}
     {{- if eq $var "base" -}}
       {{- $value = randAlphaNum 64 -}}
     {{- else if eq $var "hex" -}}

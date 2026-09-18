@@ -1,0 +1,7 @@
+name: helper-probe
+environment: dev
+
+# Exercises config.define type=value, secrets.define generate=false and
+# common.dbPool (all 2.8.0). Rendered under werf/generic only: the lookups
+# refuse to run under deployTool=argocd, so determinism-check skips it.
+helperProbe: true
