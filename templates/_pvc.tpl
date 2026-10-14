@@ -11,7 +11,7 @@ This template renders Kubernetes PersistentVolumeClaims for components.
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 
 {{- if not (hasKey $componentValues "persistence") }}
   {{- if .Debug }}

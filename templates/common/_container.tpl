@@ -89,7 +89,7 @@ Usage: {{ include "common.probe" .Values.myComponent }}
        `profile:` override before falling back to global. */ -}}
 {{- $profile := include "common.profile" (dict "root" $root "component" .) -}}
 {{- $defaults := index (include "common.profile.defaults" $root | fromYaml) $profile -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $globalProbe := dig "global" "probe" dict $values -}}
 {{- if not (kindIs "map" $globalProbe) -}}{{- $globalProbe = dict -}}{{- end -}}
 {{- $probeDefaults := $defaults.probe -}}

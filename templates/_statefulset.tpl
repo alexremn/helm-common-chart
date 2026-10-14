@@ -12,7 +12,7 @@
        chart/appVersion bump, so using it here fails every bump's `helm upgrade`.
        Gate the stable subset behind global.compat.stableVolumeClaimTemplateLabels
        (default false) -- see docs/values-reference.md. */ -}}
-{{- $stableVct := dig "global" "compat" "stableVolumeClaimTemplateLabels" false (include "common._values" . | fromYaml | default dict) -}}
+{{- $stableVct := dig "global" "compat" "stableVolumeClaimTemplateLabels" false (merge (dict) .Values) -}}
 {{- $vctLabels := ternary (include "common.labels.matchLabels" $labelCtx) (include "common.labels" $labelCtx) $stableVct }}
 apiVersion: apps/v1
 kind: StatefulSet

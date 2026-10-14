@@ -12,10 +12,10 @@ IDENTITY / NAME RESOLUTION HELPERS
 */}}
 
 {{/*
-Convert `.Values` (chartutil.Values type) into a plain map[string]interface{}
-that `dig` understands. This is the single round-trip per helper invocation;
-without it `dig` errors with `interface conversion`. Kept private (`_`)
-because consumers should never need it.
+Deprecated. Internal helpers get the plain map that `dig` needs with
+`merge (dict) .Values` (one shallow walk); this YAML round-trip of the whole
+values tree costs seconds per call on large charts. Treat the result of either
+form as read-only: deepCopy a sub-map before merging into it.
 */}}
 {{- define "common._values" -}}
 {{- if hasKey . "Values" -}}
@@ -47,7 +47,7 @@ immutable`. `common.environment` (below) takes the equivalent
 selector key.
 */}}
 {{- define "common.appName" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $chartName := "" -}}
 {{- with .Chart }}
   {{- $chartName = .Name -}}
@@ -66,7 +66,7 @@ Lookup order:
   6. literal "default"
 */}}
 {{- define "common.environment" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- coalesce .env (dig "global" "environment" nil $values) (dig "global" "env" nil $values) (dig "environment" nil $values) (dig "env" nil $values) (dig "werf" "env" nil $values) (dig "global" "werf" "env" nil $values) "default" -}}
 {{- end }}
 
@@ -189,7 +189,7 @@ resolves to "no labels" instead of failing the render.
 Usage: {{ include "common.selectorLabels" $labelCtx | fromYaml }}
 */}}
 {{- define "common.selectorLabels" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $out := dig "global" "selectorLabels" dict $values -}}
 {{- $cmp := default "" .cmp -}}
 {{- if $cmp -}}
@@ -218,7 +218,7 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
 {{- $cmp := default "" .cmp -}}
 {{- $env := include "common.environment" . | trim -}}
 {{- $instance := include "common.releaseName" . | trim -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values -}}
 {{- /* .Chart may be a struct (helm 3 / werf render context) or a map
        (helm 4, or a caller-built dict). `dig` only traverses maps, so use
@@ -309,7 +309,7 @@ Usage: {{ include "common.labels.matchLabels" (dict "svc" "my-service" "cmp" "we
 {{- $svc := include "common.appName" . | trim -}}
 {{- $cmp := default "" .cmp -}}
 {{- $instance := include "common.releaseName" . | trim -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $legacy := dig "global" "compat" "legacySelectorLabels" false $values -}}
 {{- $sel := include "common.selectorLabels" . | fromYaml | default dict -}}
 

@@ -32,7 +32,7 @@ Usage: {{ include "common.imagePullSecrets" (dict "component" .Values.web "root"
 {{- $hasGlobal := false -}}
 {{- if and (kindIs "map" .) (hasKey . "component") (hasKey . "root") -}}
   {{- $component = default dict .component -}}
-  {{- $values := include "common._values" .root | fromYaml | default dict -}}
+  {{- $values := merge (dict) .root.Values -}}
   {{- $g := dig "global" "imagePullSecrets" "" $values -}}
   {{- if not (kindIs "invalid" $g) -}}
     {{- if not (eq (printf "%v" $g) "") -}}
@@ -132,7 +132,7 @@ Usage:
 {{- $root := .root -}}
 {{- $component := default dict .component -}}
 {{- $cmp := .cmp -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- /* Under ArgoCD there is no `helm upgrade` event, so this hash is the only
        config-driven rollout mechanism — default it on there. */ -}}
 {{- $checksumDefault := eq (include "common.deployTool" $root) "argocd" -}}
