@@ -13,7 +13,7 @@ Usage: {{ include "chart.triggerauth" (dict "Values" .Values "Release" .Release 
 {{- $svc := include "common.appName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $labelCtx := dict "svc" $svc "cmp" "" "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- range $name, $val := dig "triggerAuthentications" dict $values }}
 ---
 apiVersion: keda.sh/v1alpha1

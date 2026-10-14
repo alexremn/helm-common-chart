@@ -102,7 +102,7 @@ Main ingress template
 {{- $env := include "common.environment" . | trim }}
 {{- $componentValues := index .Values (include "common.cmp.valuesKey" .cmp) | default dict }}
 {{- $ingressValues := $componentValues.ingress }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- /* label/render context; canonical shape: common.workload.context.doc */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" $cmp "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
 {{/*

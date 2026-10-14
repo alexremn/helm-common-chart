@@ -24,7 +24,7 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 */}}
 {{- define "secrets.annotations.default" }}
 {{- $env := .env }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- /* `force-sync` drives ESO to re-reconcile when its value changes.
        Default: per-render `now` timestamp so ESO always reconciles on upgrade.
        Opt out with `global.externalSecrets.forceSync: false`, which falls
@@ -101,7 +101,7 @@ template:
 {{- $cmp := include "common.componentName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $secrets := .Values.secrets }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- $globalStore := dig "global" "secretStore" "" $values }}
 {{- /* ExternalSecret apiVersion. `external-secrets.io/v1` is the default (ESO
        >= 0.14.0). Clusters running ESO 0.9.x-0.13.x only serve `v1beta1`;

@@ -29,7 +29,7 @@ once in an ApplicationSet template.
 Usage: {{- $tool := include "common.deployTool" $ -}}
 */}}
 {{- define "common.deployTool" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $valid := list "generic" "werf" "argocd" -}}
 {{- $explicit := dig "global" "deployTool" "" $values -}}
 {{- $legacy := dig "global" "werf" "annotations" nil $values -}}
@@ -105,7 +105,7 @@ Usage:
 */}}
 {{- define "common.argocd.requireCluster" -}}
 {{- $root := .root -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- if eq (include "common.deployTool" $root) "argocd" -}}
 {{- if not (dig "global" "argocd" "allowClusterlessLookups" false $values) -}}
 {{- fail (printf "%s requires a cluster lookup, which is unavailable under global.deployTool: argocd (ArgoCD renders with `helm template`, so Helm's `lookup` always returns empty and this helper would emit a regenerated or empty value over live cluster data). %s. To keep the current behaviour anyway, set global.argocd.allowClusterlessLookups: true." .helper .detail) -}}
@@ -129,7 +129,7 @@ Usage:
   {{- $tplEnabled := eq (include "common.tpl.enabled" (dict "root" $ "component" $componentValues)) "true" }}
 */}}
 {{- define "common.tpl.enabled" -}}
-{{- $values := include "common._values" .root | fromYaml | default dict -}}
+{{- $values := merge (dict) .root.Values -}}
 {{- $default := ne (include "common.deployTool" .root) "argocd" -}}
 {{- $enabled := dig "global" "tpl" "envValues" $default $values -}}
 {{- if dig "envRaw" false (default dict .component) -}}{{- $enabled = false -}}{{- end -}}
@@ -169,7 +169,7 @@ Usage:
   {{- $ann := include "common.metadata.annotations" (dict "root" $ "defaults" $orderingAnn "annotations" (dig "annotations" dict $val)) | trim }}
 */}}
 {{- define "common.metadata.annotations" -}}
-{{- $values := include "common._values" .root | fromYaml | default dict -}}
+{{- $values := merge (dict) .root.Values -}}
 {{- $syncOptKey := "argocd.argoproj.io/sync-options" -}}
 {{- $globalAnn := dig "global" "annotations" dict $values -}}
 {{- $ownAnn := default dict .annotations -}}

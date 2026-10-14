@@ -265,7 +265,7 @@ Parameters:
 {{- if kindIs "map" $secDefaults -}}
   {{- $_ := mergeOverwrite $secCtx (deepCopy (dig $scope dict $secDefaults)) -}}
 {{- end -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $globalSecCtx := dig "global" "securityContext" $scope dict $values -}}
 {{- if kindIs "map" $globalSecCtx -}}
   {{- $_ := mergeOverwrite $secCtx (deepCopy $globalSecCtx) -}}
