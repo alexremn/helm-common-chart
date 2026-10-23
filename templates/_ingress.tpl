@@ -12,7 +12,9 @@ Combines global, component-specific, and type-specific annotations
 {{- define "ingress.annotations" -}}
 {{- $baseAnnotations := default dict .baseAnnotations -}}
 {{- $ingressAnnotations := dig "annotations" dict .conf -}}
-{{- $merged := mergeOverwrite $baseAnnotations $ingressAnnotations -}}
+{{- /* deepCopy: mergeOverwrite mutates its first argument, and every list-style
+       entry of a component is handed the same baseAnnotations map. */ -}}
+{{- $merged := mergeOverwrite (deepCopy $baseAnnotations) $ingressAnnotations -}}
 {{- /* metadata.annotations is map[string]string; coerce non-string values
        (e.g. an unquoted nginx.ingress.kubernetes.io/* boolean or number) the
        same way common.annotations does, instead of rejecting them. */ -}}
