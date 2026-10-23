@@ -449,7 +449,6 @@ metadata:
     app.kubernetes.io/version: "7.8.9"
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: 32m
 spec:
   ingressClassName: nginx-internal
   tls:
