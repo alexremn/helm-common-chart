@@ -11,7 +11,7 @@ Usage: {{ include "chart.priorityclass" (dict "Values" .Values "Release" .Releas
 {{- $svc := include "common.appName" . | trim }}
 {{- $env := include "common.environment" . | trim }}
 {{- $labelCtx := dict "svc" $svc "cmp" "" "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- range $name, $val := dig "priorityClasses" dict $values }}
 ---
 apiVersion: scheduling.k8s.io/v1

@@ -120,7 +120,7 @@ subjects:
 {{- end }}
 
 {{- /* Top-level rbac map (freeform). */ -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- range $name, $val := dig "rbac" dict $values }}
 {{- include "chart._rbac.pair" (dict
     "kind" (default "Role" $val.kind)

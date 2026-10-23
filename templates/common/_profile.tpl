@@ -46,7 +46,7 @@ falls through to a "default" profile.
     {{- $component = default dict .componentValues -}}
   {{- end -}}
 {{- end -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $globalProfile := dig "global" "profile" "generic" $values -}}
 {{- $profile := $globalProfile -}}
 {{- if and (kindIs "map" $component) (hasKey $component "profile") -}}
@@ -186,7 +186,7 @@ loudly at render time.
 */}}
 {{- define "common.security" -}}
 {{- $root := . -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $security := dig "global" "security" "minimal" $values -}}
 {{- $valid := list "minimal" "generic" -}}
 {{- if not (has $security $valid) -}}

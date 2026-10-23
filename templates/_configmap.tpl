@@ -24,7 +24,7 @@ Consumers opt in via `global.hooks.preInstallEnvironments: [staging, prod]`.
 */}}
 {{- define "config.annotations.default" -}}
 {{- $env := .env -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $tool := include "common.deployTool" . -}}
 {{- $hookEnvs := dig "global" "hooks" "preInstallEnvironments" (list) $values -}}
 {{- $hooksEnabled := dig "global" "hooks" "enabled" nil $values -}}

@@ -14,7 +14,7 @@ Usage: {{ include "chart.prometheusrule" (dict "Values" .Values "Release" .Relea
 {{- /* Top-level passthrough: object name is the verbatim consumer key, so do
        NOT stamp a component label these namespace-shared resources don't own. */ -}}
 {{- $labelCtx := dict "svc" $svc "cmp" "" "env" $env "Values" .Values "Release" .Release "Chart" .Chart }}
-{{- $values := include "common._values" . | fromYaml | default dict }}
+{{- $values := merge (dict) .Values }}
 {{- range $name, $val := dig "prometheusRules" dict $values }}
 ---
 apiVersion: monitoring.coreos.com/v1

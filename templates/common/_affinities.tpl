@@ -197,7 +197,7 @@ output byte-identical). `.val.default` emits the 100/99 zone+host spread;
 `.val.custom` is appended verbatim.
 */}}
 {{- define "common.affinities.legacy.podAntiAffinity" }}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := merge (dict) .Values -}}
 {{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values }}
 podAntiAffinity:
 {{- if .val.default }}

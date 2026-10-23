@@ -112,7 +112,7 @@ Lookup order:
 {{- $root := .root -}}
 {{- $component := default dict .component -}}
 {{- $cmp := default "" .cmp -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $candidate := coalesce $component.image (dig "global" "image" nil $values) (dig "werf" "image" "app" nil $values) -}}
 {{- if empty $candidate -}}
   {{- fail (printf "Unable to resolve image for component '%s'. Tried (in order): component.image, .Values.global.image, .Values.werf.image.app." $cmp) -}}
@@ -130,7 +130,7 @@ Resolve `imagePullPolicy`. See `docs/values-reference.md` for resolution order.
 {{- $root := .root -}}
 {{- $component := default dict .component -}}
 {{- $image := default "" .image -}}
-{{- $values := include "common._values" $root | fromYaml | default dict -}}
+{{- $values := merge (dict) $root.Values -}}
 {{- $componentImagePullPolicy := "" -}}
 {{- if and (kindIs "map" $component) (hasKey $component "image") (kindIs "map" $component.image) -}}
   {{- $componentImagePullPolicy = $component.image.pullPolicy -}}
