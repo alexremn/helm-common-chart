@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.8.0"
+version: "2.8.1"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -29,14 +29,14 @@ annotations:
     - name: Values reference
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
-    - kind: added
-      description: "common.dbPool -- worker-per-core connection-pool sizing (workers or cpu quantity, threads, extra). Consolidates copies that consumer charts had been maintaining outside the library."
-    - kind: added
-      description: "config.define gains type (full|value), the same output switch secrets.retrieve and secrets.define already had, so a looked-up ConfigMap value can be composed inside a tpl'd string. An unknown type fails the render."
-    - kind: added
-      description: "secrets.define gains generate (default true). generate: false makes it a pure read-back -- existing value, else the supplied value, else empty -- never a random; a nil value renders as \"\" rather than \"<nil>\"."
+    - kind: fixed
+      description: "chart.ingress: in a list-style <cmp>.ingress, each entry's own annotations leaked into every later entry of that component whenever global.ingress.annotations was non-empty, because ingress.annotations merged into the shared base map in place. Each entry now gets global.ingress.annotations plus its own annotations only; consumers with that shape see the leaked annotations disappear from the later Ingresses on the next render."
+    - kind: fixed
+      description: "integers >= 1e6 passed via --set and read by a helper (e.g. global.image.tag, global.pdb.minAvailable) no longer render in float notation: --set global.image.tag=20240101 used to produce the invalid image reference nginx:2.0240101e+07."
     - kind: changed
-      description: "chart.configmap now fails the render on a null value under configs.<name>.data or <cmp>.configmap.data, naming the key. Helm keeps a null that arrives from a values file or --set, and toString on nil is the literal \"<nil>\", which shipped to pods as a set-but-garbage variable. No intentional use of a null ConfigMap value exists; consumers hitting the new failure have a typo in an environment values file."
+      description: "helpers no longer round-trip .Values through toYaml/fromYaml on every call; they take a shallow copy with omit instead. Rendering a ~40-component chart drops from minutes to about a second. Output is otherwise unchanged, including for helpers called without Values or root."
+    - kind: deprecated
+      description: "common._values. The chart no longer calls it; omit (default dict .Values) gives the plain map dig needs without the YAML round-trip. Kept for consumers that include it."
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
