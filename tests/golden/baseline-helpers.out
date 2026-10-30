@@ -24,3 +24,20 @@ data:
   POOL_CPU_MILLIS: "13"
   POOL_CPU_CORES: "18"
   POOL_FRACTIONAL: "11"
+---
+# Source: common-smoke/templates/all.yaml
+# Helpers called without .Values / root: each must render, not fail.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helper-probe-noroot
+data:
+  NOROOT_CONFIG: "c"
+  NOROOT_SECRET: "v"
+  APP_NAME: "x"
+  ENVIRONMENT: "prod"
+  DEPLOY_TOOL: "generic"
+  DEPLOY_TOOL_WERF_NULL: "werf"
+  TPL_ENABLED: "true"
+  LIFECYCLE: ""
+  POD_SECURITY: "\nsecurityContext:\n  runAsUser: 1000\n  seccompProfile:\n    type: RuntimeDefault"
