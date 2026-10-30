@@ -122,6 +122,22 @@ stringData:
   {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "EMPTY" "generate" false "ns" .Release.Namespace) }}
   BARE_KEEP: {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "KEEP" "value" "given" "type" "value" "generate" false "ns" .Release.Namespace) | quote }}
   BARE_EMPTY: {{ include "secrets.define" (dict "root" $ "name" "helper-probe" "key" "EMPTY" "type" "value" "generate" false "ns" .Release.Namespace) | quote }}
+---
+# Helpers called without .Values / root: each must render, not fail.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helper-probe-noroot
+data:
+  {{ include "config.define" (dict "name" "config" "key" "NOROOT_CONFIG" "value" "c" "ns" .Release.Namespace) }}
+  {{ include "secrets.define" (dict "name" "s" "key" "NOROOT_SECRET" "value" "v" "generate" false "ns" .Release.Namespace) }}
+  APP_NAME: {{ include "common.appName" (dict "svc" "x") | quote }}
+  ENVIRONMENT: {{ include "common.environment" (dict "env" "prod") | quote }}
+  DEPLOY_TOOL: {{ include "common.deployTool" (dict "Values" nil) | quote }}
+  DEPLOY_TOOL_WERF_NULL: {{ include "common.deployTool" (dict "Values" (dict "werf" nil)) | quote }}
+  TPL_ENABLED: {{ include "common.tpl.enabled" (dict "component" (dict)) | quote }}
+  LIFECYCLE: {{ include "common.annotations.lifecycle" (dict "timeout" "5m") | quote }}
+  POD_SECURITY: {{ include "common.pod.securityContext" (dict "runAsUser" 1000) | quote }}
 {{- end }}
 {{- if .Values.helperProbeBadType }}
 ---

@@ -12,10 +12,14 @@ IDENTITY / NAME RESOLUTION HELPERS
 */}}
 
 {{/*
-Convert `.Values` (chartutil.Values type) into a plain map[string]interface{}
-that `dig` understands. This is the single round-trip per helper invocation;
-without it `dig` errors with `interface conversion`. Kept private (`_`)
-because consumers should never need it.
+Deprecated. Internal helpers get the plain map that `dig` needs with
+`omit (default dict .Values)`: a shallow copy that, like this helper, keeps
+top-level null keys (`merge (dict) .Values` would drop them) and returns `{}`
+when `Values` is missing or nil, without the YAML round-trip of the whole
+values tree that costs seconds per call on large charts. Unlike this helper's
+private deep copy, `omit` aliases the nested maps of `.Values`: anything
+passed as the first argument to `merge`/`mergeOverwrite`/`set` must be
+`deepCopy`'d first, or it writes into `.Values` for the rest of the render.
 */}}
 {{- define "common._values" -}}
 {{- if hasKey . "Values" -}}
@@ -47,7 +51,7 @@ immutable`. `common.environment` (below) takes the equivalent
 selector key.
 */}}
 {{- define "common.appName" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := omit (default dict .Values) -}}
 {{- $chartName := "" -}}
 {{- with .Chart }}
   {{- $chartName = .Name -}}
@@ -66,7 +70,7 @@ Lookup order:
   6. literal "default"
 */}}
 {{- define "common.environment" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := omit (default dict .Values) -}}
 {{- coalesce .env (dig "global" "environment" nil $values) (dig "global" "env" nil $values) (dig "environment" nil $values) (dig "env" nil $values) (dig "werf" "env" nil $values) (dig "global" "werf" "env" nil $values) "default" -}}
 {{- end }}
 
@@ -189,7 +193,7 @@ resolves to "no labels" instead of failing the render.
 Usage: {{ include "common.selectorLabels" $labelCtx | fromYaml }}
 */}}
 {{- define "common.selectorLabels" -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := omit (default dict .Values) -}}
 {{- $out := dig "global" "selectorLabels" dict $values -}}
 {{- $cmp := default "" .cmp -}}
 {{- if $cmp -}}
@@ -218,7 +222,7 @@ Usage: {{ include "common.labels" (dict "svc" "my-service" "cmp" "web" "env" "pr
 {{- $cmp := default "" .cmp -}}
 {{- $env := include "common.environment" . | trim -}}
 {{- $instance := include "common.releaseName" . | trim -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := omit (default dict .Values) -}}
 {{- $emitEnv := dig "global" "emitEnvironmentLabel" true $values -}}
 {{- /* .Chart may be a struct (helm 3 / werf render context) or a map
        (helm 4, or a caller-built dict). `dig` only traverses maps, so use
@@ -309,7 +313,7 @@ Usage: {{ include "common.labels.matchLabels" (dict "svc" "my-service" "cmp" "we
 {{- $svc := include "common.appName" . | trim -}}
 {{- $cmp := default "" .cmp -}}
 {{- $instance := include "common.releaseName" . | trim -}}
-{{- $values := include "common._values" . | fromYaml | default dict -}}
+{{- $values := omit (default dict .Values) -}}
 {{- $legacy := dig "global" "compat" "legacySelectorLabels" false $values -}}
 {{- $sel := include "common.selectorLabels" . | fromYaml | default dict -}}
 
