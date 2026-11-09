@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.8.1"
+version: "2.8.2"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -30,13 +30,7 @@ annotations:
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
     - kind: fixed
-      description: "chart.ingress: in a list-style <cmp>.ingress, each entry's own annotations leaked into every later entry of that component whenever global.ingress.annotations was non-empty, because ingress.annotations merged into the shared base map in place. Each entry now gets global.ingress.annotations plus its own annotations only; consumers with that shape see the leaked annotations disappear from the later Ingresses on the next render."
-    - kind: fixed
-      description: "integers >= 1e6 passed via --set and read by a helper (e.g. global.image.tag, global.pdb.minAvailable) no longer render in float notation: --set global.image.tag=20240101 used to produce the invalid image reference nginx:2.0240101e+07."
-    - kind: changed
-      description: "helpers no longer round-trip .Values through toYaml/fromYaml on every call; they take a shallow copy with omit instead. Rendering a ~40-component chart drops from minutes to about a second. Output is otherwise unchanged, including for helpers called without Values or root."
-    - kind: deprecated
-      description: "common._values. The chart no longer calls it; omit (default dict .Values) gives the plain map dig needs without the YAML round-trip. Kept for consumers that include it."
+      description: "chart.cronjob: an explicit successfulJobsHistoryLimit: 0 or failedJobsHistoryLimit: 0 rendered 1, because default treats an integer 0 as empty. Both limits now fall back to 1 only when unset or null, so 0 keeps no finished Jobs. Consumers that set 0 see the CronJob stop retaining its last Job on the next render; the quoted \"0\" workaround keeps working."
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
