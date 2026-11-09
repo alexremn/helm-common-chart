@@ -1,0 +1,235 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: history-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: cron-history-app
+    app.kubernetes.io/component: history-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: cron-history-app
+            app.kubernetes.io/component: history-zero
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: history-zero
+              image: ghcr.io/example/cron:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: history-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: cron-history-app
+    app.kubernetes.io/component: history-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: cron-history-app
+            app.kubernetes.io/component: history-unset
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: history-unset
+              image: ghcr.io/example/cron:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: history-null
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: cron-history-app
+    app.kubernetes.io/component: history-null
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: cron-history-app
+            app.kubernetes.io/component: history-null
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: history-null
+              image: ghcr.io/example/cron:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: history-custom
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: cron-history-app
+    app.kubernetes.io/component: history-custom
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: cron-history-app
+            app.kubernetes.io/component: history-custom
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: history-custom
+              image: ghcr.io/example/cron:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: history-quoted-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: cron-history-app
+    app.kubernetes.io/component: history-quoted-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: cron-history-app
+            app.kubernetes.io/component: history-quoted-zero
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: history-quoted-zero
+              image: ghcr.io/example/cron:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false

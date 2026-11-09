@@ -1,0 +1,30 @@
+name: cron-history-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/cron
+    tag: "1.0.0"
+
+# successfulJobsHistoryLimit / failedJobsHistoryLimit fall back to 1 only when
+# unset or null. An explicit 0 (keep no finished Jobs) must render as 0, not 1.
+cronjobs:
+  history_zero:
+    schedule: "0 * * * *"
+    successfulJobsHistoryLimit: 0
+    failedJobsHistoryLimit: 0
+  history_unset:
+    schedule: "0 * * * *"
+  history_null:
+    schedule: "0 * * * *"
+    successfulJobsHistoryLimit: null
+    failedJobsHistoryLimit: null
+  history_custom:
+    schedule: "0 * * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 5
+  # The string form consumers used to get 0 past `default`; must keep working.
+  history_quoted_zero:
+    schedule: "0 * * * *"
+    successfulJobsHistoryLimit: "0"
+    failedJobsHistoryLimit: "0"

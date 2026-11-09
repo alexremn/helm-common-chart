@@ -24,8 +24,11 @@ metadata:
 spec:
   schedule: {{ (required "Schedule expression is required" $componentValues.schedule) | quote }}
   concurrencyPolicy: {{ default "Forbid" $componentValues.concurrencyPolicy | quote }}
-  successfulJobsHistoryLimit: {{ default 1 $componentValues.successfulJobsHistoryLimit | int }}
-  failedJobsHistoryLimit: {{ default 1 $componentValues.failedJobsHistoryLimit | int }}
+  {{- /* Fall back to 1 only when unset or null: `default` would also replace an explicit 0. */}}
+  {{- $successfulLimit := $componentValues.successfulJobsHistoryLimit }}
+  {{- $failedLimit := $componentValues.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ ternary 1 (int $successfulLimit) (kindIs "invalid" $successfulLimit) }}
+  failedJobsHistoryLimit: {{ ternary 1 (int $failedLimit) (kindIs "invalid" $failedLimit) }}
   {{- with $componentValues.startingDeadlineSeconds }}
   startingDeadlineSeconds: {{ . }}
   {{- end }}

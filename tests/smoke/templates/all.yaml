@@ -32,6 +32,12 @@
 {{- if and (hasKey .Values "cronjobs") (hasKey (index .Values "cronjobs") "sync_task") }}
 {{ include "chart.cronjob" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "sync_task") }}
 {{- end }}
+{{- /* CronJob history limits: explicit 0 vs unset vs null (values-cronjob-history-zero.yaml). */ -}}
+{{- if and (hasKey .Values "cronjobs") (hasKey (index .Values "cronjobs") "history_zero") }}
+{{- range $cmp := list "history-zero" "history-unset" "history-null" "history-custom" "history-quoted-zero" }}
+{{ include "chart.cronjob" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "cmp" $cmp) }}
+{{- end }}
+{{- end }}
 
 {{- /* New resources (1.4.0): each is gated on the presence of its values key
        so the existing Phase 1/2 fixtures don't accidentally render them and
