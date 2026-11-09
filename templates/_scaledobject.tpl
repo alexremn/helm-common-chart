@@ -82,7 +82,8 @@ spec:
   {{- if $nonResourceTrigger }}
   fallback:
     failureThreshold: {{ default 3 $scaleConfig.failureThreshold }}
-    replicas: {{ default 1 $scaleConfig.fallback }}
+    {{- /* 1 only when unset/null: `default` would also replace an explicit fallback of 0. */}}
+    replicas: {{ ternary 1 $scaleConfig.fallback (kindIs "invalid" $scaleConfig.fallback) }}
   {{- end }}
   triggers:
   {{- range $scaleConfig.triggers }}

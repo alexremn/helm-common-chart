@@ -1,0 +1,1287 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: zv-ds-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-ds-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  minReadySeconds: 0
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-ds-zero
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-ds-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-ds-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: zv-ds-fallback-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-ds-fallback-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  minReadySeconds: 0
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-ds-fallback-zero
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-ds-fallback-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-ds-fallback-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: zv-ds-flat-wins
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-ds-flat-wins
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  minReadySeconds: 0
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-ds-flat-wins
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-ds-flat-wins
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-ds-flat-wins
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: zv-ds-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-ds-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  minReadySeconds: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-ds-unset
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-ds-unset
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-ds-unset
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-deploy-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-deploy-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 0
+  minReadySeconds: 0
+  revisionHistoryLimit: 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-deploy-zero
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-deploy-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-deploy-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 0
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-deploy-null
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-deploy-null
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-deploy-null
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-deploy-null
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-deploy-null
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-deploy-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-deploy-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-deploy-unset
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-deploy-unset
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-deploy-unset
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-deploy-custom
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-deploy-custom
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-deploy-custom
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-deploy-custom
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-deploy-custom
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-rails-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-rails-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-rails-zero
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-rails-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-rails-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      tolerations:
+        -
+          key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      serviceAccountName: zv-rails-zero
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-rails-null
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-rails-null
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-rails-null
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-rails-null
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-rails-null
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      tolerations:
+        -
+          key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+      serviceAccountName: zv-rails-null
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-rails-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-rails-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-rails-unset
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-rails-unset
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-rails-unset
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      tolerations:
+        -
+          key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+      serviceAccountName: zv-rails-unset
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zv-rails-custom
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-rails-custom
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-rails-custom
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-rails-custom
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-rails-custom
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health_check/full
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      tolerations:
+        -
+          key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 300
+      serviceAccountName: zv-rails-custom
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zv-sts-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-sts-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  serviceName: "zv-sts-zero-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 0
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-sts-zero
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-sts-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-sts-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zv-sts-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-sts-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  serviceName: "zv-sts-unset-headless"
+  updateStrategy:
+    type: "RollingUpdate"
+  podManagementPolicy: "OrderedReady"
+  minReadySeconds: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zero-app
+      app.kubernetes.io/component: zv-sts-unset
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-sts-unset
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-sts-unset
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zv-job-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-job-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-job-zero
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-job-zero
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zv-job-null
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-job-null
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-job-null
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-job-null
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zv-job-custom
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-job-custom
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-job-custom
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-job-custom
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zv-job-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-job-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: zero-app
+        app.kubernetes.io/component: zv-job-unset
+        helm.sh/environment: "dev"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: zv-job-unset
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      restartPolicy: "Never"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: zv-cron-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-cron-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: zero-app
+            app.kubernetes.io/component: zv-cron-zero
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: zv-cron-zero
+              image: ghcr.io/example/app:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: zv-cron-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-cron-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: common-smoke-0.1.0
+            app.kubernetes.io/name: zero-app
+            app.kubernetes.io/component: zv-cron-unset
+            helm.sh/environment: "dev"
+            app.kubernetes.io/instance: smoke
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/version: "7.8.9"
+        spec:
+          containers:
+            - name: zv-cron-unset
+              image: ghcr.io/example/app:1.0.0
+              imagePullPolicy: "IfNotPresent"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+          restartPolicy: "Never"
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: zv-scaled-zero
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-scaled-zero
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  scaleTargetRef:
+    name: zv-scaled-zero
+    kind: Deployment
+  pollingInterval: 30
+  cooldownPeriod: 180
+  minReplicaCount: 1
+  maxReplicaCount: 3
+  advanced:
+    restoreToOriginalReplicaCount: false
+  fallback:
+    failureThreshold: 3
+    replicas: 0
+  triggers:
+    - type: cron
+      metadata:
+        timezone: "UTC"
+        start: "0 8 * * *"
+        end: "0 20 * * *"
+        desiredReplicas: "3"
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: zv-scaled-unset
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: zero-app
+    app.kubernetes.io/component: zv-scaled-unset
+    helm.sh/environment: "dev"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  scaleTargetRef:
+    name: zv-scaled-unset
+    kind: Deployment
+  pollingInterval: 30
+  cooldownPeriod: 180
+  minReplicaCount: 1
+  maxReplicaCount: 3
+  advanced:
+    restoreToOriginalReplicaCount: false
+  fallback:
+    failureThreshold: 3
+    replicas: 1
+  triggers:
+    - type: cron
+      metadata:
+        timezone: "UTC"
+        start: "0 8 * * *"
+        end: "0 20 * * *"
+        desiredReplicas: "3"

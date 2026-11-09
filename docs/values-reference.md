@@ -28,7 +28,7 @@ Selects the kind of workload (`Deployment` | `StatefulSet` | `DaemonSet` | `Job`
 
 **Job default `backoffLimit: 0`** — overrides the Kubernetes default `6`. Jobs do not retry on failure by default; set `backoffLimit` explicitly per Job if you want retry-on-pod-failure semantics.
 
-**Deployment default `minReadySeconds: 10`** — overrides the Kubernetes default `0`. Adds a 10-second readiness debounce to rollouts. StatefulSet and DaemonSet keep the Kubernetes default of `0`.
+**Deployment default `minReadySeconds: 10`** — overrides the Kubernetes default `0`. Adds a 10-second readiness debounce to rollouts. StatefulSet and DaemonSet keep the Kubernetes default of `0`. Set `minReadySeconds: 0` to drop the debounce (honoured since 2.8.3; earlier versions rendered `10`).
 
 **Kubernetes version floor for opt-in batch fields.** On clusters older than a field's support floor the apiserver silently drops it (the chart declares `kubeVersion: ">=1.24-0"`, so it does not enforce these): CronJob `timeZone` needs **k8s ≥1.27** (GA; alpha 1.25 — UTC is used below that), and Job/CronJob `podFailurePolicy` needs **k8s ≥1.26** (beta). Set these only on clusters at or above those versions.
 

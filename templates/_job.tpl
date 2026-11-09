@@ -40,8 +40,9 @@ spec:
   {{- with $componentValues.activeDeadlineSeconds }}
   activeDeadlineSeconds: {{ . }}
   {{- end }}
-  {{- with $componentValues.ttlSecondsAfterFinished }}
-  ttlSecondsAfterFinished: {{ . }}
+  {{- /* 0 is meaningful (delete the Job as soon as it finishes): test for unset/null, not falsy. */}}
+  {{- if not (kindIs "invalid" $componentValues.ttlSecondsAfterFinished) }}
+  ttlSecondsAfterFinished: {{ $componentValues.ttlSecondsAfterFinished }}
   {{- end }}
   {{- with $componentValues.completions }}
   completions: {{ . }}

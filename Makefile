@@ -24,7 +24,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   monitor-release \
                   prometheusrule toplevel-passthrough priorityclass triggerauth automount \
                   automount-pod-default securitycontext security-decoupled sa-not-created \
-                  job-podannotations cronjob-history-zero pdb-podmonitor-pvc-sa-annotations \
+                  job-podannotations cronjob-history-zero zero-values pdb-podmonitor-pvc-sa-annotations \
                   config-secret-annotations \
                   tpl-scoping ingress-no-tls ingress-no-host extsecret-namespaced \
                   no-environment-label \

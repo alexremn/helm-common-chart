@@ -50,8 +50,9 @@ spec:
       activeDeadlineSeconds: {{ . }}
       {{- end }}
       backoffLimit: {{ default 0 $componentValues.backoffLimit | int }}
-      {{- with $componentValues.ttlSecondsAfterFinished }}
-      ttlSecondsAfterFinished: {{ . }}
+      {{- /* 0 is meaningful (delete the Job as soon as it finishes): test for unset/null, not falsy. */}}
+      {{- if not (kindIs "invalid" $componentValues.ttlSecondsAfterFinished) }}
+      ttlSecondsAfterFinished: {{ $componentValues.ttlSecondsAfterFinished }}
       {{- end }}
       {{- with $componentValues.podFailurePolicy }}
       podFailurePolicy: {{ toYaml . | nindent 8 }}

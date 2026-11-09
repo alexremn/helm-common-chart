@@ -42,11 +42,12 @@ metadata:
   {{- include "common.workload.annotations" (dict "root" . "component" $componentValues "extra" $extraAnn) }}
 spec:
   {{- if not (or $componentValues.scaling $componentValues.hpa) }}
-  replicas: {{ default 1 $componentValues.replicas | int }}
+  {{- /* Defaults apply only when unset/null: `default`/`with` would also discard an explicit 0. */}}
+  replicas: {{ ternary 1 (int $componentValues.replicas) (kindIs "invalid" $componentValues.replicas) }}
   {{- end }}
-  minReadySeconds: {{ default 10 $componentValues.minReadySeconds }}
-  {{- with $componentValues.revisionHistoryLimit }}
-  revisionHistoryLimit: {{ . }}
+  minReadySeconds: {{ ternary 10 $componentValues.minReadySeconds (kindIs "invalid" $componentValues.minReadySeconds) }}
+  {{- if not (kindIs "invalid" $componentValues.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ $componentValues.revisionHistoryLimit }}
   {{- end }}
   {{- with $componentValues.progressDeadlineSeconds }}
   progressDeadlineSeconds: {{ . }}

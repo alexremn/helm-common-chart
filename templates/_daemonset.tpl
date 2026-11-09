@@ -25,9 +25,11 @@ spec:
   {{- $minReady := 0 }}
   {{- if hasKey $componentValues "minReadySeconds" }}{{ $minReady = $componentValues.minReadySeconds }}{{- else if hasKey $dsConfig "minReadySeconds" }}{{ $minReady = $dsConfig.minReadySeconds }}{{- end }}
   minReadySeconds: {{ $minReady }}
-  {{- $revHist := coalesce $componentValues.revisionHistoryLimit $dsConfig.revisionHistoryLimit }}
-  {{- with $revHist }}
-  revisionHistoryLimit: {{ . }}
+  {{- /* Flat key wins, daemonSet sub-map is the fallback. Not coalesce/with: both skip an explicit 0. */}}
+  {{- $revHist := $componentValues.revisionHistoryLimit }}
+  {{- if kindIs "invalid" $revHist }}{{ $revHist = $dsConfig.revisionHistoryLimit }}{{- end }}
+  {{- if not (kindIs "invalid" $revHist) }}
+  revisionHistoryLimit: {{ $revHist }}
   {{- end }}
   {{- $updStrat := coalesce $componentValues.updateStrategy $dsConfig.updateStrategy }}
   {{- with $updStrat }}

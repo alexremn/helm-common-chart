@@ -327,7 +327,8 @@ containers:
 restartPolicy: {{ . | quote }}
 {{- end }}
 {{- if $includeTerminationGracePeriod }}
-terminationGracePeriodSeconds: {{ default 30 $component.terminationGracePeriod }}
+{{- /* 30 only when unset/null: `default` would also replace an explicit 0 (kill immediately). */}}
+terminationGracePeriodSeconds: {{ ternary 30 $component.terminationGracePeriod (kindIs "invalid" $component.terminationGracePeriod) }}
 {{- end }}
 {{- /* Table-driven emission of pod-spec sections. Each entry is the
        already-rendered & trimmed section body; empty entries are skipped.

@@ -38,6 +38,28 @@
 {{ include "chart.cronjob" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "cmp" $cmp) }}
 {{- end }}
 {{- end }}
+{{- /* Explicit 0 vs unset vs null across workload kinds (values-zero-values.yaml). */ -}}
+{{- if .Values.zeroValues }}
+{{- $ctx := dict "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- range $cmp := list "zv-deploy-zero" "zv-deploy-null" "zv-deploy-unset" "zv-deploy-custom" "zv-rails-zero" "zv-rails-null" "zv-rails-unset" "zv-rails-custom" }}
+{{ include "chart.deployment" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- range $cmp := list "zv-sts-zero" "zv-sts-unset" }}
+{{ include "chart.statefulset" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- range $cmp := list "zv-ds-zero" "zv-ds-fallback-zero" "zv-ds-flat-wins" "zv-ds-unset" }}
+{{ include "chart.daemonset" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- range $cmp := list "zv-scaled-zero" "zv-scaled-unset" }}
+{{ include "chart.scaledobject" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- range $cmp := list "zv-job-zero" "zv-job-null" "zv-job-custom" "zv-job-unset" }}
+{{ include "chart.job" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- range $cmp := list "zv-cron-zero" "zv-cron-unset" }}
+{{ include "chart.cronjob" (merge (dict "cmp" $cmp) $ctx) }}
+{{- end }}
+{{- end }}
 
 {{- /* New resources (1.4.0): each is gated on the presence of its values key
        so the existing Phase 1/2 fixtures don't accidentally render them and

@@ -28,10 +28,11 @@ spec:
   podManagementPolicy: {{ default "OrderedReady" $componentValues.podManagementPolicy | quote }}
   minReadySeconds: {{ default 0 $componentValues.minReadySeconds }}
   {{- if not (or $componentValues.scaling $componentValues.hpa) }}
-  replicas: {{ default 1 $componentValues.replicas | int }}
+  {{- /* Defaults apply only when unset/null: `default`/`with` would also discard an explicit 0. */}}
+  replicas: {{ ternary 1 (int $componentValues.replicas) (kindIs "invalid" $componentValues.replicas) }}
   {{- end }}
-  {{- with $componentValues.revisionHistoryLimit }}
-  revisionHistoryLimit: {{ . }}
+  {{- if not (kindIs "invalid" $componentValues.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ $componentValues.revisionHistoryLimit }}
   {{- end }}
   {{- with $componentValues.persistentVolumeClaimRetentionPolicy }}
   persistentVolumeClaimRetentionPolicy: {{ toYaml . | nindent 4 }}

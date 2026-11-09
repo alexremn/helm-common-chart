@@ -383,8 +383,9 @@ tolerations:
     value: {{ .value | toString | quote }}
     {{- end }}
     effect: {{ default "NoSchedule" .effect | toString | quote }}
-    {{- with .tolerationSeconds }}
-    tolerationSeconds: {{ . }}
+    {{- /* 0 means evict immediately; `with` dropped it, which tolerates forever. */}}
+    {{- if not (kindIs "invalid" .tolerationSeconds) }}
+    tolerationSeconds: {{ .tolerationSeconds }}
     {{- end }}
 {{- end }}
 {{- end }}
