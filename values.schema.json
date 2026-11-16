@@ -135,6 +135,20 @@
             "replicasOnCreationAnnotation": {
               "type": "string",
               "description": "Annotation key written with the initial replica count when the component has scaling.min but no explicit replicas. Empty disables. Defaults to werf.io/replicas-on-creation when werf annotations are enabled."
+            },
+            "minReadySeconds": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "progressDeadlineSeconds": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "strategyMaxUnavailable": {
+              "$ref": "#/$defs/intOrPercent"
+            },
+            "strategyMaxSurge": {
+              "$ref": "#/$defs/intOrPercent"
             }
           }
         },

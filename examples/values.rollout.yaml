@@ -1,0 +1,29 @@
+# Example values for chart-wide Deployment rollout defaults
+# Use as: -f examples/values.rollout.yaml
+#
+# global.deployment.* sets the rollout fallbacks once for every Deployment in
+# the chart. Precedence for each key: <cmp>.<key> > global.deployment.<key> >
+# built-in default (minReadySeconds 10, maxSurge 1, maxUnavailable 25%,
+# progressDeadlineSeconds omitted). StatefulSet and DaemonSet ignore these.
+
+name: rollout-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+  deployment:
+    minReadySeconds: 0             # no readiness debounce (0 is honoured)
+    progressDeadlineSeconds: 300
+    strategyMaxSurge: "25%"
+    strategyMaxUnavailable: 0      # surge-only rollouts
+
+# Inherits all four global values.
+web:
+  ports:
+    http: 8080
+
+# Overrides one key; the other three still come from global.deployment.
+worker:
+  minReadySeconds: 30

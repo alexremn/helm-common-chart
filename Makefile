@@ -50,6 +50,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   sidecars \
                   schema-reserved-keys \
                   global-pdb-minavailable \
+                  global-deployment-rollout \
                   extsecret-datafrom \
                   extsecret-properties-map \
                   config-checksum \

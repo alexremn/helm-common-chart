@@ -1,0 +1,43 @@
+# Exercises the global.deployment rollout fallbacks: minReadySeconds,
+# progressDeadlineSeconds, strategyMaxSurge, strategyMaxUnavailable.
+# Precedence for each: <cmp>.<key> > global.deployment.<key> > built-in default.
+# web sets none of the four, so it inherits every global value, including the
+# explicit 0s (minReadySeconds 0, not 10; maxUnavailable 0, not 25%).
+# override sets all four, so none of the global values reach it.
+# api-gateway sets one key and one component-level 0: its minReadySeconds wins,
+# the 0 surge counts as unset and falls through to the global 50%, the other
+# two are inherited.
+name: global-deployment-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+  deployment:
+    minReadySeconds: 0
+    progressDeadlineSeconds: 900
+    strategyMaxSurge: "50%"
+    strategyMaxUnavailable: 0
+
+web:
+  ports:
+    http: 8080
+
+override:
+  ports:
+    http: 8081
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  strategyMaxSurge: 2
+  strategyMaxUnavailable: "10%"
+
+# The smoke chart renders the api-gateway Deployment when this key exists and
+# reads its values from api_gateway (valuesKey turns the hyphen into "_").
+api-gateway: {}
+
+api_gateway:
+  ports:
+    http: 8082
+  minReadySeconds: 30
+  strategyMaxSurge: 0

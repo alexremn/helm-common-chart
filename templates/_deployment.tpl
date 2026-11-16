@@ -45,11 +45,17 @@ spec:
   {{- /* Defaults apply only when unset/null: `default`/`with` would also discard an explicit 0. */}}
   replicas: {{ ternary 1 (int $componentValues.replicas) (kindIs "invalid" $componentValues.replicas) }}
   {{- end }}
-  minReadySeconds: {{ ternary 10 $componentValues.minReadySeconds (kindIs "invalid" $componentValues.minReadySeconds) }}
+  {{- /* Rollout keys: <cmp>.<key> > global.deployment.<key> > built-in default.
+         The global level is skipped only when unset/null, so a global 0 is kept;
+         the component-level checks are unchanged. */}}
+  {{- $minReady := $componentValues.minReadySeconds }}
+  {{- if kindIs "invalid" $minReady }}{{ $minReady = dig "global" "deployment" "minReadySeconds" nil $values }}{{- end }}
+  minReadySeconds: {{ ternary 10 $minReady (kindIs "invalid" $minReady) }}
   {{- if not (kindIs "invalid" $componentValues.revisionHistoryLimit) }}
   revisionHistoryLimit: {{ $componentValues.revisionHistoryLimit }}
   {{- end }}
-  {{- with $componentValues.progressDeadlineSeconds }}
+  {{- /* 0 is not a valid deadline, so at either level it counts as unset. */}}
+  {{- with $componentValues.progressDeadlineSeconds | default (dig "global" "deployment" "progressDeadlineSeconds" nil $values) }}
   progressDeadlineSeconds: {{ . }}
   {{- end }}
   {{- with $componentValues.paused }}
@@ -59,8 +65,10 @@ spec:
     type: {{ default "RollingUpdate" $componentValues.strategyType }}
     {{- if eq (default "RollingUpdate" $componentValues.strategyType) "RollingUpdate" }}
     rollingUpdate:
-      maxUnavailable: {{ default "25%" $componentValues.strategyMaxUnavailable }}
-      maxSurge: {{ default "1" $componentValues.strategyMaxSurge }}
+      {{- $maxUnavailable := $componentValues.strategyMaxUnavailable | default (dig "global" "deployment" "strategyMaxUnavailable" nil $values) }}
+      {{- $maxSurge := $componentValues.strategyMaxSurge | default (dig "global" "deployment" "strategyMaxSurge" nil $values) }}
+      maxUnavailable: {{ ternary "25%" $maxUnavailable (kindIs "invalid" $maxUnavailable) }}
+      maxSurge: {{ ternary "1" $maxSurge (kindIs "invalid" $maxSurge) }}
     {{- end }}
   selector:
     matchLabels:
