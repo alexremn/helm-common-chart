@@ -2,7 +2,7 @@ apiVersion: v2
 name: common
 description: Library Helm chart providing reusable templates for Kubernetes workloads, services, autoscaling, and observability.
 type: library
-version: "2.8.4"
+version: "2.9.0"
 kubeVersion: ">=1.24-0"
 home: https://github.com/alexremn/helm-common-chart
 sources:
@@ -30,9 +30,11 @@ annotations:
       url: https://github.com/alexremn/helm-common-chart/blob/main/docs/values-reference.md
   artifacthub.io/changes: |
     - kind: added
-      description: "global.deployment.minReadySeconds, progressDeadlineSeconds, strategyMaxSurge and strategyMaxUnavailable: chart-wide fallbacks for the Deployment rollout keys. Each key resolves as <component>.<key>, then global.deployment.<key>, then the built-in default (10, omitted, 1, 25%). A global 0 is honoured for minReadySeconds, strategyMaxSurge and strategyMaxUnavailable; progressDeadlineSeconds: 0 counts as unset at either level. StatefulSet and DaemonSet are not affected."
+      description: "chart.agentgatewaypolicy: one agentgateway.dev/v1alpha1 AgentgatewayPolicy per <component>.agentgatewayPolicies entry (the policy spec as is, plus optional annotations), for clusters whose Gateway API implementation is agentgateway. Without targetRefs or targetSelectors an entry targets every HTTPRoute chart.httproute renders for the component; on a component without a route that is a render error."
+    - kind: added
+      description: "chart.httproute passes a rule's name through, so a policy can target one rule by sectionName."
     - kind: changed
-      description: "charts that set none of the four global keys render exactly as before. Once a global key is set, a component-level 0 for strategyMaxSurge or strategyMaxUnavailable (already discarded in favour of the built-in default) falls through to the global value instead."
+      description: "charts that set neither agentgatewayPolicies nor a rule name render exactly as before. A rules[].name that was already set used to be dropped and is now rendered."
   artifacthub.io/signKey: |
     fingerprint: keyless
     url: https://github.com/alexremn/helm-common-chart/blob/main/SECURITY.md#verification
