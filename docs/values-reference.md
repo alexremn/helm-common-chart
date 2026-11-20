@@ -99,7 +99,7 @@ See: PVC behavior is exercised in profile and statefulset variants.
 
 ## Networking
 
-Keys: `service`, `ingress`, `httpRoute`, `networkPolicy`.
+Keys: `service`, `ingress`, `httpRoute`, `agentgatewayPolicies`, `networkPolicy`.
 
 `service.type`, `service.ports` (named map matching container ports); `ingress.hosts[]`, `ingress.tls[]`, `ingress.annotations`; `networkPolicy.ingress[]` / `egress[]` with shorthand for common patterns.
 
@@ -122,9 +122,37 @@ Keys: `service`, `ingress`, `httpRoute`, `networkPolicy`.
           - { name: web, port: 8080, weight: 100 }
 ```
 
-Gated on the `httpRoute` key, so existing consumers are unaffected. With no `rules`, a single catch-all rule routes to the component Service.
+Gated on the `httpRoute` key, so existing consumers are unaffected. With no `rules`, a single catch-all rule routes to the component Service. A rule's `name` is passed through, so a policy can target that one rule by `sectionName`.
 
-See: [`examples/values.networkpolicy.yaml`](../examples/values.networkpolicy.yaml).
+**`agentgatewayPolicies` — agentgateway (`chart.agentgatewaypolicy`).** For clusters whose Gateway API implementation is [agentgateway](https://agentgateway.dev): what a route takes from a policy rather than from the HTTPRoute itself (CORS, basic auth, a direct response, ...). Renders one `agentgateway.dev/v1alpha1` AgentgatewayPolicy per entry, named `<cmp>-<key>`. An entry is the policy spec as is, plus optional `annotations`:
+
+```yaml
+<cmp>:
+  httpRoute:
+    parentRefs: [{ name: external-gateway, namespace: gateway-system }]
+    hostnames: [app.example.com]
+    rules:
+      - name: internal            # a named rule, for the second policy
+        matches:
+          - path: { type: PathPrefix, value: /internal }
+      - matches:
+          - path: { type: PathPrefix, value: / }
+  agentgatewayPolicies:
+    cors:                         # no targetRefs -> every HTTPRoute of the component
+      traffic:
+        cors:
+          allowOrigins: ["https://*.example.com"]
+          allowMethods: [GET, POST, OPTIONS]
+    deny-internal:                # targetRefs / targetSelectors are kept as given
+      targetRefs:
+        - { group: gateway.networking.k8s.io, kind: HTTPRoute, name: web, sectionName: internal }
+      traffic:
+        directResponse: { status: 404 }
+```
+
+Without `targetRefs` or `targetSelectors` an entry targets every HTTPRoute `chart.httproute` renders for the component (`httpRoute` and each `httpRoutes` entry); on a component without a route that is a render error. An empty entry (`null` or `{}`) renders nothing. Keys become part of the object name, so keep them lowercase and distinct once `_` reads as `-`. Gated on the `agentgatewayPolicies` key.
+
+See: [`examples/values.agentgatewaypolicy.yaml`](../examples/values.agentgatewaypolicy.yaml), [`examples/values.networkpolicy.yaml`](../examples/values.networkpolicy.yaml).
 
 ### `<cmp>.networkPolicy`
 

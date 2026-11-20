@@ -1,0 +1,65 @@
+# Example values for agentgateway policies next to a Gateway API route
+# Use as: -f examples/values.agentgatewaypolicy.yaml
+#
+# For clusters whose Gateway API implementation is agentgateway. Each entry of
+# <cmp>.agentgatewayPolicies renders one AgentgatewayPolicy named <cmp>-<key>;
+# the entry is the policy spec as is. Without targetRefs/targetSelectors it
+# targets every HTTPRoute of the component.
+
+name: gateway-policy-app
+environment: dev
+
+global:
+  image:
+    repository: ghcr.io/example/web
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: external-gateway
+        namespace: gateway-system
+    hostnames:
+      - app.example.com
+    rules:
+      # A named rule, so the deny-internal policy can target just this one.
+      - name: internal
+        matches:
+          - path:
+              type: PathPrefix
+              value: /internal
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+  agentgatewayPolicies:
+    # No targetRefs: applies to the route above.
+    cors:
+      traffic:
+        cors:
+          allowOrigins:
+            - https://*.example.com
+          allowMethods: [GET, POST, OPTIONS]
+          allowHeaders: [Authorization, Content-Type]
+          allowCredentials: true
+          maxAge: 600
+    # htpasswd lines under the key "auth" of the Secret web-basic-auth.
+    auth:
+      traffic:
+        basicAuthentication:
+          realm: Authentication Required
+          secretRef:
+            name: web-basic-auth
+            key: auth
+    # One rule only: answer /internal with 404 instead of routing it.
+    deny-internal:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: web
+          sectionName: internal
+      traffic:
+        directResponse:
+          status: 404

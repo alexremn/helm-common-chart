@@ -1,0 +1,69 @@
+# Exercises chart.agentgatewaypolicy: an entry without targetRefs targets every
+# HTTPRoute of the component (the singular one and each httpRoutes entry), an
+# entry with targetRefs keeps them (here one named rule of the route), an entry
+# set to null renders nothing. The named rule also covers rules[].name.
+name: gateway-policy-app
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  httpRoute:
+    parentRefs:
+      - name: external-gateway
+        namespace: gateway-system
+    hostnames:
+      - app.example.com
+    rules:
+      - name: internal
+        matches:
+          - path:
+              type: PathPrefix
+              value: /internal
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+  httpRoutes:
+    admin:
+      parentRefs:
+        - name: external-gateway
+          namespace: gateway-system
+      hostnames:
+        - admin.example.com
+  agentgatewayPolicies:
+    cors:
+      annotations:
+        example.com/owner: platform
+      # Empty: as if not given, the default targets apply (and only once).
+      targetRefs: []
+      traffic:
+        cors:
+          allowOrigins:
+            - https://*.example.com
+          allowMethods: [GET, POST, OPTIONS]
+          allowHeaders: [Authorization, Content-Type]
+          allowCredentials: true
+          maxAge: 600
+    auth:
+      traffic:
+        basicAuthentication:
+          realm: Authentication Required
+          secretRef:
+            name: web-basic-auth
+            key: auth
+    deny_internal:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: web
+          sectionName: internal
+      traffic:
+        directResponse:
+          status: 404
+    disabled: null

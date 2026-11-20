@@ -40,7 +40,7 @@ Usage: {{ include "chart.httproute" (dict "Values" .Values "Release" .Release "C
 {{- if kindIs "map" $httpRoutes }}
 {{- range $name, $entryHr := $httpRoutes }}
 {{- if $entryHr }}
-{{- $entries = append $entries (dict "name" (include "common.cmp.dns" (printf "%s-%s-httproute" $cmp $name) | trim) "hr" $entryHr) }}
+{{- $entries = append $entries (dict "name" (include "common.httproute.entryName" (dict "cmp" $cmp "key" $name) | trim) "hr" $entryHr) }}
 {{- end }}
 {{- end }}
 {{- end }}

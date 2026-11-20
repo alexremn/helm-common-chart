@@ -55,6 +55,7 @@ SMOKE_VARIANTS := generic werf-legacy image-resolution features profile-generic 
                   extsecret-properties-map \
                   config-checksum \
                   httproute httproute-redirect httproute-multi httproute-timeouts httproute-both \
+                  agentgatewaypolicy \
                   annotations \
                   werf-service-values \
                   argocd \
@@ -119,7 +120,7 @@ golden-check: render-smoke
 
 # Negative render checks — these fixtures MUST fail (invalid input rejected).
 # Not part of SMOKE_VARIANTS (would break render-smoke / golden-check).
-NEGATIVE_VARIANTS := security-invalid affinity-scalar hpa-badkind extrapodconfig-containers hpa-no-maxreplicas deploytool-invalid argocd-lookup config-define-badtype configmap-nil-value dbpool-missing-input dbpool-bad-cpu
+NEGATIVE_VARIANTS := security-invalid affinity-scalar hpa-badkind extrapodconfig-containers hpa-no-maxreplicas deploytool-invalid argocd-lookup config-define-badtype configmap-nil-value dbpool-missing-input dbpool-bad-cpu agentgatewaypolicy-no-target
 
 lint-negative:
 	( cd $(SMOKE_DIR) && \

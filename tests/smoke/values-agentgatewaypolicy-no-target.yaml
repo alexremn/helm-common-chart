@@ -1,0 +1,19 @@
+# NEGATIVE: a policy without targetRefs/targetSelectors on a component that
+# renders no HTTPRoute has nothing to default to and must be rejected, instead
+# of rendering a policy the API server refuses.
+name: gateway-policy-no-target
+environment: production
+
+global:
+  image:
+    repository: ghcr.io/example/app
+    tag: "1.0.0"
+
+web:
+  ports:
+    http: 8080
+  agentgatewayPolicies:
+    cors:
+      traffic:
+        cors:
+          allowOrigins: ["*"]

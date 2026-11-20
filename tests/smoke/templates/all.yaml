@@ -79,6 +79,9 @@
 {{- if and $hasWeb (or (hasKey (index .Values "web") "httpRoute") (hasKey (index .Values "web") "httpRoutes")) }}
 {{ include "chart.httproute" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}
+{{- if and $hasWeb (hasKey (index .Values "web") "agentgatewayPolicies") }}
+{{ include "chart.agentgatewaypolicy" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
+{{- end }}
 {{- if or (and $hasWeb (hasKey (index .Values "web") "networkPolicy")) (hasKey .Values "networkPolicies") }}
 {{ include "chart.networkpolicy" (dict "Values" .Values "Release" .Release "Chart" .Chart "cmp" "web") }}
 {{- end }}

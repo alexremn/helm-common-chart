@@ -1,0 +1,298 @@
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway-policy-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+data:
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    app.kubernetes.io/instance: smoke
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway-policy-app
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: smoke
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: common-smoke-0.1.0
+        app.kubernetes.io/name: gateway-policy-app
+        app.kubernetes.io/component: web
+        helm.sh/environment: "production"
+        app.kubernetes.io/instance: smoke
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "7.8.9"
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/example/app:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: web-auth
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: web
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: web-admin-httproute
+  traffic:
+    basicAuthentication:
+      realm: Authentication Required
+      secretRef:
+        key: auth
+        name: web-basic-auth
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: web-cors
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+  annotations:
+    example.com/owner: platform
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: web
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: web-admin-httproute
+  traffic:
+    cors:
+      allowCredentials: true
+      allowHeaders:
+      - Authorization
+      - Content-Type
+      allowMethods:
+      - GET
+      - POST
+      - OPTIONS
+      allowOrigins:
+      - https://*.example.com
+      maxAge: 600
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: web-deny-internal
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: web
+    sectionName: internal
+  traffic:
+    directResponse:
+      status: 404
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  parentRefs:
+    - name: external-gateway
+      namespace: gateway-system
+  hostnames:
+    - app.example.com
+  rules:
+    -
+      name: "internal"
+      matches:
+        - path:
+            type: PathPrefix
+            value: /internal
+      backendRefs:
+        - name: web
+          port: 8080
+    -
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: web
+          port: 8080
+---
+# Source: common-smoke/templates/all.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web-admin-httproute
+  labels:
+    helm.sh/chart: common-smoke-0.1.0
+    app.kubernetes.io/name: gateway-policy-app
+    app.kubernetes.io/component: web
+    helm.sh/environment: "production"
+    app.kubernetes.io/instance: smoke
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "7.8.9"
+spec:
+  parentRefs:
+    - name: external-gateway
+      namespace: gateway-system
+  hostnames:
+    - admin.example.com
+  rules:
+    - backendRefs:
+        - name: web
+          port: 8080

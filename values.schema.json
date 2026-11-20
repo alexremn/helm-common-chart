@@ -799,6 +799,13 @@
           "additionalProperties": true,
           "description": "Gateway API HTTPRoute (chart.httproute): parentRefs, hostnames, rules, port. backendRefs default to the component's Service."
         },
+        "agentgatewayPolicies": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["object", "null"]
+          },
+          "description": "agentgateway AgentgatewayPolicy objects (chart.agentgatewaypolicy), one per entry named <component>-<key>: the policy spec as is, plus optional annotations. Without targetRefs or targetSelectors an entry targets the component's HTTPRoute(s). null renders nothing."
+        },
         "scaling": {
           "type": "object",
           "additionalProperties": true,

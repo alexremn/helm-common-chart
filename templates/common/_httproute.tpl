@@ -1,4 +1,15 @@
 {{/*
+Name of the HTTPRoute of an `httpRoutes` entry. One definition for chart.httproute,
+which renders it, and chart.agentgatewaypolicy, which targets it by that name.
+Expects:
+- .cmp: the component name
+- .key: the entry's key in httpRoutes
+*/}}
+{{- define "common.httproute.entryName" -}}
+{{- include "common.cmp.dns" (printf "%s-%s-httproute" .cmp .key) -}}
+{{- end -}}
+
+{{/*
 Render the rules of an HTTPRoute.
 Expects:
 - .hr: the route spec (httpRoute or an httpRoutes entry)
@@ -13,6 +24,9 @@ rules:
 {{- if $hr.rules }}
 {{- range $hr.rules }}
   -
+    {{- with .name }}
+    name: {{ . | quote }}
+    {{- end }}
     {{- with .matches }}
     matches:
       {{- toYaml . | nindent 6 }}
